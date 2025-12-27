@@ -1,0 +1,24 @@
+# 環境変数（APIキーを含む）
+.env
+
+# Python仮想環境
+.venv/
+
+# Pythonキャッシュ
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+.history/
+
+# Claude Code
+.claude/
