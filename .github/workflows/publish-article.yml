@@ -1,0 +1,100 @@
+name: Publish Article to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'langchain_cheatsheet.md'
+      - '.github/workflows/publish-article.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Build HTML from Markdown
+        run: |
+          mkdir -p _site
+
+          # HTMLヘッダー
+          cat > _site/index.html << 'HTMLHEADER'
+          <!DOCTYPE html>
+          <html lang="ja">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>LangChain チートシート</title>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.5.0/github-markdown.min.css">
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+            <style>
+              body {
+                box-sizing: border-box;
+                min-width: 200px;
+                max-width: 980px;
+                margin: 0 auto;
+                padding: 45px;
+                background-color: #f6f8fa;
+              }
+              .markdown-body {
+                background-color: white;
+                padding: 45px;
+                border-radius: 6px;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+              }
+              @media (max-width: 767px) {
+                body {
+                  padding: 15px;
+                }
+                .markdown-body {
+                  padding: 15px;
+                }
+              }
+            </style>
+          </head>
+          <body>
+            <article class="markdown-body">
+          HTMLHEADER
+
+          # MarkdownをHTMLに変換（シンプルな方法）
+          sudo apt-get update && sudo apt-get install -y pandoc
+          pandoc langchain_cheatsheet.md -f markdown -t html >> _site/index.html
+
+          # HTMLフッター
+          cat >> _site/index.html << 'HTMLFOOTER'
+            </article>
+            <script>hljs.highlightAll();</script>
+          </body>
+          </html>
+          HTMLFOOTER
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
