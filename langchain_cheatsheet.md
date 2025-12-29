@@ -2,7 +2,58 @@
 
 電車で覚える用。現場で使うものだけに絞りました。
 
+**最終更新日:** 2025-12-30
+
 ---
+
+<!-- タブUI用のHTML/CSS -->
+<style>
+.tab-container {
+  margin: 20px 0;
+}
+.tab-buttons {
+  display: flex;
+  gap: 4px;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 20px;
+}
+.tab-button {
+  padding: 12px 24px;
+  border: none;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px 8px 0 0;
+  transition: all 0.2s;
+}
+.tab-button:hover {
+  background: #e8e8e8;
+}
+.tab-button.active {
+  background: #4CAF50;
+  color: white;
+}
+.tab-content {
+  display: none;
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 0 0 8px 8px;
+}
+.tab-content.active {
+  display: block;
+}
+</style>
+
+<div class="tab-container">
+<div class="tab-buttons">
+  <button class="tab-button active" onclick="openTab(event, 'basic')">基礎</button>
+  <button class="tab-button" onclick="openTab(event, 'advanced')">応用</button>
+  <button class="tab-button" onclick="openTab(event, 'reference')">補足</button>
+</div>
+
+<!-- ==================== 基礎タブ ==================== -->
+<div id="basic" class="tab-content active">
 
 ## 1. なぜLangChainを使うのか
 
@@ -210,7 +261,10 @@ print(result)          # → "こんにちは！"（.content 不要）
 
 **使い所:** チェーンの最後に付けると、`.content` を書かなくて済む
 
----
+</div>
+
+<!-- ==================== 応用タブ ==================== -->
+<div id="advanced" class="tab-content">
 
 ## 7. Runnable（パイプラインで関数を使う）
 
@@ -718,7 +772,10 @@ for chunk in llm.stream("長い話をして"):
 | `must have a docstring` | @toolにdocstringがない | `"""説明"""` を追加 |
 | `{"a", "b"}` がエラー | セットになってる | `("a", "b")` タプルに |
 
----
+</div>
+
+<!-- ==================== 補足タブ ==================== -->
+<div id="reference" class="tab-content">
 
 # 補足資料
 
@@ -1052,6 +1109,29 @@ query = "りんごの産地は？"
 ```
 
 SQLで言うと `WHERE query LIKE '%りんご%'` と同じ意味。
+
+</div>
+</div>
+
+<!-- タブ切り替え用JavaScript -->
+<script>
+function openTab(evt, tabName) {
+  var i, tabcontent, tabbuttons;
+
+  tabcontent = document.getElementsByClassName("tab-content");
+  for (i = 0; i < tabcontent.length; i++) {
+    tabcontent[i].className = tabcontent[i].className.replace(" active", "");
+  }
+
+  tabbuttons = document.getElementsByClassName("tab-button");
+  for (i = 0; i < tabbuttons.length; i++) {
+    tabbuttons[i].className = tabbuttons[i].className.replace(" active", "");
+  }
+
+  document.getElementById(tabName).className += " active";
+  evt.currentTarget.className += " active";
+}
+</script>
 
 ---
 
