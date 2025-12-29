@@ -212,7 +212,52 @@ print(result)          # → "こんにちは！"（.content 不要）
 
 ---
 
-## 7. 構造化出力（with_structured_output）
+## 7. Runnable（パイプラインで関数を使う）
+
+### 3つの方法
+
+```python
+from langchain_core.runnables import RunnableLambda
+from langchain_core.runnables import chain
+
+# 方法1: lambda（最も一般的）★よく使う
+chain = (
+    (lambda x: x.upper())
+    | (lambda x: f"結果: {x}")
+)
+chain.invoke("hello")  # → "結果: HELLO"
+
+# 方法2: RunnableLambda（明示的に書く場合）
+RunnableLambda(lambda x: x.upper())
+
+# 方法3: @chain デコレータ（複雑な処理の場合）あまり使わない
+@chain
+def process(data):
+    return data.upper()
+```
+
+### 実践パターン: 文字列 → 辞書に変換
+
+```python
+# よくあるパターン: 文字列入力を辞書に変換して次に渡す
+chain = (
+    (lambda x: {"dish": x})  # 文字列 → 辞書
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+
+chain.invoke("オムライス")  # 文字列で直接呼べる
+```
+
+**まとめ:**
+- `lambda x: ...` を使えばOK（90%のケースはこれで十分）
+- `RunnableLambda` は明示的に書きたい時だけ
+- `@chain` は複雑な処理をまとめたい時（めったに使わない）
+
+---
+
+## 8. 構造化出力（with_structured_output）
 
 LLMの出力を決まった形（Pythonオブジェクト）で取得する。
 
@@ -319,7 +364,7 @@ result = chain.invoke({"ingredient": "今日の天気"})
 
 ---
 
-## 8. RAG（検索拡張生成）
+## 9. RAG（検索拡張生成）
 
 ### RAGとは？
 
@@ -489,33 +534,106 @@ pip install langchain-google-community
 
 ---
 
-## 9. Function Calling
+## 10. Function Calling
 
-AIが「どの関数を呼ぶか」を判断する機能。
+### Function Calling とは？
+
+**AIが「どの関数を呼ぶべきか」を判断し、引数を生成する機能**
+
+```
+ユーザー: 「東京の天気は？」
+    ↓
+AI: 「get_weather関数を、city="東京"で呼ぶべきだ」
+    ↓
+開発者: 実際に関数を実行
+    ↓
+結果: 「東京は晴れです」
+```
+
+**重要:** AIは「どの関数を呼ぶか」を判断するだけ。**実行は自分でやる**。
+
+### 基本の流れ（3ステップ）
 
 ```python
 from langchain_core.tools import tool
+from langchain_google_genai import ChatGoogleGenerativeAI
 
-# 1. ツールを定義（docstringは必須！）
+# ステップ1: ツールを定義（docstringは必須！）
+@tool
+def get_weather(city: str) -> str:
+    """指定した都市の天気を取得する"""  # ← これがないとエラー
+    return f"{city}の天気は晴れです"
+
+# ステップ2: LLMにツールをバインド
+llm = ChatGoogleGenerativeAI(...)
+llm_with_tools = llm.bind_tools([get_weather])
+
+# ステップ3: 質問 → AIの判断を取得 → 実行
+response = llm_with_tools.invoke("東京の天気は？")
+
+if response.tool_calls:
+    tool_call = response.tool_calls[0]
+    print(tool_call["name"])  # → "get_weather"
+    print(tool_call["args"])  # → {"city": "東京"}
+
+    # 実際に実行
+    result = get_weather.invoke(tool_call["args"])
+    print(result)  # → "東京の天気は晴れです"
+```
+
+### 覚えること
+
+| 項目 | 内容 |
+|------|------|
+| `@tool` | 関数をツール化するデコレータ |
+| `"""docstring"""` | **必須**。AIがこれを見て判断する |
+| `.bind_tools([...])` | LLMにツールを教える |
+| `response.tool_calls` | AIが「呼ぶべき」と判断したツール情報 |
+| `tool_call["name"]` | ツール名 |
+| `tool_call["args"]` | AIが生成した引数 |
+
+### なぜ docstring が必須？
+
+```python
+@tool
+def get_weather(city: str) -> str:
+    """指定した都市の天気を取得する"""  # ← AIはこれを見て判断する
+    return f"{city}の天気は晴れです"
+```
+
+**AIの内部処理（イメージ）:**
+```
+利用可能なツール:
+- get_weather: 「指定した都市の天気を取得する」 ← docstringがそのまま使われる
+
+ユーザーの質問: 「東京の天気は？」
+→ 天気に関する質問だから get_weather を使おう
+→ 引数は city="東京" だな
+```
+
+docstringがないと、AIは「この関数が何をするか」がわからない。
+
+### 複数ツールの場合
+
+```python
 @tool
 def get_weather(city: str) -> str:
     """指定した都市の天気を取得する"""
     return f"{city}の天気は晴れです"
 
-# 2. LLMにツールをバインド
-llm_with_tools = llm.bind_tools([get_weather])
+@tool
+def calculate(expression: str) -> str:
+    """数式を計算する"""
+    return str(eval(expression))
 
-# 3. 質問する
-response = llm_with_tools.invoke("東京の天気は？")
+# 複数のツールをバインド
+llm_with_tools = llm.bind_tools([get_weather, calculate])
 
-# 4. ツールを実行（手動）
-if response.tool_calls:
-    tool_call = response.tool_calls[0]
-    result = get_weather.invoke(tool_call["args"])
-    print(result)
+# AIが適切なツールを選ぶ
+response = llm_with_tools.invoke("100 + 200 は？")
+# → tool_call["name"] = "calculate"
+# → tool_call["args"] = {"expression": "100 + 200"}
 ```
-
-**ポイント:** AIは「どの関数を呼ぶか」を決めるだけ。実行は自分でやる。
 
 ### 構造化データの取得にも使える
 
@@ -543,9 +661,20 @@ response.tool_calls[0]["args"]
 # → {"name": "田中太郎", "age": 30, "city": "東京"}
 ```
 
+### with_structured_output との違い
+
+| 機能 | 用途 | 特徴 |
+|------|------|------|
+| Function Calling | ツールを呼び出す | AIが「どの関数を呼ぶか」も判断 |
+| with_structured_output | 出力形式を固定 | 必ず指定した形式で返す |
+
+**使い分け:**
+- 「天気を調べて」「計算して」→ Function Calling（ツール選択が必要）
+- 「レシピを教えて」→ with_structured_output（形式を固定したいだけ）
+
 ---
 
-## 10. 会話履歴（チャットボット用）
+## 11. 会話履歴（チャットボット用）
 
 ```python
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
@@ -568,7 +697,7 @@ result = prompt.invoke({
 
 ---
 
-## 11. ストリーミング（参考程度でOK）
+## 12. ストリーミング（参考程度でOK）
 
 ChatGPTみたいに「文字がポロポロ出てくる」演出。UI演出なので後回しでOK。
 
@@ -581,7 +710,7 @@ for chunk in llm.stream("長い話をして"):
 
 ---
 
-## 12. よくあるエラー
+## 13. よくあるエラー
 
 | エラー | 原因 | 解決 |
 |--------|------|------|
@@ -597,7 +726,96 @@ for chunk in llm.stream("長い話をして"):
 
 ---
 
-## 補足A. Vector Store と Embedding（本番RAG）
+## 補足A. Python基礎: クラス・インスタンス・デコレータ
+
+LangChainを理解するために必要なPythonの基礎知識。
+
+### クラスとインスタンス
+
+```python
+# クラス = 設計図
+class Dog:
+    def __init__(self, name):   # 初期化（自動で呼ばれる）
+        self.name = name        # self = このインスタンス自体
+
+    def bark(self):             # メソッド（手動で呼ぶ）
+        return f"{self.name}がワン！"
+
+# インスタンス = 設計図から作った実体
+dog1 = Dog("ポチ")   # → __init__(self=dog1, name="ポチ") が自動実行
+dog2 = Dog("タロウ")
+
+dog1.bark()  # → "ポチがワン！"（self = dog1）
+dog2.bark()  # → "タロウがワン！"（self = dog2）
+```
+
+### selfの理解（重要！）
+
+```python
+# selfは「ポチ」ではなく「dog1」
+dog1 = Dog("ポチ")
+
+# dog1.bark() が呼ばれると
+#   → bark(self=dog1) として実行される
+#   → self.name は dog1.name = "ポチ"
+
+# イメージ
+# dog1 = 箱（インスタンス）
+# "ポチ" = 箱の中身（値）
+# self = 箱自体を指す
+```
+
+### __init__ の理解
+
+```python
+# __init__ = 定義は書くが、呼び出しは書かない
+class Dog:
+    def __init__(self, name):  # ← 定義は書く
+        self.name = name
+
+dog1 = Dog("ポチ")  # ← 呼び出しは書かない（Pythonが自動で呼ぶ）
+```
+
+**よくある疑問:**
+- Q: `__init__` は「自動で呼ばれる」のに、なぜ書くの？
+- A: 「何をするか」は自分で決める必要があるから。Pythonが呼ぶタイミングは決まっているが、処理内容は自分で書く
+
+### __init__ がないクラス
+
+```python
+# データを持たない場合は __init__ 不要
+class Calculator:
+    def add(self, a, b):
+        return a + b
+
+calc = Calculator()  # 何も渡さなくてOK
+calc.add(1, 2)  # → 3
+```
+
+### @（デコレータ）
+
+```python
+# 関数を「ラップ」して追加機能を付ける構文
+
+# LangChainでよく使うデコレータ
+@tool   # 関数をLLMのツールにする（よく使う）
+@chain  # 関数をパイプライン部品にする（あまり使わない）
+
+# 例
+from langchain_core.tools import tool
+
+@tool
+def get_weather(city: str) -> str:
+    """指定した都市の天気を取得する"""
+    return f"{city}の天気は晴れです"
+
+# @tool を付けると .invoke() で呼べるようになる
+get_weather.invoke({"city": "東京"})  # → "東京の天気は晴れです"
+```
+
+---
+
+## 補足B. Vector Store と Embedding（本番RAG）
 
 ### 簡易検索の限界
 
@@ -666,7 +884,7 @@ Embeddingしたデータを保存・検索するデータベース。
 
 ---
 
-## 補足B. Pydantic
+## 補足C. Pydantic
 
 ### なぜ Pydantic？
 
@@ -719,7 +937,7 @@ class Recipe(BaseModel):
 
 ---
 
-## 補足C. Python文法メモ
+## 補足D. Python文法メモ
 
 ### タプル・辞書・セット
 
