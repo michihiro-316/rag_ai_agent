@@ -2,7 +2,7 @@
 
 電車で覚える用。現場で使うものだけに絞りました。
 
-**最終更新日:** 2025-12-30
+**最終更新日:** 2025-12-31
 
 ---
 
@@ -268,50 +268,101 @@ print(result)          # → "こんにちは！"（.content 不要）
 
 ## 7. Runnable（パイプラインで関数を使う）
 
+> **このセクションの主要関数:** `lambda` / `RunnableLambda` / `@chain`
+
 ### 3つの方法
 
 ```python
 from langchain_core.runnables import RunnableLambda
-from langchain_core.runnables import chain
+from langchain_core.runnables import chain  # ← @chain デコレータ用
 
 # 方法1: lambda（最も一般的）★よく使う
-chain = (
+my_chain = (
     (lambda x: x.upper())
     | (lambda x: f"結果: {x}")
 )
-chain.invoke("hello")  # → "結果: HELLO"
+my_chain.invoke("hello")  # → "結果: HELLO"
 
 # 方法2: RunnableLambda（明示的に書く場合）
 RunnableLambda(lambda x: x.upper())
 
-# 方法3: @chain デコレータ（複雑な処理の場合）あまり使わない
-@chain
-def process(data):
-    return data.upper()
+# 方法3: @chain デコレータ（複雑な処理の場合）
+# → 下の「@chainの実践例」を参照
 ```
 
 ### 実践パターン: 文字列 → 辞書に変換
 
 ```python
 # よくあるパターン: 文字列入力を辞書に変換して次に渡す
-chain = (
+my_chain = (
     (lambda x: {"dish": x})  # 文字列 → 辞書
     | prompt
     | llm
     | StrOutputParser()
 )
 
-chain.invoke("オムライス")  # 文字列で直接呼べる
+my_chain.invoke("オムライス")  # 文字列で直接呼べる
+```
+
+### @chain の実践例（複雑な処理をまとめる）
+
+lambdaでは書きにくい「複数行の処理」や「条件分岐」がある場合に使う。
+
+```python
+from langchain_core.runnables import chain
+
+@chain
+def validate_and_format(input_text: str) -> dict:
+    """入力を検証してフォーマットする"""
+    # 複数行の処理が書ける
+    text = input_text.strip()
+
+    if len(text) < 2:
+        return {"error": "入力が短すぎます", "dish": None}
+
+    # 先頭を大文字に
+    formatted = text.capitalize()
+
+    return {"dish": formatted, "original": text}
+
+# パイプラインで使える
+my_chain = validate_and_format | prompt | llm | StrOutputParser()
+
+my_chain.invoke("カレー")
+# → {"dish": "カレー", "original": "カレー"} がpromptに渡る
+```
+
+**@chain を使う場面:**
+| 場面 | 例 |
+|------|-----|
+| 複数行の処理 | 入力の検証、整形、変換など |
+| 条件分岐 | if文で処理を分ける |
+| try-except | エラーハンドリングが必要な時 |
+| デバッグ | print文を入れたい時 |
+
+**lambda vs @chain:**
+```python
+# lambda: 1行で書ける簡単な処理
+(lambda x: {"dish": x})
+
+# @chain: 複数行や条件分岐がある処理
+@chain
+def process(x):
+    if not x:
+        return {"error": "empty"}
+    return {"dish": x.strip()}
 ```
 
 **まとめ:**
 - `lambda x: ...` を使えばOK（90%のケースはこれで十分）
 - `RunnableLambda` は明示的に書きたい時だけ
-- `@chain` は複雑な処理をまとめたい時（めったに使わない）
+- `@chain` は複数行の処理・条件分岐・エラーハンドリングが必要な時
 
 ---
 
 ## 7.5 並列実行（RunnableParallel）
+
+> **このセクションの主要関数:** `RunnableParallel`
 
 ### 基本の使い方
 
@@ -359,6 +410,8 @@ result = chain.invoke("カレー")
 ---
 
 ## 7.6 条件分岐（RunnableBranch）
+
+> **このセクションの主要関数:** `RunnableBranch`
 
 ### 基本の使い方
 
@@ -434,6 +487,8 @@ RunnableBranch(
 
 ## 7.8 itemgetter（補足）
 
+> **このセクションの主要関数:** `itemgetter`
+
 dictから値を取り出す方法。lambdaでも書けるが、itemgetterは短く書ける。
 
 ```python
@@ -452,6 +507,8 @@ itemgetter("name", "age")  # → (name値, age値) をタプルで返す
 ---
 
 ## 7.9 入力を保持して追加（RunnablePassthrough.assign）
+
+> **このセクションの主要関数:** `RunnablePassthrough.assign`
 
 ### 問題: チェーンを通すと元の情報が消える
 
@@ -541,6 +598,8 @@ RunnablePassthrough.assign(
 ---
 
 ## 8. 構造化出力（with_structured_output）
+
+> **このセクションの主要関数:** `llm.with_structured_output()` / `BaseModel` / `Field`
 
 LLMの出力を決まった形（Pythonオブジェクト）で取得する。
 
@@ -648,6 +707,8 @@ result = chain.invoke({"ingredient": "今日の天気"})
 ---
 
 ## 9. RAG（検索拡張生成）
+
+> **このセクションの主要関数:** `VertexAISearchRetriever` / `lambda x: x`
 
 ### RAGとは？
 
@@ -818,6 +879,8 @@ pip install langchain-google-community
 ---
 
 ## 10. Function Calling
+
+> **このセクションの主要関数:** `@tool` / `.bind_tools()` / `response.tool_calls`
 
 ### Function Calling とは？
 
