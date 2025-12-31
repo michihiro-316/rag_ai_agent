@@ -311,6 +311,235 @@ chain.invoke("オムライス")  # 文字列で直接呼べる
 
 ---
 
+## 7.5 並列実行（RunnableParallel）
+
+### 基本の使い方
+
+```python
+from langchain_core.runnables import RunnableParallel
+
+chain = RunnableParallel(
+    key1=チェーン1,
+    key2=チェーン2,
+)
+result = chain.invoke(入力)
+# → {"key1": 結果1, "key2": 結果2}
+```
+
+### 実践例: 複数観点で同時分析
+
+```python
+from langchain_core.runnables import RunnableParallel
+
+prompt_ingredients = ChatPromptTemplate.from_template("{dish}の材料を3つだけ")
+prompt_calories = ChatPromptTemplate.from_template("{dish}のカロリーを数値だけ")
+
+chain = (
+    (lambda x: {"dish": x})
+    | RunnableParallel(
+        ingredients=prompt_ingredients | llm | StrOutputParser(),
+        calories=prompt_calories | llm | StrOutputParser(),
+    )
+)
+
+result = chain.invoke("カレー")
+# → {"ingredients": "・玉ねぎ\n・肉\n・ルー", "calories": "約600kcal"}
+```
+
+### いつ使う？
+
+| ユースケース | 例 |
+|-------------|-----|
+| 複数観点で同時分析 | 感情分析 + キーワード抽出 + 要約 |
+| RAGで検索と質問を同時処理 | context=retriever, question=質問リライト |
+| 多言語同時翻訳 | english=英訳, chinese=中訳, korean=韓訳 |
+
+**ポイント:** 独立した処理を同時に走らせて**時間短縮**
+
+---
+
+## 7.6 条件分岐（RunnableBranch）
+
+### 基本の使い方
+
+```python
+from langchain_core.runnables import RunnableBranch
+
+branch = RunnableBranch(
+    (条件関数1, Trueの時のチェーン),
+    (条件関数2, Trueの時のチェーン),
+    デフォルトのチェーン,  # ← タプルじゃない = どれにも当てはまらない時
+)
+```
+
+### 実践例: 入力タイプ別ルーティング
+
+```python
+def is_food_question(x):
+    dish = x["dish"]  # ← 前のステップの出力がdictなら取り出す
+    return "カレー" in dish or "作り方" in dish or "レシピ" in dish
+
+prompt_recipe = ChatPromptTemplate.from_template("料理に関する情報：{dish}")
+
+chain = (
+    (lambda x: {"dish": x})
+    | RunnableBranch(
+        (is_food_question, prompt_recipe | llm | StrOutputParser()),
+        lambda x: "料理に関する質問をしてください"
+    )
+)
+
+chain.invoke("カレーの作り方")  # → レシピが返る
+chain.invoke("天気を教えて")    # → "料理に関する質問をしてください"
+```
+
+### いつ使う？
+
+| ユースケース | 例 |
+|-------------|-----|
+| 入力タイプ別ルーティング | コード質問 → コード生成、計算 → 計算チェーン |
+| 言語判定 | 日本語 → 日本語チェーン、英語 → 英語チェーン |
+| エラーハンドリング | 検索結果あり → RAG回答、なし → フォールバック |
+
+**ポイント:** 入力に応じて**処理を振り分ける**
+
+### よくあるエラー
+
+| エラー | 原因 | 解決 |
+|--------|------|------|
+| `default must be Runnable` | デフォルトがない | 最後にタプルでない引数を追加 |
+| 条件が常にFalse | 条件関数の入力がdictなのに文字列として扱った | `x["key"]` で値を取り出す |
+
+---
+
+## 7.7 並列と分岐の比較
+
+| 項目 | RunnableParallel | RunnableBranch |
+|------|------------------|----------------|
+| 目的 | 同時実行で時間短縮 | 条件で処理を分岐 |
+| 出力 | dict（全結果をまとめる） | 選ばれた1つの結果 |
+| 使う時 | 独立した複数処理 | 入力によって処理が変わる |
+
+### 組み合わせも可能
+
+```python
+# 分岐の中で並列を使う
+RunnableBranch(
+    (is_food, RunnableParallel(recipe=..., calories=...)),
+    "対応外です",
+)
+```
+
+---
+
+## 7.8 itemgetter（補足）
+
+dictから値を取り出す方法。lambdaでも書けるが、itemgetterは短く書ける。
+
+```python
+from operator import itemgetter
+
+# 同じ意味
+lambda x: x["dish"]
+itemgetter("dish")
+
+# 複数キー取得はitemgetterが便利
+itemgetter("name", "age")  # → (name値, age値) をタプルで返す
+```
+
+**結論:** lambdaで慣れてから、必要になったらitemgetterを使えばOK
+
+---
+
+## 7.9 入力を保持して追加（RunnablePassthrough.assign）
+
+### 問題: チェーンを通すと元の情報が消える
+
+```python
+chain = (
+    (lambda x: {"dish": x})
+    | prompt_ingredients | llm | StrOutputParser()
+)
+result = chain.invoke("カレー")
+# result = "玉ねぎ、肉、ルー"  ← 材料だけ。元の「カレー」は消えた！
+```
+
+### 解決: RunnablePassthrough.assign
+
+```python
+from langchain_core.runnables import RunnablePassthrough
+
+chain = (
+    (lambda x: {"dish": x})
+    | RunnablePassthrough.assign(
+        ingredients=prompt_ingredients | llm | StrOutputParser()
+    )
+)
+result = chain.invoke("カレー")
+# result = {"dish": "カレー", "ingredients": "玉ねぎ、肉、ルー"}
+#           ↑元の入力が残ってる   ↑追加された
+```
+
+### 動作イメージ
+
+```
+入力: {"dish": "カレー"}
+         ↓
+RunnablePassthrough.assign(ingredients=...)
+         ↓
+1. 元の入力をそのまま保持: {"dish": "カレー"}
+2. ingredients チェーンを実行: "玉ねぎ、肉、ルー"
+3. 結果をマージ: {"dish": "カレー", "ingredients": "玉ねぎ、肉、ルー"}
+```
+
+### 連鎖も可能
+
+```python
+chain = (
+    (lambda x: {"dish": x})
+    | RunnablePassthrough.assign(ingredients=材料取得チェーン)
+    # → {"dish": "カレー", "ingredients": "..."}
+    | RunnablePassthrough.assign(calories=カロリー取得チェーン)
+    # → {"dish": "カレー", "ingredients": "...", "calories": "..."}
+    | RunnablePassthrough.assign(summary=要約チェーン)
+    # → {"dish": "カレー", "ingredients": "...", "calories": "...", "summary": "..."}
+)
+```
+
+### 複数同時追加（速い）
+
+```python
+# 独立した処理なら1つのassignにまとめる（並列実行される）
+RunnablePassthrough.assign(
+    ingredients=材料チェーン,
+    calories=カロリーチェーン,
+)
+```
+
+### RunnableParallel との違い
+
+| 機能 | 入力 | 出力 |
+|------|------|------|
+| `RunnableParallel` | **消える** | 全て新しく作る |
+| `RunnablePassthrough.assign` | **保持される** | 元 + 追加 |
+
+### いつ使う？
+
+| シーン | 使うもの |
+|--------|----------|
+| 元の入力を途中で捨てたくない | `RunnablePassthrough.assign` |
+| 検索結果 + 元の質問 を次に渡したい（RAG） | `RunnablePassthrough.assign` |
+| 複数の独立した処理を同時に（元の入力は不要） | `RunnableParallel` |
+
+### with_structured_output との違い
+
+| 方法 | 用途 | タイミング |
+|------|------|-----------|
+| `with_structured_output` | LLMに**決まった形式で出力させる** | LLMの出力時 |
+| `RunnablePassthrough.assign` | **元の入力を保持**しながら追加 | チェーンの途中 |
+
+---
+
 ## 8. 構造化出力（with_structured_output）
 
 LLMの出力を決まった形（Pythonオブジェクト）で取得する。
