@@ -614,7 +614,7 @@ chain.invoke("LangChainとは？")
 ```python
 chain = (
     {
-        "question": RunnablePassthrough(),  # 入力をそのまま
+        "question": RunnablePassthrough(),  # 入力をそのまま（= lambda x: x）
         "context": retriever                # 入力で検索
     }
     | prompt
@@ -623,6 +623,8 @@ chain = (
 
 chain.invoke("LangChainとは？")
 ```
+
+**補足:** `"question": RunnablePassthrough()` は `"question": lambda x: x` と同じ意味。どちらでもOK。
 
 **図解:**
 ```
@@ -722,7 +724,7 @@ prompt = ChatPromptTemplate.from_messages([
 # 方法1: dict パターン（シンプル）★おすすめ
 chain = (
     {
-        "question": RunnablePassthrough(),
+        "question": RunnablePassthrough(),  # = lambda x: x
         "context": retriever
     }
     | prompt
