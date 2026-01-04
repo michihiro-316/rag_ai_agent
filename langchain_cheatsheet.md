@@ -2,7 +2,7 @@
 
 電車で覚える用。現場で使うものだけに絞りました。
 
-**最終更新日:** 2026-01-04（RAG-Fusion追加）
+**最終更新日:** 2026-01-04（タブ構成を6分割に変更）
 
 ---
 
@@ -13,16 +13,17 @@
 }
 .tab-buttons {
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   border-bottom: 2px solid #e0e0e0;
   margin-bottom: 20px;
 }
 .tab-button {
-  padding: 12px 24px;
+  padding: 10px 16px;
   border: none;
   background: #f5f5f5;
   cursor: pointer;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   border-radius: 8px 8px 0 0;
   transition: all 0.2s;
@@ -48,7 +49,10 @@
 <div class="tab-container">
 <div class="tab-buttons">
   <button class="tab-button active" onclick="openTab(event, 'basic')">基礎</button>
-  <button class="tab-button" onclick="openTab(event, 'advanced')">応用</button>
+  <button class="tab-button" onclick="openTab(event, 'chain')">チェーン</button>
+  <button class="tab-button" onclick="openTab(event, 'rag')">RAG</button>
+  <button class="tab-button" onclick="openTab(event, 'tools')">ツール</button>
+  <button class="tab-button" onclick="openTab(event, 'practice')">実践</button>
   <button class="tab-button" onclick="openTab(event, 'reference')">補足</button>
 </div>
 
@@ -263,8 +267,8 @@ print(result)          # → "こんにちは！"（.content 不要）
 
 </div>
 
-<!-- ==================== 応用タブ ==================== -->
-<div id="advanced" class="tab-content">
+<!-- ==================== チェーンタブ ==================== -->
+<div id="chain" class="tab-content">
 
 ## 7. Runnable（パイプラインで関数を使う）
 
@@ -672,81 +676,6 @@ chain.invoke("LangChainとは？")
 
 ---
 
-### よくある疑問
-
-**Q: なぜ `RunnablePassthrough()` を使う？ `lambda x: x` でいいのでは？**
-
-A: 機能は同じ。でも `RunnablePassthrough()` は：
-- LangChainの公式パターン
-- デバッグで見やすい
-- コードの意図が明確
-
-**Q: assign の `context=retriever` で、retriever には何が渡されるの？**
-
-A: **チェーンへの元の入力**（文字列）が渡される。
-
-```python
-chain.invoke("LangChainとは？")
-#                ↓
-# retriever.invoke("LangChainとは？") が実行される
-```
-
-**Q: 「Passthrough」って結局何をしてるの？**
-
-A: **question を消さないようにしている**。
-
-```python
-# もし Passthrough がなかったら...
-chain = retriever | prompt | llm
-# → retriever の出力 [Doc1, Doc2] だけがpromptに渡る
-# → {question} を埋められない！エラー！
-
-# Passthrough.assign を使うと
-chain = (lambda x: {"question": x}) | RunnablePassthrough.assign(context=retriever)
-# → {"question": "...", "context": [...]} がpromptに渡る
-# → {question} も {context} も埋められる！
-```
-
----
-
-### 実践: RAGでの使い方
-
-```python
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.runnables import RunnablePassthrough
-
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "以下のドキュメントを参考に質問に答えてください。"),
-    ("human", "ドキュメント:\n{context}\n\n質問: {question}")
-])
-
-# 方法1: dict パターン（シンプル）★おすすめ
-chain = (
-    {
-        "question": RunnablePassthrough(),  # = lambda x: x
-        "context": retriever
-    }
-    | prompt
-    | llm
-    | StrOutputParser()
-)
-
-# 方法2: assign パターン
-chain = (
-    (lambda x: {"question": x})
-    | RunnablePassthrough.assign(context=retriever)
-    | prompt
-    | llm
-    | StrOutputParser()
-)
-
-# どちらも同じ結果
-chain.invoke("LangChainとは？")
-```
-
----
-
 ### まとめ図解
 
 ```
@@ -778,116 +707,10 @@ chain.invoke("LangChainとは？")
 | `RunnablePassthrough.assign` | **保持する** | 元 + 追加 |
 | `RunnableParallel` / dict | 使わない | 新しく作る |
 
----
+</div>
 
-## 8. 構造化出力（with_structured_output）
-
-> **このセクションの主要関数:** `llm.with_structured_output()` / `BaseModel` / `Field`
-
-LLMの出力を決まった形（Pythonオブジェクト）で取得する。
-
-```python
-from pydantic import BaseModel, Field
-
-# 型定義
-class Recipe(BaseModel):
-    ingredients: list[str] = Field(description="料理の材料のリスト")
-    steps: list[str] = Field(description="料理の手順のリスト")
-
-# これだけでOK！
-structured_llm = llm.with_structured_output(Recipe)
-result = structured_llm.invoke("オムライスのレシピを教えて")
-
-print(result.ingredients)  # → ['卵 3個', '鶏もも肉 100g', ...]
-print(result.steps)        # → ['鶏もも肉を切る', '炒める', ...]
-```
-
-**覚えること:** `llm.with_structured_output(クラス名)` これだけ！
-
-### with_structured_output の仕組み
-
-実は内部で「systemプロンプト」のように型定義をLLMに伝えている。
-
-```python
-# あなたが書いたコード
-structured_llm.invoke("オムライスのレシピを教えて")
-
-# 内部でLLMが受け取るメッセージ（イメージ）
-[system] 以下のJSON形式で出力してください:
-         {
-           "ingredients": ["材料1", "材料2"],
-           "steps": ["手順1", "手順2"]
-         }
-[human] オムライスのレシピを教えて
-```
-
-**つまり:**
-- `with_structured_output(Recipe)` の時点で型定義がLLMに伝わる
-- Fieldの `description` もLLMへの指示になる
-
-### パイプラインで使う例（実践）
-
-```python
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.output_parsers import StrOutputParser
-from pydantic import BaseModel, Field
-
-# 型定義
-class Recipe(BaseModel):
-    menu: str = Field(description="料理名")
-    ingredients: list[str] = Field(description="材料リスト")
-    steps: list[str] = Field(description="手順リスト")
-
-# 1つ目のチェーン: 食材から料理名を考える
-prompt1 = ChatPromptTemplate.from_template(
-    "{ingredient}を使った料理名を1つだけ答えて"
-)
-
-# 2つ目のチェーン: 料理名からレシピを構造化して取得
-prompt2 = ChatPromptTemplate.from_template(
-    "{dish}のレシピを教えて"
-)
-
-structured_llm = llm.with_structured_output(Recipe)
-
-# チェーンをつなげる
-chain = (
-    prompt1
-    | llm
-    | StrOutputParser()                    # → "オムライス"
-    | (lambda x: {"dish": x})              # → {"dish": "オムライス"}
-    | prompt2
-    | structured_llm                       # → Recipe オブジェクト
-)
-
-# 実行
-result = chain.invoke({"ingredient": "卵"})
-print(result.menu)         # → "オムライス"
-print(result.ingredients)  # → ['卵 3個', '鶏もも肉 100g', ...]
-print(result.steps)        # → ['鶏もも肉を切る', '炒める', ...]
-```
-
-**ポイント:**
-- `StrOutputParser()` で文字列に変換
-- `lambda x: {"dish": x}` で次のプロンプト用に辞書化
-- 最後に `structured_llm` で構造化データを取得
-
-**この方法の強み:**
-- 途中で何段階パイプを通しても、**最後の出力形式を `Recipe` クラスで強制できる**
-- プログラムで扱いやすい（`result.ingredients` でアクセス可能）
-- LLMが文章で返す心配がない
-
-**注意:**
-- 関係ない入力を渡すと、LLMが適当に埋めてしまう
-```python
-# 例: レシピと関係ない質問
-result = chain.invoke({"ingredient": "今日の天気"})
-# → LLMが無理やり Recipe 形式で返そうとする
-#    menu: "天気サラダ"（？）みたいに適当に埋まる
-```
-- 入力とクラス定義の整合性は自分で担保する必要がある
-
----
+<!-- ==================== RAGタブ ==================== -->
+<div id="rag" class="tab-content">
 
 ## 9. RAG（検索拡張生成）
 
@@ -968,51 +791,7 @@ result = chain.invoke("りんごの産地は？")
 print(result)  # → 青森県が生産量日本一です
 ```
 
-### Q: lambda x: x って何？なぜ必要？
-
-**疑問:** なぜ `{"question": "りんご"}` じゃダメなの？
-
-**答え:** チェーンは「関数」を期待しているから
-
-```python
-# これはダメ（固定値）
-{"question": "りんご"}  # ← 毎回「りんご」になってしまう
-
-# これがOK（関数）
-{"question": lambda x: x}  # ← 入力をそのまま返す関数
-```
-
-**イメージ:**
-```python
-# lambda x: x の動き
-入力: "りんごの産地は？"
-  ↓
-lambda x: x が受け取る
-  ↓
-出力: "りんごの産地は？"  # そのまま返す
-```
-
-**なぜ関数が必要？**
-- チェーンは実行時に「入力を受け取って処理する」仕組み
-- 固定値だと、`invoke("みかん")` しても「りんご」のまま
-- 関数なら、実行時に入力を受け取って動的に処理できる
-
-### 複数の入力がある場合
-
-```python
-# 入力が辞書の場合
-chain.invoke({"question": "りんご", "category": "果物"})
-
-# 辞書から特定のキーを取り出す
-{
-    "question": lambda x: x["question"],   # questionを取り出す
-    "category": lambda x: x["category"]    # categoryを取り出す
-}
-```
-
 ### Vertex AI Search を使う場合（実践）
-
-上の例では `simple_retriever` を自作したが、本番では Vertex AI Search を使う。
 
 ```python
 from langchain_google_community import VertexAISearchRetriever
@@ -1049,192 +828,9 @@ result = chain.invoke("就業規則について教えて")
 print(result)
 ```
 
-**ポイント:**
-- `simple_retriever` の代わりに `VertexAISearchRetriever` を使うだけ
-- チャンク分割・Embedding・検索は Vertex AI Search が自動でやってくれる
-- `max_documents` で取得件数を調整
-
 **必要なパッケージ:**
 ```bash
 pip install langchain-google-community
-```
-
----
-
-## 10. Function Calling
-
-> **このセクションの主要関数:** `@tool` / `.bind_tools()` / `response.tool_calls`
-
-### Function Calling とは？
-
-**AIが「どの関数を呼ぶべきか」を判断し、引数を生成する機能**
-
-```
-ユーザー: 「東京の天気は？」
-    ↓
-AI: 「get_weather関数を、city="東京"で呼ぶべきだ」
-    ↓
-開発者: 実際に関数を実行
-    ↓
-結果: 「東京は晴れです」
-```
-
-**重要:** AIは「どの関数を呼ぶか」を判断するだけ。**実行は自分でやる**。
-
-### 基本の流れ（3ステップ）
-
-```python
-from langchain_core.tools import tool
-from langchain_google_genai import ChatGoogleGenerativeAI
-
-# ステップ1: ツールを定義（docstringは必須！）
-@tool
-def get_weather(city: str) -> str:
-    """指定した都市の天気を取得する"""  # ← これがないとエラー
-    return f"{city}の天気は晴れです"
-
-# ステップ2: LLMにツールをバインド
-llm = ChatGoogleGenerativeAI(...)
-llm_with_tools = llm.bind_tools([get_weather])
-
-# ステップ3: 質問 → AIの判断を取得 → 実行
-response = llm_with_tools.invoke("東京の天気は？")
-
-if response.tool_calls:
-    tool_call = response.tool_calls[0]
-    print(tool_call["name"])  # → "get_weather"
-    print(tool_call["args"])  # → {"city": "東京"}
-
-    # 実際に実行
-    result = get_weather.invoke(tool_call["args"])
-    print(result)  # → "東京の天気は晴れです"
-```
-
-### 覚えること
-
-| 項目 | 内容 |
-|------|------|
-| `@tool` | 関数をツール化するデコレータ |
-| `"""docstring"""` | **必須**。AIがこれを見て判断する |
-| `.bind_tools([...])` | LLMにツールを教える |
-| `response.tool_calls` | AIが「呼ぶべき」と判断したツール情報 |
-| `tool_call["name"]` | ツール名 |
-| `tool_call["args"]` | AIが生成した引数 |
-
-### なぜ docstring が必須？
-
-```python
-@tool
-def get_weather(city: str) -> str:
-    """指定した都市の天気を取得する"""  # ← AIはこれを見て判断する
-    return f"{city}の天気は晴れです"
-```
-
-**AIの内部処理（イメージ）:**
-```
-利用可能なツール:
-- get_weather: 「指定した都市の天気を取得する」 ← docstringがそのまま使われる
-
-ユーザーの質問: 「東京の天気は？」
-→ 天気に関する質問だから get_weather を使おう
-→ 引数は city="東京" だな
-```
-
-docstringがないと、AIは「この関数が何をするか」がわからない。
-
-### 複数ツールの場合
-
-```python
-@tool
-def get_weather(city: str) -> str:
-    """指定した都市の天気を取得する"""
-    return f"{city}の天気は晴れです"
-
-@tool
-def calculate(expression: str) -> str:
-    """数式を計算する"""
-    return str(eval(expression))
-
-# 複数のツールをバインド
-llm_with_tools = llm.bind_tools([get_weather, calculate])
-
-# AIが適切なツールを選ぶ
-response = llm_with_tools.invoke("100 + 200 は？")
-# → tool_call["name"] = "calculate"
-# → tool_call["args"] = {"expression": "100 + 200"}
-```
-
-### 構造化データの取得にも使える
-
-Function Callingは「関数を実行する」だけでなく、「構造化データを取得する」用途にも使える。
-
-```python
-# 構造化されていない（ただの文字列）
-"田中太郎は30歳で東京に住んでいます"
-
-# 構造化されている（決まった形）
-{"name": "田中太郎", "age": 30, "city": "東京"}
-```
-
-```python
-@tool
-def extract_person(name: str, age: int, city: str) -> dict:
-    """人物情報を抽出する"""
-    return {"name": name, "age": age, "city": city}
-
-llm_with_tools = llm.bind_tools([extract_person])
-response = llm_with_tools.invoke("田中太郎、30歳、東京在住です")
-
-# AIが勝手に構造化してくれる
-response.tool_calls[0]["args"]
-# → {"name": "田中太郎", "age": 30, "city": "東京"}
-```
-
-### with_structured_output との違い
-
-| 機能 | 用途 | 特徴 |
-|------|------|------|
-| Function Calling | ツールを呼び出す | AIが「どの関数を呼ぶか」も判断 |
-| with_structured_output | 出力形式を固定 | 必ず指定した形式で返す |
-
-**使い分け:**
-- 「天気を調べて」「計算して」→ Function Calling（ツール選択が必要）
-- 「レシピを教えて」→ with_structured_output（形式を固定したいだけ）
-
----
-
-## 11. 会話履歴（チャットボット用）
-
-```python
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
-
-prompt = ChatPromptTemplate.from_messages([
-    ("system", "あなたはアシスタントです"),
-    MessagesPlaceholder(variable_name="history", optional=True),
-    ("human", "{question}")
-])
-
-# 履歴を渡す
-result = prompt.invoke({
-    "question": "私の名前は？",
-    "history": [
-        ("human", "私は田中です"),
-        ("ai", "こんにちは、田中さん！")
-    ]
-})
-```
-
----
-
-## 12. ストリーミング（参考程度でOK）
-
-ChatGPTみたいに「文字がポロポロ出てくる」演出。UI演出なので後回しでOK。
-
-「ストリーミング」というワードだけ覚えておけば大丈夫。
-
-```python
-for chunk in llm.stream("長い話をして"):
-    print(chunk.content, end="", flush=True)
 ```
 
 ---
@@ -1510,6 +1106,253 @@ rag_fusion_chain = (
 | Multi-Query RAG | 全結果をまとめる | シンプル |
 | RAG-Fusion | スコアで順位付け | 重複排除・関連性重視 |
 
+</div>
+
+<!-- ==================== ツールタブ ==================== -->
+<div id="tools" class="tab-content">
+
+## 8. 構造化出力（with_structured_output）
+
+> **このセクションの主要関数:** `llm.with_structured_output()` / `BaseModel` / `Field`
+
+LLMの出力を決まった形（Pythonオブジェクト）で取得する。
+
+```python
+from pydantic import BaseModel, Field
+
+# 型定義
+class Recipe(BaseModel):
+    ingredients: list[str] = Field(description="料理の材料のリスト")
+    steps: list[str] = Field(description="料理の手順のリスト")
+
+# これだけでOK！
+structured_llm = llm.with_structured_output(Recipe)
+result = structured_llm.invoke("オムライスのレシピを教えて")
+
+print(result.ingredients)  # → ['卵 3個', '鶏もも肉 100g', ...]
+print(result.steps)        # → ['鶏もも肉を切る', '炒める', ...]
+```
+
+**覚えること:** `llm.with_structured_output(クラス名)` これだけ！
+
+### with_structured_output の仕組み
+
+実は内部で「systemプロンプト」のように型定義をLLMに伝えている。
+
+```python
+# あなたが書いたコード
+structured_llm.invoke("オムライスのレシピを教えて")
+
+# 内部でLLMが受け取るメッセージ（イメージ）
+[system] 以下のJSON形式で出力してください:
+         {
+           "ingredients": ["材料1", "材料2"],
+           "steps": ["手順1", "手順2"]
+         }
+[human] オムライスのレシピを教えて
+```
+
+**つまり:**
+- `with_structured_output(Recipe)` の時点で型定義がLLMに伝わる
+- Fieldの `description` もLLMへの指示になる
+
+### パイプラインで使う例（実践）
+
+```python
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from pydantic import BaseModel, Field
+
+# 型定義
+class Recipe(BaseModel):
+    menu: str = Field(description="料理名")
+    ingredients: list[str] = Field(description="材料リスト")
+    steps: list[str] = Field(description="手順リスト")
+
+# 1つ目のチェーン: 食材から料理名を考える
+prompt1 = ChatPromptTemplate.from_template(
+    "{ingredient}を使った料理名を1つだけ答えて"
+)
+
+# 2つ目のチェーン: 料理名からレシピを構造化して取得
+prompt2 = ChatPromptTemplate.from_template(
+    "{dish}のレシピを教えて"
+)
+
+structured_llm = llm.with_structured_output(Recipe)
+
+# チェーンをつなげる
+chain = (
+    prompt1
+    | llm
+    | StrOutputParser()                    # → "オムライス"
+    | (lambda x: {"dish": x})              # → {"dish": "オムライス"}
+    | prompt2
+    | structured_llm                       # → Recipe オブジェクト
+)
+
+# 実行
+result = chain.invoke({"ingredient": "卵"})
+print(result.menu)         # → "オムライス"
+print(result.ingredients)  # → ['卵 3個', '鶏もも肉 100g', ...]
+print(result.steps)        # → ['鶏もも肉を切る', '炒める', ...]
+```
+
+---
+
+## 10. Function Calling
+
+> **このセクションの主要関数:** `@tool` / `.bind_tools()` / `response.tool_calls`
+
+### Function Calling とは？
+
+**AIが「どの関数を呼ぶべきか」を判断し、引数を生成する機能**
+
+```
+ユーザー: 「東京の天気は？」
+    ↓
+AI: 「get_weather関数を、city="東京"で呼ぶべきだ」
+    ↓
+開発者: 実際に関数を実行
+    ↓
+結果: 「東京は晴れです」
+```
+
+**重要:** AIは「どの関数を呼ぶか」を判断するだけ。**実行は自分でやる**。
+
+### 基本の流れ（3ステップ）
+
+```python
+from langchain_core.tools import tool
+from langchain_google_genai import ChatGoogleGenerativeAI
+
+# ステップ1: ツールを定義（docstringは必須！）
+@tool
+def get_weather(city: str) -> str:
+    """指定した都市の天気を取得する"""  # ← これがないとエラー
+    return f"{city}の天気は晴れです"
+
+# ステップ2: LLMにツールをバインド
+llm = ChatGoogleGenerativeAI(...)
+llm_with_tools = llm.bind_tools([get_weather])
+
+# ステップ3: 質問 → AIの判断を取得 → 実行
+response = llm_with_tools.invoke("東京の天気は？")
+
+if response.tool_calls:
+    tool_call = response.tool_calls[0]
+    print(tool_call["name"])  # → "get_weather"
+    print(tool_call["args"])  # → {"city": "東京"}
+
+    # 実際に実行
+    result = get_weather.invoke(tool_call["args"])
+    print(result)  # → "東京の天気は晴れです"
+```
+
+### 覚えること
+
+| 項目 | 内容 |
+|------|------|
+| `@tool` | 関数をツール化するデコレータ |
+| `"""docstring"""` | **必須**。AIがこれを見て判断する |
+| `.bind_tools([...])` | LLMにツールを教える |
+| `response.tool_calls` | AIが「呼ぶべき」と判断したツール情報 |
+| `tool_call["name"]` | ツール名 |
+| `tool_call["args"]` | AIが生成した引数 |
+
+### なぜ docstring が必須？
+
+```python
+@tool
+def get_weather(city: str) -> str:
+    """指定した都市の天気を取得する"""  # ← AIはこれを見て判断する
+    return f"{city}の天気は晴れです"
+```
+
+**AIの内部処理（イメージ）:**
+```
+利用可能なツール:
+- get_weather: 「指定した都市の天気を取得する」 ← docstringがそのまま使われる
+
+ユーザーの質問: 「東京の天気は？」
+→ 天気に関する質問だから get_weather を使おう
+→ 引数は city="東京" だな
+```
+
+docstringがないと、AIは「この関数が何をするか」がわからない。
+
+### 複数ツールの場合
+
+```python
+@tool
+def get_weather(city: str) -> str:
+    """指定した都市の天気を取得する"""
+    return f"{city}の天気は晴れです"
+
+@tool
+def calculate(expression: str) -> str:
+    """数式を計算する"""
+    return str(eval(expression))
+
+# 複数のツールをバインド
+llm_with_tools = llm.bind_tools([get_weather, calculate])
+
+# AIが適切なツールを選ぶ
+response = llm_with_tools.invoke("100 + 200 は？")
+# → tool_call["name"] = "calculate"
+# → tool_call["args"] = {"expression": "100 + 200"}
+```
+
+### with_structured_output との違い
+
+| 機能 | 用途 | 特徴 |
+|------|------|------|
+| Function Calling | ツールを呼び出す | AIが「どの関数を呼ぶか」も判断 |
+| with_structured_output | 出力形式を固定 | 必ず指定した形式で返す |
+
+**使い分け:**
+- 「天気を調べて」「計算して」→ Function Calling（ツール選択が必要）
+- 「レシピを教えて」→ with_structured_output（形式を固定したいだけ）
+
+</div>
+
+<!-- ==================== 実践タブ ==================== -->
+<div id="practice" class="tab-content">
+
+## 11. 会話履歴（チャットボット用）
+
+```python
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+
+prompt = ChatPromptTemplate.from_messages([
+    ("system", "あなたはアシスタントです"),
+    MessagesPlaceholder(variable_name="history", optional=True),
+    ("human", "{question}")
+])
+
+# 履歴を渡す
+result = prompt.invoke({
+    "question": "私の名前は？",
+    "history": [
+        ("human", "私は田中です"),
+        ("ai", "こんにちは、田中さん！")
+    ]
+})
+```
+
+---
+
+## 12. ストリーミング（参考程度でOK）
+
+ChatGPTみたいに「文字がポロポロ出てくる」演出。UI演出なので後回しでOK。
+
+「ストリーミング」というワードだけ覚えておけば大丈夫。
+
+```python
+for chunk in llm.stream("長い話をして"):
+    print(chunk.content, end="", flush=True)
+```
+
 ---
 
 ## 15. よくあるエラー
@@ -1519,6 +1362,15 @@ rag_fusion_chain = (
 | `has no attribute 'text'` | ChatPromptValueに`.text`はない | `.to_string()` を使う |
 | `must have a docstring` | @toolにdocstringがない | `"""説明"""` を追加 |
 | `{"a", "b"}` がエラー | セットになってる | `("a", "b")` タプルに |
+
+---
+
+## 今後追加予定
+
+- デバッグ方法
+- 本番デプロイ時の注意点
+- Vertex AI Search との連携例
+- エラーハンドリングのベストプラクティス
 
 </div>
 
