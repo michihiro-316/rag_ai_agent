@@ -2,7 +2,7 @@
 
 電車で覚える用。現場で使うものだけに絞りました。
 
-**最終更新日:** 2026-01-02
+**最終更新日:** 2026-01-04（RAG-Fusion追加）
 
 ---
 
@@ -1239,7 +1239,280 @@ for chunk in llm.stream("長い話をして"):
 
 ---
 
-## 13. よくあるエラー
+## 13. Multi-Query RAG
+
+> **このセクションの主要関数:** `retriever.map()` / `with_structured_output`
+
+### Multi-Query RAG とは？
+
+1つの質問から複数の検索クエリを生成し、検索精度を上げる手法。
+
+```
+質問: "LangChainとは？"
+    ↓ LLMが複数クエリ生成
+["LangChainの概要", "LangChainの機能", "LangChainの使い方"]
+    ↓ 各クエリで検索
+結果をまとめてLLMに渡す → 回答生成
+```
+
+### 基本コード
+
+```python
+from pydantic import BaseModel, Field
+from langchain_core.runnables import RunnablePassthrough
+
+# 複数クエリを生成するための型定義
+class QueryGenerationOutput(BaseModel):
+    queries: list[str] = Field(..., description="検索クエリのリスト")
+
+# クエリ生成用プロンプト
+query_generation_prompt = ChatPromptTemplate.from_messages([
+    ("human", """質問に対してベクターデータベースで検索するための
+適切な検索クエリを3つ生成してください。
+多様な観点からアプローチするクエリを作成します。
+
+質問: {question}""")
+])
+
+# クエリ生成チェーン
+query_generation_chain = (
+    query_generation_prompt
+    | llm.with_structured_output(QueryGenerationOutput)
+    | (lambda x: x.queries)  # オブジェクトからリストを取り出す
+)
+
+# Multi-Query RAG チェーン
+multi_query_rag_chain = (
+    {
+        "question": RunnablePassthrough(),
+        "context": query_generation_chain | retriever.map(),
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+```
+
+### retriever.map() とは？
+
+リストの各要素に対してretrieverを実行する。
+
+```
+["クエリ1", "クエリ2", "クエリ3"]
+    ↓ retriever.map()
+[[Doc1, Doc2], [Doc3, Doc4], [Doc5, Doc6]]
+  ↑クエリ1結果  ↑クエリ2結果  ↑クエリ3結果
+```
+
+**注意:** 結果は**ネストしたリスト**になる
+
+---
+
+## 14. RAG-Fusion（スコアリングで検索精度UP）
+
+> **このセクションの主要関数:** `reciprocal_rank_fusion` / `retriever.map()`
+
+### RAG-Fusion とは？
+
+Multi-Query RAGの結果を**スコアリング**して、より関連性の高いドキュメントを選ぶ手法。
+
+### 全体の流れ
+
+```
+【前提】ベクトルDBには事前にドキュメントが保存されている
+┌─────────────────────────────────────────────┐
+│ DocA: "LangChainはLLMアプリ開発フレームワーク..."  │
+│ DocB: "LangChainのインストール方法は..."          │
+│ DocC: "RAGとは検索拡張生成の略で..."              │
+│ DocD: "Pythonの基礎文法について..."              │
+│ DocE: "LCELはLangChain Expression Languageの略..." │
+└─────────────────────────────────────────────┘
+
+ステップ1: クエリ生成（LLM）
+─────────────────────────
+質問: "LangChainとは？"
+    ↓
+["LangChainの概要", "LangChainの機能", "LangChainの使い方"]
+
+ステップ2: 各クエリでDB検索（ベクトルDB）
+─────────────────────────────────────
+クエリ1 → [DocA, DocE, DocB]  ← 類似度順（DBが返す）
+クエリ2 → [DocE, DocA, DocC]
+クエリ3 → [DocA, DocB, DocE]
+
+※ ここまでLLMは関与しない。DBが類似度計算して返しているだけ。
+
+ステップ3: RRFでスコアリング（数学的計算）
+────────────────────────────────────
+DocA: クエリ1で1位、クエリ2で2位、クエリ3で1位 → 高スコア
+DocE: クエリ1で2位、クエリ2で1位、クエリ3で3位 → 中スコア
+DocB: クエリ1で3位、クエリ3で2位              → 低スコア
+    ↓
+[DocA, DocE, DocB, ...]  ← スコア順にソート
+
+ステップ4: LLMに渡して解答生成（LLM）
+─────────────────────────────────
+上位ドキュメントをcontextとしてプロンプトに渡す
+    ↓
+「LangChainは、LLMを使ったアプリケーション開発のための...」
+```
+
+### まとめ表
+
+| ステップ | 処理 | 誰がやる |
+|---------|------|---------|
+| 1 | クエリ3つ生成 | LLM |
+| 2 | 各クエリでDB検索 | ベクトルDB |
+| 3 | 検索結果をスコアリング | RRF（数学的計算） |
+| 4 | 解答生成 | LLM |
+
+**LLMが動くのは最初（クエリ生成）と最後（解答生成）だけ！**
+
+### RRF（Reciprocal Rank Fusion）とは？
+
+**「順位の逆数」を足し合わせるスコアリング手法**
+
+```python
+スコア = 1/(k + 順位)   # k=60 が一般的
+```
+
+**例：k=60の場合**
+| 順位 | スコア |
+|------|--------|
+| 1位  | 1/61 = 0.0164 |
+| 2位  | 1/62 = 0.0161 |
+| 3位  | 1/63 = 0.0159 |
+
+**DocAのスコア計算：**
+```
+クエリ1で1位: 1/61 = 0.0164
+クエリ2で2位: 1/62 = 0.0161
+クエリ3で1位: 1/61 = 0.0164
+─────────────────────────
+合計: 0.0489（高い！）
+```
+
+**なぜk=60？**
+- 順位の差を「なだらかに」するため
+- k=0だと1位と2位の差が大きすぎる（2倍の差）
+- k=60だと差が小さい（約1.01倍の差）
+- 60は論文由来の経験則
+
+### RRFの実装
+
+```python
+from langchain_core.documents import Document
+
+def reciprocal_rank_fusion(
+    results: list[list[Document]],  # 入力: [[Doc1,Doc2,...], [Doc3,Doc4,...], ...]
+    k: int = 60
+) -> list[Document]:                 # 出力: [Doc3, Doc1, ...]（スコア順）
+    """
+    RRF（Reciprocal Rank Fusion）スコアリング
+
+    - 上位に出てくるほど高スコア
+    - 複数クエリで出てくるほど高スコア
+    """
+    fused_scores: dict[str, float] = {}  # {"ドキュメント内容": スコア}
+    doc_map: dict[str, Document] = {}    # {"ドキュメント内容": Documentオブジェクト}
+
+    for docs in results:  # 外側: 各クエリの結果（クエリ1→クエリ2→クエリ3）
+        for rank, doc in enumerate(docs):  # 内側: 各ドキュメントと順位（0,1,2,3...）
+            doc_id = doc.page_content  # ドキュメントの中身をキーに
+
+            if doc_id not in fused_scores:  # 初めて見たドキュメントなら
+                fused_scores[doc_id] = 0.0  # スコア初期化
+                doc_map[doc_id] = doc       # オブジェクト保存
+
+            # RRFスコアを加算（同じドキュメントが複数回出てきたら加算される）
+            fused_scores[doc_id] += 1 / (k + rank + 1)
+
+    # スコアが高い順にソート
+    sorted_docs = sorted(
+        fused_scores.items(),   # [("Doc内容", 0.048), ("Doc内容", 0.032), ...]
+        key=lambda x: x[1],     # タプルの2番目（スコア）でソート
+        reverse=True            # 降順（高い順）
+    )
+
+    # Documentオブジェクトのリストで返す
+    return [doc_map[doc_id] for doc_id, _ in sorted_docs]
+```
+
+### ループの動き（具体例）
+
+```
+入力: 3クエリ × 各4件 = 12回のスコア加算処理
+
+results = [
+    [Doc1, Doc2, Doc3, Doc4],  ← docs（外側1周目）= クエリ1の結果
+    [Doc2, Doc5, Doc1, Doc6],  ← docs（外側2周目）= クエリ2の結果
+    [Doc1, Doc3, Doc2, Doc7],  ← docs（外側3周目）= クエリ3の結果
+]
+
+【外側1周目】クエリ1の結果を処理
+    rank=0 → Doc1 に +1/61（1位）
+    rank=1 → Doc2 に +1/62（2位）
+    rank=2 → Doc3 に +1/63（3位）
+    rank=3 → Doc4 に +1/64（4位）
+
+【外側2周目】クエリ2の結果を処理
+    rank=0 → Doc2 に +1/61 ← 2回目！加算される
+    rank=1 → Doc5 に +1/62
+    rank=2 → Doc1 に +1/63 ← 2回目！
+    rank=3 → Doc6 に +1/64
+
+【外側3周目】クエリ3の結果を処理
+    rank=0 → Doc1 に +1/61 ← 3回目！さらに加算
+    rank=1 → Doc3 に +1/62
+    rank=2 → Doc2 に +1/63 ← 3回目！
+    rank=3 → Doc7 に +1/64
+
+最終スコア:
+  Doc1: 1/61 + 1/63 + 1/61 = 0.0487（3回出現、1位が2回）← 最強
+  Doc2: 1/62 + 1/61 + 1/63 = 0.0484（3回出現）
+  Doc3: 1/63 + 1/62 = 0.0320（2回出現）
+  ...
+
+出力: [Doc1, Doc2, Doc3, ...] ← スコア順
+```
+
+**ポイント:** 複数クエリで共通して上位に出てくる = 高スコア = 本当に関連性が高い
+
+### RAG-Fusionチェーン
+
+```python
+# RAG-Fusionチェーン
+rag_fusion_chain = (
+    {
+        "question": RunnablePassthrough(),
+        "context": query_generation_chain | retriever.map() | reciprocal_rank_fusion,
+    }
+    | prompt
+    | llm
+    | StrOutputParser()
+)
+```
+
+### Multi-Query RAG vs RAG-Fusion
+
+```python
+# Multi-Query RAG（単純に結合）
+"context": query_generation_chain | retriever.map()
+# → [[Doc1, Doc2], [Doc3, Doc4]] をそのまま渡す
+
+# RAG-Fusion（スコアリング）
+"context": query_generation_chain | retriever.map() | reciprocal_rank_fusion
+# → [Doc3, Doc1, Doc4, ...] スコア順にソート
+```
+
+| 手法 | 処理 | メリット |
+|------|------|---------|
+| Multi-Query RAG | 全結果をまとめる | シンプル |
+| RAG-Fusion | スコアで順位付け | 重複排除・関連性重視 |
+
+---
+
+## 15. よくあるエラー
 
 | エラー | 原因 | 解決 |
 |--------|------|------|
@@ -1344,6 +1617,133 @@ def get_weather(city: str) -> str:
 # @tool を付けると .invoke() で呼べるようになる
 get_weather.invoke({"city": "東京"})  # → "東京の天気は晴れです"
 ```
+
+---
+
+## 補足A2. dict 型 vs オブジェクト型（超重要！）
+
+LangChain でデータを扱う時、**dict** と **オブジェクト** の2種類がある。
+取り出し方が違うので混乱しがち。
+
+### 基本の違い
+
+```python
+# ========== dict 型 ==========
+# 定義不要、自由に作れる
+d = {"queries": ["a", "b", "c"], "count": 3}
+
+# 取り出し方: ブラケット ["キー名"]
+d["queries"]  # → ["a", "b", "c"]
+d["count"]    # → 3
+
+
+# ========== オブジェクト型 ==========
+# クラス定義が必要（設計図を先に作る）
+from pydantic import BaseModel
+
+class QueryOutput(BaseModel):
+    queries: list[str]
+    count: int
+
+obj = QueryOutput(queries=["a", "b", "c"], count=3)
+
+# 取り出し方: ドット .属性名
+obj.queries   # → ["a", "b", "c"]
+obj.count     # → 3
+```
+
+### 比較表
+
+| | dict | オブジェクト |
+|--|------|-------------|
+| 定義 | 不要（その場で作れる） | クラス定義が必要 |
+| 構造 | 自由（何でも入れられる） | 事前に決まっている |
+| 取り出し | `x["key"]` | `x.属性` |
+| 型チェック | なし | あり（間違うとエラー） |
+| 用途 | 一時的なデータ | 構造化された出力 |
+
+### LangChain での使い分け
+
+```python
+# dict を使う場面: チェーン内のデータ受け渡し
+chain = (
+    {"question": RunnablePassthrough(), "context": retriever}
+    | prompt
+    | llm
+)
+# → {"question": "...", "context": [...]} が prompt に渡る
+#   prompt 内で {question} や {context} を使う
+
+
+# オブジェクトを使う場面: LLM の構造化出力
+class Recipe(BaseModel):
+    ingredients: list[str]
+    steps: list[str]
+
+structured_llm = llm.with_structured_output(Recipe)
+result = structured_llm.invoke("カレーのレシピ")
+
+result.ingredients  # → ["じゃがいも", "玉ねぎ", ...]
+result.steps        # → ["野菜を切る", "炒める", ...]
+```
+
+### よくある間違い
+
+```python
+# ❌ dict なのにドットでアクセス
+d = {"queries": ["a", "b"]}
+d.queries  # AttributeError!
+
+# ✅ dict はブラケット
+d["queries"]  # → ["a", "b"]
+
+
+# ❌ オブジェクトなのにブラケットでアクセス
+obj = QueryOutput(queries=["a", "b"])
+obj["queries"]  # TypeError!
+
+# ✅ オブジェクトはドット
+obj.queries  # → ["a", "b"]
+```
+
+### チェーンでの lambda の書き方
+
+```python
+# 前のステップの出力が dict の場合
+| (lambda x: x["question"])
+
+# 前のステップの出力がオブジェクトの場合
+| (lambda x: x.queries)
+```
+
+**見分け方:**
+- `with_structured_output` の後 → **オブジェクト**（ドット記法）
+- `RunnableParallel` / dict パターンの後 → **dict**（ブラケット記法）
+
+### Pydantic の __init__ 自動生成
+
+```python
+# 普通のクラス（__init__ を自分で書く）
+class MyClass:
+    def __init__(self, queries: list[str]):
+        self.queries = queries
+
+# Pydantic BaseModel（__init__ 不要！）
+class QueryOutput(BaseModel):
+    queries: list[str]  # これだけで OK
+
+# どちらも同じように使える
+obj1 = MyClass(queries=["a", "b"])
+obj2 = QueryOutput(queries=["a", "b"])
+
+obj1.queries  # → ["a", "b"]
+obj2.queries  # → ["a", "b"]
+```
+
+**BaseModel の強み:**
+- `__init__` を書かなくていい
+- 型チェックを自動でやってくれる
+- LangChain の `with_structured_output` と相性が良い
 
 ---
 
