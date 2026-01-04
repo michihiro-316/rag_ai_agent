@@ -1365,11 +1365,329 @@ for chunk in llm.stream("長い話をして"):
 
 ---
 
+## 16. Enumルーティング（質問の種類で振り分け）
+
+> **このセクションの主要関数:** `Enum` / `with_structured_output` / `RunnableLambda`
+
+### Enumルーティングとは？
+
+ユーザーの質問を分類して、適切な処理（retriever等）に振り分ける手法。
+
+```
+質問: "Pythonのエラーについて"
+    ↓ LLMが分類
+Route.TECH（技術系）
+    ↓
+tech_retriever で検索 → 回答
+```
+
+### Step 1: Enumの定義
+
+```python
+from enum import Enum
+
+class Route(str, Enum):
+    TECH = "tech"        # 技術系の質問
+    GENERAL = "general"  # 一般的な質問
+```
+
+**`(str, Enum)` の意味:**
+- `Enum`: 選択肢を制限（TECH or GENERAL のみ）
+- `str`: 値を文字列として扱える
+
+```python
+# 使用例
+print(Route.TECH.value)      # → "tech"
+print(Route.TECH == "tech")  # → True（strを継承しているので比較可能）
+
+# int型にしたい場合
+class Priority(int, Enum):
+    HIGH = 1
+    LOW = 2
+```
+
+### Step 2: ルート判定用の型
+
+```python
+from pydantic import BaseModel, Field
+
+class RouteOutput(BaseModel):
+    route: Route = Field(description="質問の分類")
+```
+
+LLMに `with_structured_output(RouteOutput)` で返させる。
+
+### Step 3: 完全なコード例
+
+```python
+from enum import Enum
+from pydantic import BaseModel, Field
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.runnables import RunnableLambda
+
+# ========== 1. Enum定義 ==========
+class Route(str, Enum):
+    TECH = "tech"
+    GENERAL = "general"
+
+class RouteOutput(BaseModel):
+    route: Route = Field(description="質問の分類")
+
+# ========== 2. ダミーretriever（本番はVertex AI等） ==========
+tech_docs = {
+    "Python": "Pythonは動的型付け言語です。",
+    "LangChain": "LangChainはLLMアプリ開発フレームワークです。",
+}
+
+general_docs = {
+    "天気": "東京の天気は晴れです。",
+    "挨拶": "こんにちは！",
+}
+
+def tech_retriever(query: str) -> str:
+    for keyword, content in tech_docs.items():
+        if keyword.lower() in query.lower():
+            return content
+    return "技術情報が見つかりません。"
+
+def general_retriever(query: str) -> str:
+    for keyword, content in general_docs.items():
+        if keyword in query:
+            return content
+    return "一般情報が見つかりません。"
+
+# ========== 3. LLMとプロンプト ==========
+llm = ChatGoogleGenerativeAI(
+    model="gemini-2.0-flash-001",
+    project="your-project-id",
+    location="us-central1"
+)
+
+route_prompt = ChatPromptTemplate.from_messages([
+    ("system", """質問を以下のどちらかに分類してください:
+- tech: プログラミング、技術、IT関連
+- general: 天気、ニュース、日常会話など"""),
+    ("human", "{question}")
+])
+
+answer_prompt = ChatPromptTemplate.from_messages([
+    ("system", "以下の情報を元に回答してください。"),
+    ("human", "情報: {context}\n\n質問: {question}")
+])
+
+# ========== 4. ルート判定チェーン ==========
+route_chain = (
+    route_prompt
+    | llm.with_structured_output(RouteOutput)
+    | (lambda x: x.route)  # Route.TECH or Route.GENERAL
+)
+
+# ========== 5. 分岐処理 ==========
+def route_and_retrieve(input_dict):
+    question = input_dict["question"]
+    route = route_chain.invoke({"question": question})
+
+    print(f"📍 ルート判定: {route.value}")
+
+    if route == Route.TECH:
+        context = tech_retriever(question)
+    else:
+        context = general_retriever(question)
+
+    return {"question": question, "context": context}
+
+# ========== 6. 最終チェーン ==========
+full_chain = (
+    RunnableLambda(lambda x: {"question": x})
+    | RunnableLambda(route_and_retrieve)
+    | answer_prompt
+    | llm
+    | StrOutputParser()
+)
+
+# ========== 実行 ==========
+print(full_chain.invoke("Pythonについて教えて"))
+# → 📍 ルート判定: tech
+# → Pythonは動的型付け言語です...
+```
+
+### なぜEnumを使う？
+
+```python
+# ❌ 文字列だとタイポしても気づかない
+route = "teck"  # タイポ！でもエラーにならない
+
+# ✅ Enumだとエラーになる
+route = Route.TECK  # AttributeError!
+```
+
+**LLMの出力を決まった選択肢に制限**できる。
+
+### RunnableLambda が必要な理由
+
+```python
+# ❌ 両方とも普通の関数だとエラー
+(lambda x: ...) | route_and_retrieve  # TypeError!
+
+# ✅ RunnableLambdaでラップ
+RunnableLambda(lambda x: ...) | RunnableLambda(func)
+```
+
+**ルール:** `|`の右側がRunnableなら左側は自動変換される。両方普通の関数だとダメ。
+
+### まとめ表
+
+| 要素 | 役割 |
+|------|------|
+| `Route(str, Enum)` | 選択肢を制限（tech/general のみ） |
+| `RouteOutput(BaseModel)` | LLMの出力型 |
+| `with_structured_output` | LLMにEnumを返させる |
+| `route == Route.TECH` | 分岐条件 |
+| `RunnableLambda` | 関数をパイプラインで使う |
+
+---
+
+## 17. Enumルーティング × RAG-Fusion（応用）
+
+> **このセクションの主要関数:** ルーティング + RRF の組み合わせ
+
+### 発展パターン
+
+Enumルーティングで振り分けた後、各retrieverでRAG-Fusionを実行する。
+
+```
+質問: "Pythonのエラーについて"
+    ↓
+ルート判定 → TECH
+    ↓
+tech用に Multi-Query 生成
+    ↓
+複数クエリで tech_retriever 検索
+    ↓
+RRFでスコアリング
+    ↓
+回答生成
+```
+
+### コード例
+
+```python
+from langchain_core.runnables import RunnablePassthrough
+
+# クエリ生成（16章と同じ）
+class QueryGenerationOutput(BaseModel):
+    queries: list[str] = Field(description="検索クエリ3つ")
+
+query_prompt = ChatPromptTemplate.from_messages([
+    ("human", "質問に対して検索クエリを3つ生成:\n{question}")
+])
+
+query_chain = (
+    query_prompt
+    | llm.with_structured_output(QueryGenerationOutput)
+    | (lambda x: x.queries)
+)
+
+# retrieverを辞書で管理
+retrievers = {
+    Route.TECH: tech_vector_store.as_retriever(),
+    Route.GENERAL: general_vector_store.as_retriever(),
+}
+
+def route_and_fusion(input_dict):
+    """ルーティング → Multi-Query → RRF"""
+    question = input_dict["question"]
+
+    # 1. ルート判定
+    route = route_chain.invoke({"question": question})
+    print(f"📍 ルート: {route.value}")
+
+    # 2. Multi-Query生成
+    queries = query_chain.invoke({"question": question})
+    print(f"📝 生成クエリ: {queries}")
+
+    # 3. 選ばれたretrieverで検索
+    retriever = retrievers[route]
+    results = [retriever.invoke(q) for q in queries]
+
+    # 4. RRFでスコアリング
+    fused_docs = reciprocal_rank_fusion(results)
+
+    return {
+        "question": question,
+        "context": fused_docs[:5]  # 上位5件
+    }
+
+# 最終チェーン
+fusion_chain = (
+    RunnableLambda(lambda x: {"question": x})
+    | RunnableLambda(route_and_fusion)
+    | answer_prompt
+    | llm
+    | StrOutputParser()
+)
+```
+
+### 処理の流れ
+
+```
+1. 質問: "LangChainのエラー対処法"
+    ↓
+2. ルート判定: Route.TECH
+    ↓
+3. Multi-Query生成:
+   ["LangChainエラー", "LangChain例外", "LangChainトラブル"]
+    ↓
+4. tech_retrieverで各クエリ検索:
+   クエリ1 → [Doc1, Doc2, Doc3]
+   クエリ2 → [Doc2, Doc4, Doc1]
+   クエリ3 → [Doc1, Doc3, Doc5]
+    ↓
+5. RRFスコアリング:
+   Doc1: 3回出現・上位 → 高スコア
+   Doc2: 2回出現 → 中スコア
+   ...
+    ↓
+6. 上位ドキュメントでLLM回答生成
+```
+
+### 本番での使い方
+
+```python
+# Vertex AI Searchの場合
+from langchain_google_community import VertexAISearchRetriever
+
+retrievers = {
+    Route.TECH: VertexAISearchRetriever(
+        project_id="...",
+        data_store_id="tech-docs",  # 技術文書用
+    ),
+    Route.GENERAL: VertexAISearchRetriever(
+        project_id="...",
+        data_store_id="general-docs",  # 一般文書用
+    ),
+}
+```
+
+### まとめ
+
+| 手法 | 処理 |
+|------|------|
+| Enumルーティング | 質問を分類してretrieverを選択 |
+| Multi-Query | 複数の検索クエリを生成 |
+| RAG-Fusion (RRF) | 結果をスコアリングして重複排除 |
+| 組み合わせ | 分類 → 複数検索 → スコアリング → 回答 |
+
+**この組み合わせで、適切なデータソースから高精度な検索結果を得られる！**
+
+---
+
 ## 今後追加予定
 
 - デバッグ方法
 - 本番デプロイ時の注意点
-- Vertex AI Search との連携例
 - エラーハンドリングのベストプラクティス
 
 </div>
