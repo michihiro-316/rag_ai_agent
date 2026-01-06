@@ -267,14 +267,15 @@
         .tag.purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
         .tag.orange { background: rgba(249, 115, 22, 0.2); color: var(--accent-orange); }
         .highlight-box {
-            background: rgba(34, 197, 94, 0.1);
+            background: #1a2634;
+            border: 2px solid var(--border-color);
             border-left: 4px solid var(--accent-green);
             border-radius: 0 12px 12px 0;
             padding: 1.5rem;
             margin: 1.5rem 0;
         }
-        .highlight-box.warning { border-left-color: var(--accent-orange); background: rgba(249, 115, 22, 0.1); }
-        .highlight-box.success { border-left-color: var(--accent-green); background: rgba(34, 197, 94, 0.15); }
+        .highlight-box.warning { border-left-color: var(--accent-orange); background: #2a1f1a; }
+        .highlight-box.success { border-left-color: var(--accent-green); background: #1a2a1f; }
         .highlight-title { font-weight: 700; color: var(--accent-green); margin-bottom: 0.5rem; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1rem 0; }
         th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
@@ -899,6 +900,31 @@ workflow.add_conditional_edges(
                 <p class="section-subtitle">カスタマーサポートAIを一から作る</p>
             </div>
 
+            <!-- 進行インジケーター -->
+            <div class="card" style="background: linear-gradient(135deg, #1a2634, #243447); padding: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                    <span style="color: var(--accent-green); font-weight: 700;">📍 現在の進行状況</span>
+                    <span id="tutorialProgress" style="color: var(--text-secondary);">Step 1 / 6</span>
+                </div>
+                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                    <button class="tut-step-btn active" data-step="1" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--accent-green); background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">1. 環境</button>
+                    <button class="tut-step-btn" data-step="2" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">2. State</button>
+                    <button class="tut-step-btn" data-step="3" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">3. Node</button>
+                    <button class="tut-step-btn" data-step="4" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">4. 分岐</button>
+                    <button class="tut-step-btn" data-step="5" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">5. 組立</button>
+                    <button class="tut-step-btn" data-step="6" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">6. 実行</button>
+                </div>
+                <div style="margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 2rem;" id="tutorialIcon">📁</span>
+                        <div>
+                            <div id="tutorialStepName" style="color: var(--text-primary); font-weight: 700;">環境準備</div>
+                            <div id="tutorialStepDesc" style="color: var(--text-secondary); font-size: 0.85rem;">プロジェクト作成とライブラリインストール</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon blue">🎯</div>
@@ -970,16 +996,16 @@ mkdir customer_support_ai
 cd customer_support_ai
 
 <span class="cm"># 必要なライブラリをインストール</span>
-pip install langgraph langchain-openai python-dotenv
+pip install langgraph langchain-google-vertexai python-dotenv
 
-<span class="cm"># 環境変数ファイルを作成</span>
-echo "OPENAI_API_KEY=sk-your-key-here" > .env</pre>
+<span class="cm"># Google Cloud認証（事前にgcloud CLIをインストール）</span>
+gcloud auth application-default login</pre>
                         </div>
                     </div>
                 </div>
                 <div class="highlight-box warning">
-                    <div class="highlight-title">⚠️ APIキーについて</div>
-                    <p>OpenAI APIキーは<a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>から取得できます。<br><code>.env</code>ファイルは<strong>絶対にGitにコミットしない</strong>でください！</p>
+                    <div class="highlight-title">⚠️ Google Cloud認証について</div>
+                    <p>Vertex AIを使うには<a href="https://console.cloud.google.com/" target="_blank" style="color: var(--accent-cyan);">Google Cloud Console</a>でプロジェクトを作成し、Vertex AI APIを有効化してください。<br><code>gcloud</code>コマンドで認証後、プロジェクトIDを設定します。</p>
                 </div>
             </div>
 
@@ -1027,6 +1053,15 @@ echo "OPENAI_API_KEY=sk-your-key-here" > .env</pre>
                         <li><code>Annotated[..., add]</code>: 新しい値が「追加」される（上書きではない）</li>
                     </ul>
                 </div>
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
+                    <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 AIエンジニア視点</div>
+                    <p style="margin-bottom: 0.5rem;"><strong>State設計は最初にしっかり考える！</strong></p>
+                    <ul style="margin: 0 0 0 1rem; color: var(--text-secondary);">
+                        <li>後から追加するのは簡単だが、<strong>削除は難しい</strong>（既存のNodeが依存している可能性）</li>
+                        <li>実務では<code>error_message</code>や<code>retry_count</code>も入れておくと便利</li>
+                        <li><code>history</code>はトークン数制限があるので、<strong>直近N件に絞る</strong>のが定石</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- ステップ3 -->
@@ -1044,10 +1079,10 @@ echo "OPENAI_API_KEY=sk-your-key-here" > .env</pre>
                     <div class="code-body">
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span></div>
                         <div class="code-content">
-<pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+<pre><span class="kw">from</span> langchain_google_vertexai <span class="kw">import</span> ChatVertexAI
 <span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
 
-llm = ChatOpenAI(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="cl">0</span>)
+llm = ChatVertexAI(model=<span class="st">"gemini-1.5-flash"</span>, temperature=<span class="cl">0</span>)
 
 <span class="kw">def</span> <span class="fn">classifier_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
     <span class="st">"""ユーザーの質問を分類する"""</span>
@@ -1113,6 +1148,16 @@ llm = ChatOpenAI(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span 
                         </div>
                     </div>
                 </div>
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
+                    <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 AIエンジニア視点</div>
+                    <p style="margin-bottom: 0.5rem;"><strong>Node設計のベストプラクティス</strong></p>
+                    <ul style="margin: 0 0 0 1rem; color: var(--text-secondary);">
+                        <li><strong>1 Node = 1責務</strong>: 分類と応答生成を分けると、後で差し替えやすい</li>
+                        <li><strong>LLM呼び出しは最小限</strong>: API料金とレイテンシに直結する</li>
+                        <li><strong>エラーハンドリング</strong>: 本番では<code>try-except</code>でLLM障害に備える</li>
+                        <li><strong>ログ出力</strong>: <code>print(f"[classifier] {category}")</code>でデバッグしやすく</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- ステップ4 -->
@@ -1168,9 +1213,10 @@ llm = ChatOpenAI(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span 
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span></div>
                         <div class="code-content">
 <pre><span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
-<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+<span class="kw">import</span> os
 
-load_dotenv()  <span class="cm"># .envからAPIキーを読み込み</span>
+<span class="cm"># Google CloudプロジェクトIDを設定</span>
+os.environ[<span class="st">"GOOGLE_CLOUD_PROJECT"</span>] = <span class="st">"your-project-id"</span>
 
 <span class="kw">def</span> <span class="fn">create_support_graph</span>():
     <span class="st">"""カスタマーサポートグラフを構築"""</span>
@@ -1401,6 +1447,79 @@ result2 = graph.invoke({
 
         // 初期表示
         updateFlowDiagram();
+
+        // チュートリアル進行インジケーター
+        const tutorialSteps = {
+            1: { icon: '📁', name: '環境準備', desc: 'プロジェクト作成とライブラリインストール' },
+            2: { icon: '📦', name: 'State定義', desc: '共有データ構造を設計する' },
+            3: { icon: '⚙️', name: 'Node定義', desc: '処理ロジックを実装する' },
+            4: { icon: '🔀', name: '条件分岐', desc: 'ルーティングロジックを作る' },
+            5: { icon: '🔗', name: 'グラフ組立', desc: 'すべてを接続してグラフ完成' },
+            6: { icon: '▶️', name: '実行テスト', desc: '動作確認して完成！' }
+        };
+
+        document.querySelectorAll('.tut-step-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const step = parseInt(this.dataset.step);
+
+                // ボタンのスタイル更新
+                document.querySelectorAll('.tut-step-btn').forEach(b => {
+                    b.style.border = '2px solid var(--border-color)';
+                    b.style.background = 'transparent';
+                    b.style.color = 'var(--text-secondary)';
+                });
+                this.style.border = '2px solid var(--accent-green)';
+                this.style.background = 'rgba(34, 197, 94, 0.2)';
+                this.style.color = 'var(--accent-green)';
+
+                // 情報更新
+                document.getElementById('tutorialProgress').textContent = `Step ${step} / 6`;
+                document.getElementById('tutorialIcon').textContent = tutorialSteps[step].icon;
+                document.getElementById('tutorialStepName').textContent = tutorialSteps[step].name;
+                document.getElementById('tutorialStepDesc').textContent = tutorialSteps[step].desc;
+
+                // 該当セクションにスクロール
+                const targetId = `tut-step${step}`;
+                const target = document.getElementById(targetId);
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    target.style.animation = 'none';
+                    setTimeout(() => {
+                        target.style.animation = 'fadeIn 0.5s ease';
+                    }, 10);
+                }
+            });
+        });
+
+        // スクロールで自動更新
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const stepMatch = entry.target.id.match(/tut-step(\d)/);
+                    if (stepMatch) {
+                        const step = parseInt(stepMatch[1]);
+                        document.querySelectorAll('.tut-step-btn').forEach(b => {
+                            const btnStep = parseInt(b.dataset.step);
+                            if (btnStep === step) {
+                                b.style.border = '2px solid var(--accent-green)';
+                                b.style.background = 'rgba(34, 197, 94, 0.2)';
+                                b.style.color = 'var(--accent-green)';
+                            } else {
+                                b.style.border = '2px solid var(--border-color)';
+                                b.style.background = 'transparent';
+                                b.style.color = 'var(--text-secondary)';
+                            }
+                        });
+                        document.getElementById('tutorialProgress').textContent = `Step ${step} / 6`;
+                        document.getElementById('tutorialIcon').textContent = tutorialSteps[step].icon;
+                        document.getElementById('tutorialStepName').textContent = tutorialSteps[step].name;
+                        document.getElementById('tutorialStepDesc').textContent = tutorialSteps[step].desc;
+                    }
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('[id^="tut-step"]').forEach(el => observer.observe(el));
     </script>
 </body>
 </html>
