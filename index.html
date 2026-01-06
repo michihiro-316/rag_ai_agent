@@ -1020,50 +1020,72 @@ workflow.add_conditional_edges(
                     <div class="card-icon blue">🎯</div>
                     <h3 class="card-title">このチュートリアルで作るもの</h3>
                 </div>
-                <p>実際に動く<strong>カスタマーサポートAI</strong>を作ります。</p>
+                <p>実際に動く<strong>議事録要約AI</strong>を作ります。会議テキストから構造化された議事録を自動生成！</p>
                 <div class="highlight-box success" style="margin: 1rem 0;">
                     <div class="highlight-title">✅ 完成後にできること</div>
                     <ul style="margin: 0.5rem 0 0 1.5rem;">
-                        <li>ユーザーの質問を<strong>自動分類</strong>（返品・配送・その他）</li>
-                        <li>分類に応じて<strong>適切な回答</strong>を生成</li>
-                        <li>曖昧な質問には<strong>確認質問</strong>を返す</li>
-                        <li>会話履歴を<strong>自動保存</strong></li>
+                        <li>会議テキストを<strong>自動要約</strong>（300文字程度）</li>
+                        <li>主要な<strong>議題を抽出</strong>（リスト形式）</li>
+                        <li><strong>アクションアイテム</strong>を自動抽出（担当者・期限付き）</li>
+                        <li>長い会議は詳細モード、短い会議は簡易モードで<strong>自動切り替え</strong></li>
                     </ul>
                 </div>
                 <div class="diagram-container">
-                    <div class="diagram-title">完成イメージ</div>
-                    <svg class="svg-diagram" viewBox="0 0 700 200">
+                    <div class="diagram-title">完成イメージ - 議事録要約AIのフロー</div>
+                    <svg class="svg-diagram" viewBox="0 0 800 220">
                         <defs>
                             <marker id="arrTut" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
                                 <polygon points="0 0, 10 3.5, 0 7" fill="#667eea"/>
                             </marker>
                         </defs>
-                        <circle cx="80" cy="100" r="35" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="2"/>
-                        <text x="80" y="105" text-anchor="middle" fill="#10b981" font-size="11">START</text>
-                        <line x1="115" y1="100" x2="165" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
-                        <circle cx="210" cy="100" r="40" fill="#667eea" fill-opacity="0.3" stroke="#667eea" stroke-width="2"/>
-                        <text x="210" y="95" text-anchor="middle" fill="#667eea" font-size="10">classifier</text>
-                        <text x="210" y="110" text-anchor="middle" fill="#667eea" font-size="10">_node</text>
-                        <polygon points="300,100 330,70 360,100 330,130" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
-                        <line x1="255" y1="100" x2="295" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
-                        <line x1="360" y1="100" x2="405" y2="60" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
-                        <line x1="360" y1="100" x2="405" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
-                        <line x1="360" y1="100" x2="405" y2="140" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
-                        <circle cx="450" cy="55" r="30" fill="#06b6d4" fill-opacity="0.3" stroke="#06b6d4" stroke-width="2"/>
-                        <text x="450" y="60" text-anchor="middle" fill="#06b6d4" font-size="9">返品対応</text>
-                        <circle cx="450" cy="100" r="30" fill="#f97316" fill-opacity="0.3" stroke="#f97316" stroke-width="2"/>
-                        <text x="450" y="105" text-anchor="middle" fill="#f97316" font-size="9">配送確認</text>
-                        <circle cx="450" cy="145" r="30" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="2"/>
-                        <text x="450" y="150" text-anchor="middle" fill="#ec4899" font-size="9">一般質問</text>
-                        <line x1="485" y1="60" x2="540" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
-                        <line x1="485" y1="100" x2="540" y2="100" stroke="#667eea" stroke-width="2"/>
-                        <line x1="485" y1="145" x2="540" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
-                        <circle cx="580" cy="100" r="35" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="2"/>
-                        <text x="580" y="95" text-anchor="middle" fill="#22c55e" font-size="10">responder</text>
-                        <text x="580" y="110" text-anchor="middle" fill="#22c55e" font-size="10">_node</text>
-                        <line x1="620" y1="100" x2="660" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
-                        <circle cx="680" cy="100" r="20" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="2"/>
-                        <text x="680" y="105" text-anchor="middle" fill="#ec4899" font-size="9">END</text>
+                        <!-- START -->
+                        <circle cx="50" cy="110" r="25" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="2"/>
+                        <text x="50" y="115" text-anchor="middle" fill="#10b981" font-size="10">START</text>
+                        <!-- Arrow to summarize -->
+                        <line x1="75" y1="110" x2="115" y2="110" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <!-- summarize -->
+                        <rect x="120" y="85" width="80" height="50" rx="8" fill="#667eea" fill-opacity="0.3" stroke="#667eea" stroke-width="2"/>
+                        <text x="160" y="105" text-anchor="middle" fill="#667eea" font-size="9">summarize</text>
+                        <text x="160" y="120" text-anchor="middle" fill="#667eea" font-size="9">_node</text>
+                        <!-- Arrow to check_length -->
+                        <line x1="200" y1="110" x2="240" y2="110" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <!-- check_length -->
+                        <rect x="245" y="85" width="80" height="50" rx="8" fill="#06b6d4" fill-opacity="0.3" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="285" y="105" text-anchor="middle" fill="#06b6d4" font-size="9">check</text>
+                        <text x="285" y="120" text-anchor="middle" fill="#06b6d4" font-size="9">_length</text>
+                        <!-- Diamond (routing) -->
+                        <polygon points="390,110 420,80 450,110 420,140" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
+                        <text x="420" y="113" text-anchor="middle" fill="#8b5cf6" font-size="9">is_long?</text>
+                        <line x1="325" y1="110" x2="385" y2="110" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <!-- Detailed path (top) -->
+                        <line x1="450" y1="95" x2="490" y2="60" stroke="#22c55e" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <text x="460" y="65" fill="#22c55e" font-size="8">True</text>
+                        <!-- extract_topics -->
+                        <rect x="495" y="35" width="70" height="45" rx="6" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="2"/>
+                        <text x="530" y="53" text-anchor="middle" fill="#22c55e" font-size="8">extract</text>
+                        <text x="530" y="66" text-anchor="middle" fill="#22c55e" font-size="8">_topics</text>
+                        <!-- Arrow to extract_actions -->
+                        <line x1="565" y1="57" x2="590" y2="57" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <!-- extract_actions -->
+                        <rect x="595" y="35" width="70" height="45" rx="6" fill="#f97316" fill-opacity="0.3" stroke="#f97316" stroke-width="2"/>
+                        <text x="630" y="53" text-anchor="middle" fill="#f97316" font-size="8">extract</text>
+                        <text x="630" y="66" text-anchor="middle" fill="#f97316" font-size="8">_actions</text>
+                        <!-- Arrow from actions to format -->
+                        <line x1="665" y1="80" x2="665" y2="120" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <!-- Simple path (bottom) -->
+                        <line x1="450" y1="125" x2="540" y2="160" stroke="#f97316" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <text x="480" y="155" fill="#f97316" font-size="8">False</text>
+                        <!-- format_doc -->
+                        <rect x="545" y="135" width="80" height="50" rx="8" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="2"/>
+                        <text x="585" y="155" text-anchor="middle" fill="#ec4899" font-size="9">format</text>
+                        <text x="585" y="170" text-anchor="middle" fill="#ec4899" font-size="9">_doc</text>
+                        <!-- Connect detailed to format -->
+                        <line x1="665" y1="130" x2="625" y2="145" stroke="#667eea" stroke-width="2"/>
+                        <!-- Arrow to END -->
+                        <line x1="625" y1="160" x2="700" y2="160" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <!-- END -->
+                        <circle cx="730" cy="160" r="25" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="2"/>
+                        <text x="730" y="165" text-anchor="middle" fill="#ec4899" font-size="10">END</text>
                     </svg>
                 </div>
             </div>
@@ -1080,27 +1102,65 @@ workflow.add_conditional_edges(
                     <h3 class="card-title">Step 1: 環境準備</h3>
                     <span class="tag green" style="margin-left: auto;">所要時間: 5分</span>
                 </div>
-                <p>まずはプロジェクトを作成し、必要なライブラリをインストールします。</p>
+                <p>「<strong>議事録要約AI</strong>」を作ります。会議のテキストを入力すると、要約・議題・アクションアイテムを自動抽出してくれるツールです。</p>
+
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
+                    <div class="highlight-title" style="color: var(--accent-cyan);">🎯 このチュートリアルで作るもの</div>
+                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
+                        <li><strong>入力</strong>: 会議のテキスト（Zoomの文字起こし、手書きメモなど）</li>
+                        <li><strong>処理</strong>: 要約生成 → 長さ判定 → 議題抽出 → アクションアイテム抽出</li>
+                        <li><strong>出力</strong>: 構造化された議事録（Markdown形式）</li>
+                    </ul>
+                </div>
+
                 <div class="code-block">
-                    <div class="code-header">Terminal</div>
+                    <div class="code-header">Terminal - プロジェクトのセットアップ</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span></div>
                         <div class="code-content">
-<pre><span class="cm"># プロジェクトディレクトリを作成</span>
-mkdir customer_support_ai
-cd customer_support_ai
+<pre><span class="cm"># ============================================</span>
+<span class="cm"># 1. プロジェクトディレクトリを作成</span>
+<span class="cm">#    → 専用フォルダで依存関係を管理</span>
+<span class="cm"># ============================================</span>
+mkdir meeting_summarizer
+cd meeting_summarizer
 
-<span class="cm"># 必要なライブラリをインストール</span>
-pip install langgraph langchain-google-vertexai python-dotenv
-
-<span class="cm"># Google Cloud認証（事前にgcloud CLIをインストール）</span>
-gcloud auth application-default login</pre>
+<span class="cm"># ============================================</span>
+<span class="cm"># 2. 必要なライブラリをインストール</span>
+<span class="cm">#    langgraph: グラフ構築の本体</span>
+<span class="cm">#    langchain-google-vertexai: Gemini APIへの接続</span>
+<span class="cm"># ============================================</span>
+pip install langgraph langchain-google-vertexai</pre>
                         </div>
                     </div>
                 </div>
+
+                <div class="code-block">
+                    <div class="code-header">Terminal - Google Cloud認証</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span></div>
+                        <div class="code-content">
+<pre><span class="cm"># ============================================</span>
+<span class="cm"># 3. Google Cloud認証</span>
+<span class="cm">#    なぜ必要？ → Vertex AI（Gemini）はGCPのサービスなので認証が必要</span>
+<span class="cm">#    事前準備: gcloud CLIをインストールしておく</span>
+<span class="cm"># ============================================</span>
+
+<span class="cm"># ブラウザが開いてGoogleアカウントでログイン</span>
+gcloud auth application-default login
+
+<span class="cm"># プロジェクトIDを設定（GCPコンソールで確認）</span>
+gcloud config set project YOUR_PROJECT_ID</pre>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="highlight-box warning">
-                    <div class="highlight-title">⚠️ Google Cloud認証について</div>
-                    <p>Vertex AIを使うには<a href="https://console.cloud.google.com/" target="_blank" style="color: var(--accent-cyan);">Google Cloud Console</a>でプロジェクトを作成し、Vertex AI APIを有効化してください。<br><code>gcloud</code>コマンドで認証後、プロジェクトIDを設定します。</p>
+                    <div class="highlight-title">⚠️ Vertex AI APIの有効化（初回のみ）</div>
+                    <p>1. <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--accent-cyan);">Google Cloud Console</a>にアクセス<br>
+                    2. 「APIとサービス」→「ライブラリ」で「Vertex AI API」を検索<br>
+                    3. 「有効にする」をクリック<br>
+                    <strong>※ 無料枠あり</strong>: Gemini 1.5 Flashは月100万トークンまで無料</p>
                 </div>
             </div>
 
@@ -1111,50 +1171,115 @@ gcloud auth application-default login</pre>
                     <h3 class="card-title">Step 2: Stateを定義する</h3>
                     <span class="tag emerald" style="margin-left: auto;">最重要</span>
                 </div>
-                <p>まず「何のデータを持ち回るか」を決めます。これが<strong>State</strong>です。</p>
+
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
+                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 なぜStateが必要？</div>
+                    <p>LangGraphでは、<strong>Nodeの間でデータを受け渡す</strong>ために「State」を使います。<br>
+                    「会議テキスト」から始まり、「要約」→「議題」→「アクションアイテム」と加工されていくデータの<strong>箱</strong>です。</p>
+                </div>
+
                 <div class="code-block">
-                    <div class="code-header">Python - state.py</div>
+                    <div class="code-header">Python - state.py（このファイルを作成）</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span></div>
                         <div class="code-content">
-<pre><span class="kw">from</span> typing <span class="kw">import</span> TypedDict, Literal, Annotated, List
-<span class="kw">from</span> operator <span class="kw">import</span> add
+<pre><span class="st">"""
+State定義ファイル
 
-<span class="kw">class</span> <span class="cl">SupportState</span>(TypedDict):
-    <span class="st">"""カスタマーサポートAIの状態"""</span>
+【このファイルの役割】
+LangGraphで処理するデータの「型」を定義します。
+TypedDictを使うと、IDEの補完が効いて開発が楽になります。
+"""</span>
 
-    <span class="cm"># ユーザーからの質問（入力）</span>
-    user_question: <span class="cl">str</span>
+<span class="kw">from</span> typing <span class="kw">import</span> TypedDict, Literal, Annotated, List
+<span class="kw">from</span> operator <span class="kw">import</span> add  <span class="cm"># リストを「追加」するためのreducer</span>
 
-    <span class="cm"># 質問の分類結果（返品/配送/一般/不明）</span>
-    category: Literal[<span class="st">"refund"</span>, <span class="st">"shipping"</span>, <span class="st">"general"</span>, <span class="st">"unclear"</span>]
 
-    <span class="cm"># AIからの回答（出力）</span>
-    response: <span class="cl">str</span>
+<span class="kw">class</span> <span class="cl">MeetingState</span>(TypedDict):
+    <span class="st">"""
+    議事録要約AIの状態（State）
 
-    <span class="cm"># 会話履歴（自動で追加されていく）</span>
-    history: Annotated[List[<span class="cl">str</span>], add]
+    【設計のポイント】
+    1. 入力: 最初に与えるデータ（raw_text）
+    2. 中間: 処理途中で埋まるデータ（summary, is_long）
+    3. 出力: 最終的に取り出すデータ（topics, action_items, final_doc）
+    """</span>
 
-    <span class="cm"># 確信度（0.0〜1.0）</span>
-    confidence: <span class="cl">float</span></pre>
+    <span class="cm"># ============================</span>
+    <span class="cm"># 入力データ（ユーザーが与える）</span>
+    <span class="cm"># ============================</span>
+    raw_text: <span class="cl">str</span>  <span class="cm"># 会議の生テキスト（Zoom文字起こし等）</span>
+
+    <span class="cm"># ============================</span>
+    <span class="cm"># 中間データ（Nodeが埋めていく）</span>
+    <span class="cm"># ============================</span>
+    summary: <span class="cl">str</span>              <span class="cm"># 要約結果（300文字程度）</span>
+    is_long: <span class="cl">bool</span>             <span class="cm"># 長い会議か？（条件分岐に使用）</span>
+    topics: List[<span class="cl">str</span>]        <span class="cm"># 議題リスト（例: ["予算", "スケジュール"]）</span>
+    action_items: List[<span class="cl">str</span>]  <span class="cm"># アクションアイテム（例: ["田中: 見積作成"]）</span>
+
+    <span class="cm"># ============================</span>
+    <span class="cm"># 出力データ（最終成果物）</span>
+    <span class="cm"># ============================</span>
+    final_doc: <span class="cl">str</span>  <span class="cm"># 整形された議事録（Markdown形式）</span>
+
+    <span class="cm"># ============================</span>
+    <span class="cm"># 処理ログ（デバッグ用）</span>
+    <span class="cm"># Annotated[List, add] = 新しい値が「追加」される</span>
+    <span class="cm"># → 各Nodeが ["[要約完了]", "[議題抽出完了]"] と追加していく</span>
+    <span class="cm"># ============================</span>
+    logs: Annotated[List[<span class="cl">str</span>], add]</pre>
                         </div>
                     </div>
                 </div>
+
                 <div class="highlight-box success">
-                    <div class="highlight-title">💡 ポイント解説</div>
-                    <ul style="margin: 0.5rem 0 0 1rem;">
-                        <li><code>TypedDict</code>: Pythonの辞書に型をつけたもの。IDEの補完が効く！</li>
-                        <li><code>Literal</code>: 決まった値しか入らないことを示す</li>
-                        <li><code>Annotated[..., add]</code>: 新しい値が「追加」される（上書きではない）</li>
-                    </ul>
+                    <div class="highlight-title">💡 各フィールドの説明</div>
+                    <table style="width: 100%; margin-top: 0.5rem;">
+                        <tr>
+                            <th style="width: 25%; padding: 0.5rem; background: rgba(34, 197, 94, 0.1);">フィールド</th>
+                            <th style="width: 35%; padding: 0.5rem; background: rgba(34, 197, 94, 0.1);">役割</th>
+                            <th style="width: 40%; padding: 0.5rem; background: rgba(34, 197, 94, 0.1);">誰が設定？</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;"><code>raw_text</code></td>
+                            <td style="padding: 0.5rem;">生の会議テキスト</td>
+                            <td style="padding: 0.5rem;">ユーザー（最初に渡す）</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;"><code>summary</code></td>
+                            <td style="padding: 0.5rem;">要約テキスト</td>
+                            <td style="padding: 0.5rem;">summarize_node</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;"><code>is_long</code></td>
+                            <td style="padding: 0.5rem;">長い会議フラグ</td>
+                            <td style="padding: 0.5rem;">check_length_node</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;"><code>topics</code></td>
+                            <td style="padding: 0.5rem;">議題リスト</td>
+                            <td style="padding: 0.5rem;">extract_topics_node</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;"><code>action_items</code></td>
+                            <td style="padding: 0.5rem;">アクション一覧</td>
+                            <td style="padding: 0.5rem;">extract_actions_node</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem;"><code>final_doc</code></td>
+                            <td style="padding: 0.5rem;">最終議事録</td>
+                            <td style="padding: 0.5rem;">format_doc_node</td>
+                        </tr>
+                    </table>
                 </div>
+
                 <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
                     <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 AIエンジニア視点</div>
-                    <p style="margin-bottom: 0.5rem;"><strong>State設計は最初にしっかり考える！</strong></p>
-                    <ul style="margin: 0 0 0 1rem; color: var(--text-secondary);">
-                        <li>後から追加するのは簡単だが、<strong>削除は難しい</strong>（既存のNodeが依存している可能性）</li>
-                        <li>実務では<code>error_message</code>や<code>retry_count</code>も入れておくと便利</li>
-                        <li><code>history</code>はトークン数制限があるので、<strong>直近N件に絞る</strong>のが定石</li>
+                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
+                        <li><strong>State設計は最初にしっかり考える！</strong> 後から追加は簡単だが、削除は既存Nodeに影響</li>
+                        <li><code>logs</code>のような<strong>Annotated[List, add]</strong>は、各Nodeがログを「追記」できて便利</li>
+                        <li>実務では<code>error_message</code>や<code>retry_count</code>も入れておくとエラーハンドリングしやすい</li>
                     </ul>
                 </div>
             </div>
@@ -1166,91 +1291,233 @@ gcloud auth application-default login</pre>
                     <h3 class="card-title">Step 3: Nodeを定義する</h3>
                     <span class="tag blue" style="margin-left: auto;">処理ロジック</span>
                 </div>
-                <p>各Node（頂点）は「Stateを受け取って、更新内容を返す関数」です。</p>
 
-                <h4 style="margin: 1.5rem 0 1rem; color: #667eea;">3-1. 分類ノード（classifier_node）</h4>
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
+                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 Nodeとは？</div>
+                    <p>Nodeは<strong>「Stateを受け取って、更新内容を返す関数」</strong>です。<br>
+                    議事録AIでは「要約する」「議題を抽出する」「アクションを抽出する」など、それぞれがNodeになります。</p>
+                </div>
+
+                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-1. 要約ノード（summarize_node）</h4>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">会議テキストを300文字程度に要約します。LLMを使う典型的なパターンです。</p>
+
                 <div class="code-block">
-                    <div class="code-header">Python - nodes.py（その1）</div>
+                    <div class="code-header">Python - nodes.py（その1: 要約）</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span></div>
                         <div class="code-content">
-<pre><span class="kw">from</span> langchain_google_vertexai <span class="kw">import</span> ChatVertexAI
+<pre><span class="st">"""
+Node定義ファイル
+
+【このファイルの役割】
+各処理（要約、議題抽出など）を個別の関数として定義します。
+関数は必ず「Stateを受け取り、更新する部分だけをdictで返す」形式です。
+"""</span>
+
+<span class="kw">from</span> langchain_google_vertexai <span class="kw">import</span> ChatVertexAI
 <span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
+<span class="kw">from</span> state <span class="kw">import</span> MeetingState  <span class="cm"># Step 2で作ったStateをimport</span>
 
-llm = ChatVertexAI(model=<span class="st">"gemini-1.5-flash"</span>, temperature=<span class="cl">0</span>)
+<span class="cm"># ============================================</span>
+<span class="cm"># LLMの初期化（全Nodeで共有）</span>
+<span class="cm"># temperature=0: 出力を安定させる（毎回同じ結果）</span>
+<span class="cm"># ============================================</span>
+llm = ChatVertexAI(
+    model=<span class="st">"gemini-1.5-flash"</span>,  <span class="cm"># 高速・低コスト</span>
+    temperature=<span class="cl">0</span>              <span class="cm"># 創造性を抑えて安定した出力</span>
+)
 
-<span class="kw">def</span> <span class="fn">classifier_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
-    <span class="st">"""ユーザーの質問を分類する"""</span>
 
+<span class="kw">def</span> <span class="fn">summarize_node</span>(state: MeetingState) -> <span class="cl">dict</span>:
+    <span class="st">"""
+    【要約ノード】
+    会議テキスト → 300文字程度の要約
+
+    なぜ要約から始める？
+    → 長い会議テキストをそのまま後続処理に渡すと、
+      トークン数が増えてコストが上がる＆精度が下がる
+    """</span>
+
+    <span class="cm"># プロンプトを定義（systemとhumanの2つのメッセージ）</span>
     prompt = ChatPromptTemplate.from_messages([
-        (<span class="st">"system"</span>, <span class="st">"""以下の質問を分類してください。
-- refund: 返品・返金に関する質問
-- shipping: 配送・配達に関する質問
-- general: その他の質問
-- unclear: 情報が不足している質問
-
-回答は分類名のみ（例: refund）"""</span>),
-        (<span class="st">"human"</span>, <span class="st">"{question}"</span>)
+        (<span class="st">"system"</span>, <span class="st">"""あなたは議事録作成のプロです。
+以下の会議内容を300文字程度で要約してください。
+- 重要な決定事項を優先
+- 具体的な数字や期日は必ず含める
+- 箇条書きではなく文章で"""</span>),
+        (<span class="st">"human"</span>, <span class="st">"{text}"</span>)  <span class="cm"># {text}に実際のテキストが入る</span>
     ])
 
+    <span class="cm"># LangChain式: prompt | llm で「チェーン」を作成</span>
     chain = prompt | llm
-    result = chain.invoke({<span class="st">"question"</span>: state[<span class="st">"user_question"</span>]})
-    category = result.content.strip().lower()
 
-    <span class="cm"># categoryとhistoryを更新して返す</span>
+    <span class="cm"># Stateから生テキストを取り出してLLMに渡す</span>
+    result = chain.invoke({<span class="st">"text"</span>: state[<span class="st">"raw_text"</span>]})
+
+    <span class="cm"># 更新したいフィールドだけをdictで返す</span>
+    <span class="cm"># → LangGraphが自動でStateにマージしてくれる</span>
     <span class="kw">return</span> {
-        <span class="st">"category"</span>: category,
-        <span class="st">"history"</span>: [<span class="st">f"[分類] {category}"</span>],
-        <span class="st">"confidence"</span>: <span class="cl">0.9</span> <span class="kw">if</span> category != <span class="st">"unclear"</span> <span class="kw">else</span> <span class="cl">0.3</span>
+        <span class="st">"summary"</span>: result.content,
+        <span class="st">"logs"</span>: [<span class="st">"[summarize] 要約完了"</span>]
     }</pre>
                         </div>
                     </div>
                 </div>
 
-                <h4 style="margin: 1.5rem 0 1rem; color: #667eea;">3-2. 各カテゴリの応答ノード</h4>
+                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-2. 長さチェックノード（check_length_node）</h4>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">LLMを使わない処理もNodeにできます。条件分岐に使うフラグを設定します。</p>
+
                 <div class="code-block">
-                    <div class="code-header">Python - nodes.py（その2）</div>
+                    <div class="code-header">Python - nodes.py（その2: 長さチェック）</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span></div>
                         <div class="code-content">
-<pre><span class="kw">def</span> <span class="fn">refund_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
-    <span class="st">"""返品・返金の問い合わせに対応"""</span>
-    prompt = ChatPromptTemplate.from_messages([
-        (<span class="st">"system"</span>, <span class="st">"返品・返金担当のサポートAIです。丁寧に対応してください。"</span>),
-        (<span class="st">"human"</span>, <span class="st">"{question}"</span>)
-    ])
-    chain = prompt | llm
-    result = chain.invoke({<span class="st">"question"</span>: state[<span class="st">"user_question"</span>]})
-    <span class="kw">return</span> {<span class="st">"response"</span>: result.content, <span class="st">"history"</span>: [<span class="st">"[返品対応]"</span>]}
+<pre><span class="kw">def</span> <span class="fn">check_length_node</span>(state: MeetingState) -> <span class="cl">dict</span>:
+    <span class="st">"""
+    【長さチェックノード】
+    会議テキストの長さで「詳細モード or 簡易モード」を判定
 
-<span class="kw">def</span> <span class="fn">shipping_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
-    <span class="st">"""配送の問い合わせに対応"""</span>
-    prompt = ChatPromptTemplate.from_messages([
-        (<span class="st">"system"</span>, <span class="st">"配送担当のサポートAIです。配送状況を案内してください。"</span>),
-        (<span class="st">"human"</span>, <span class="st">"{question}"</span>)
-    ])
-    chain = prompt | llm
-    result = chain.invoke({<span class="st">"question"</span>: state[<span class="st">"user_question"</span>]})
-    <span class="kw">return</span> {<span class="st">"response"</span>: result.content, <span class="st">"history"</span>: [<span class="st">"[配送対応]"</span>]}
+    なぜ分岐が必要？
+    → 長い会議: 議題・アクション抽出をしっかり
+    → 短い会議: シンプルに要約だけでOK
+    """</span>
 
-<span class="kw">def</span> <span class="fn">general_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
-    <span class="st">"""一般的な問い合わせに対応"""</span>
-    <span class="kw">return</span> {<span class="st">"response"</span>: <span class="st">"お問い合わせありがとうございます。詳しい内容をお聞かせください。"</span>}
+    <span class="cm"># 2000文字以上なら「長い会議」と判定</span>
+    text_length = <span class="bi">len</span>(state[<span class="st">"raw_text"</span>])
+    is_long = text_length > <span class="cl">2000</span>
 
-<span class="kw">def</span> <span class="fn">clarification_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
-    <span class="st">"""情報不足時の確認"""</span>
-    <span class="kw">return</span> {<span class="st">"response"</span>: <span class="st">"申し訳ありません。もう少し詳しくお聞かせいただけますか？"</span>}</pre>
+    <span class="bi">print</span>(<span class="st">f"[check_length] テキスト長: {text_length}文字 → {'詳細モード' if is_long else '簡易モード'}"</span>)
+
+    <span class="kw">return</span> {
+        <span class="st">"is_long"</span>: is_long,
+        <span class="st">"logs"</span>: [<span class="st">f"[check_length] {text_length}文字"</span>]
+    }</pre>
                         </div>
                     </div>
                 </div>
+
+                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-3. 議題抽出ノード / アクション抽出ノード</h4>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">同じパターンで複数のNodeを作ります。抽出結果はリストで返します。</p>
+
+                <div class="code-block">
+                    <div class="code-header">Python - nodes.py（その3: 抽出系）</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span></div>
+                        <div class="code-content">
+<pre><span class="kw">def</span> <span class="fn">extract_topics_node</span>(state: MeetingState) -> <span class="cl">dict</span>:
+    <span class="st">"""
+    【議題抽出ノード】
+    要約から主要な議題を抽出（リスト形式）
+
+    ポイント: LLMの出力を「改行区切り」にしてsplit()で分割
+    → JSON形式より確実に動作する
+    """</span>
+
+    prompt = ChatPromptTemplate.from_messages([
+        (<span class="st">"system"</span>, <span class="st">"""以下の会議要約から、議題を抽出してください。
+- 1行に1議題
+- 議題のみを出力（番号や記号なし）
+- 最大5個まで"""</span>),
+        (<span class="st">"human"</span>, <span class="st">"{summary}"</span>)
+    ])
+
+    chain = prompt | llm
+    result = chain.invoke({<span class="st">"summary"</span>: state[<span class="st">"summary"</span>]})
+
+    <span class="cm"># 改行で分割してリスト化</span>
+    topics = [
+        line.strip()
+        <span class="kw">for</span> line <span class="kw">in</span> result.content.split(<span class="st">"\n"</span>)
+        <span class="kw">if</span> line.strip()  <span class="cm"># 空行を除外</span>
+    ]
+
+    <span class="kw">return</span> {
+        <span class="st">"topics"</span>: topics,
+        <span class="st">"logs"</span>: [<span class="st">f"[topics] {len(topics)}件抽出"</span>]
+    }
+
+
+<span class="kw">def</span> <span class="fn">extract_actions_node</span>(state: MeetingState) -> <span class="cl">dict</span>:
+    <span class="st">"""
+    【アクションアイテム抽出ノード】
+    「誰が」「何を」「いつまでに」を抽出
+    """</span>
+
+    prompt = ChatPromptTemplate.from_messages([
+        (<span class="st">"system"</span>, <span class="st">"""以下の会議要約から、アクションアイテムを抽出してください。
+形式: 担当者: タスク内容（期限があれば記載）
+- 1行に1アクション
+- 具体的なタスクのみ抽出"""</span>),
+        (<span class="st">"human"</span>, <span class="st">"{summary}"</span>)
+    ])
+
+    chain = prompt | llm
+    result = chain.invoke({<span class="st">"summary"</span>: state[<span class="st">"summary"</span>]})
+
+    actions = [line.strip() <span class="kw">for</span> line <span class="kw">in</span> result.content.split(<span class="st">"\n"</span>) <span class="kw">if</span> line.strip()]
+
+    <span class="kw">return</span> {
+        <span class="st">"action_items"</span>: actions,
+        <span class="st">"logs"</span>: [<span class="st">f"[actions] {len(actions)}件抽出"</span>]
+    }</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-4. 整形ノード（format_doc_node）</h4>
+                <p style="margin-bottom: 1rem; color: var(--text-secondary);">最後に、すべての情報をMarkdown形式に整形します。</p>
+
+                <div class="code-block">
+                    <div class="code-header">Python - nodes.py（その4: 整形）</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> datetime <span class="kw">import</span> datetime
+
+<span class="kw">def</span> <span class="fn">format_doc_node</span>(state: MeetingState) -> <span class="cl">dict</span>:
+    <span class="st">"""
+    【整形ノード】
+    全ての情報をMarkdown形式の議事録に整形
+
+    LLMを使わない処理: テンプレートに値を埋め込むだけ
+    → コスト削減＆高速化
+    """</span>
+
+    <span class="cm"># 議題をMarkdownリストに変換</span>
+    topics_md = <span class="st">"\n"</span>.join([<span class="st">f"- {t}"</span> <span class="kw">for</span> t <span class="kw">in</span> state.get(<span class="st">"topics"</span>, [])])
+
+    <span class="cm"># アクションアイテムをMarkdownリストに変換</span>
+    actions_md = <span class="st">"\n"</span>.join([<span class="st">f"- [ ] {a}"</span> <span class="kw">for</span> a <span class="kw">in</span> state.get(<span class="st">"action_items"</span>, [])])
+
+    <span class="cm"># Markdown形式で議事録を生成</span>
+    doc = <span class="st">f"""# 議事録
+**作成日時**: {datetime.now().strftime('%Y-%m-%d %H:%M')}
+
+## 要約
+{state.get('summary', '(要約なし)')}
+
+## 議題
+{topics_md or '(議題なし)'}
+
+## アクションアイテム
+{actions_md or '(アクションなし)'}
+"""</span>
+
+    <span class="kw">return</span> {
+        <span class="st">"final_doc"</span>: doc,
+        <span class="st">"logs"</span>: [<span class="st">"[format] 議事録生成完了"</span>]
+    }</pre>
+                        </div>
+                    </div>
+                </div>
+
                 <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
                     <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 AIエンジニア視点</div>
-                    <p style="margin-bottom: 0.5rem;"><strong>Node設計のベストプラクティス</strong></p>
-                    <ul style="margin: 0 0 0 1rem; color: var(--text-secondary);">
-                        <li><strong>1 Node = 1責務</strong>: 分類と応答生成を分けると、後で差し替えやすい</li>
-                        <li><strong>LLM呼び出しは最小限</strong>: API料金とレイテンシに直結する</li>
-                        <li><strong>エラーハンドリング</strong>: 本番では<code>try-except</code>でLLM障害に備える</li>
-                        <li><strong>ログ出力</strong>: <code>print(f"[classifier] {category}")</code>でデバッグしやすく</li>
+                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
+                        <li><strong>1 Node = 1責務</strong>: 要約と議題抽出を分けると、テストや差し替えが容易</li>
+                        <li><strong>LLM呼び出しは最小限に</strong>: format_doc_nodeはLLM不要 → コスト削減</li>
+                        <li><strong>print()でデバッグ</strong>: 処理の流れを追いやすくなる</li>
+                        <li><strong>state.get("key", default)</strong>: キーがない場合のエラー回避</li>
                     </ul>
                 </div>
             </div>
@@ -1262,35 +1529,96 @@ llm = ChatVertexAI(model=<span class="st">"gemini-1.5-flash"</span>, temperature
                     <h3 class="card-title">Step 4: 条件分岐を定義する</h3>
                     <span class="tag purple" style="margin-left: auto;">ルーティング</span>
                 </div>
-                <p>categoryの値によって「次にどのNodeに進むか」を決めます。</p>
+
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
+                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 なぜ条件分岐が必要？</div>
+                    <p>議事録AIでは、<strong>長い会議と短い会議で処理を変えたい</strong>です。<br>
+                    - 長い会議 → 議題抽出・アクション抽出もやる（詳細モード）<br>
+                    - 短い会議 → 要約だけで十分（簡易モード）</p>
+                </div>
+
                 <div class="code-block">
-                    <div class="code-header">Python - routing.py</div>
+                    <div class="code-header">Python - routing.py（条件分岐関数）</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span></div>
                         <div class="code-content">
-<pre><span class="kw">from</span> typing <span class="kw">import</span> Literal
+<pre><span class="st">"""
+ルーティング関数
 
-<span class="kw">def</span> <span class="fn">route_by_category</span>(state: <span class="cl">SupportState</span>) -> Literal[
-    <span class="st">"refund"</span>, <span class="st">"shipping"</span>, <span class="st">"general"</span>, <span class="st">"clarification"</span>
-]:
-    <span class="st">"""カテゴリに応じて次のNodeを決定"""</span>
+【このファイルの役割】
+条件分岐のロジックを定義します。
+Stateの値を見て「次にどのNodeに進むか」を返します。
 
-    category = state[<span class="st">"category"</span>]
+重要: ルーティング関数はStateを「読むだけ」で「更新しない」
+→ 戻り値は文字列（次のNodeの名前）
+"""</span>
 
-    <span class="kw">if</span> category == <span class="st">"refund"</span>:
-        <span class="kw">return</span> <span class="st">"refund"</span>
-    <span class="kw">elif</span> category == <span class="st">"shipping"</span>:
-        <span class="kw">return</span> <span class="st">"shipping"</span>
-    <span class="kw">elif</span> category == <span class="st">"unclear"</span>:
-        <span class="kw">return</span> <span class="st">"clarification"</span>
+<span class="kw">from</span> typing <span class="kw">import</span> Literal
+<span class="kw">from</span> state <span class="kw">import</span> MeetingState
+
+
+<span class="kw">def</span> <span class="fn">route_by_length</span>(state: MeetingState) -> Literal[<span class="st">"detailed"</span>, <span class="st">"simple"</span>]:
+    <span class="st">"""
+    【長さによるルーティング】
+
+    Stateの`is_long`フラグを見て、次の処理を決定する
+
+    戻り値の型ヒント Literal["detailed", "simple"] は
+    「この2つの文字列しか返さない」ことを示す
+    → タイポ防止＆IDEの補完が効く
+    """</span>
+
+    <span class="cm"># check_length_nodeで設定されたフラグを参照</span>
+    is_long = state.get(<span class="st">"is_long"</span>, <span class="cl">False</span>)
+
+    <span class="kw">if</span> is_long:
+        <span class="cm"># 長い会議 → 詳細な議題抽出へ</span>
+        <span class="bi">print</span>(<span class="st">"[routing] 詳細モードへ分岐"</span>)
+        <span class="kw">return</span> <span class="st">"detailed"</span>
     <span class="kw">else</span>:
-        <span class="kw">return</span> <span class="st">"general"</span></pre>
+        <span class="cm"># 短い会議 → シンプルな整形へ</span>
+        <span class="bi">print</span>(<span class="st">"[routing] 簡易モードへ分岐"</span>)
+        <span class="kw">return</span> <span class="st">"simple"</span></pre>
                         </div>
                     </div>
                 </div>
-                <div class="highlight-box">
-                    <div class="highlight-title">💡 条件分岐のコツ</div>
-                    <p>条件分岐関数は<strong>Stateを読むだけ</strong>で、更新はしません。<br>戻り値は「次に進むNodeの名前（文字列）」です。</p>
+
+                <div class="highlight-box success">
+                    <div class="highlight-title">💡 条件分岐のポイント</div>
+                    <ul style="margin: 0.5rem 0 0 1rem;">
+                        <li><strong>Stateを読むだけ</strong>: 条件分岐関数はStateを更新しない</li>
+                        <li><strong>戻り値は文字列</strong>: 次に進むNodeの名前を返す</li>
+                        <li><strong>Literal型で安全に</strong>: 返せる値を限定してタイポを防ぐ</li>
+                    </ul>
+                </div>
+
+                <div class="diagram-container" style="margin-top: 1.5rem;">
+                    <div class="diagram-title">条件分岐のイメージ</div>
+                    <svg viewBox="0 0 500 150" style="max-width: 500px; margin: 0 auto; display: block;">
+                        <defs>
+                            <marker id="routeArr" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#667eea"/>
+                            </marker>
+                        </defs>
+                        <!-- check_length -->
+                        <rect x="30" y="50" width="100" height="50" rx="8" fill="#1a2634" stroke="#667eea" stroke-width="2"/>
+                        <text x="80" y="80" text-anchor="middle" fill="#86efac" font-size="11">check_length</text>
+                        <!-- Diamond -->
+                        <polygon points="200,75 230,45 260,75 230,105" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
+                        <text x="230" y="78" text-anchor="middle" fill="#8b5cf6" font-size="10">is_long?</text>
+                        <!-- Arrows from check to diamond -->
+                        <line x1="130" y1="75" x2="195" y2="75" stroke="#667eea" stroke-width="2" marker-end="url(#routeArr)"/>
+                        <!-- detailed path -->
+                        <rect x="320" y="20" width="100" height="40" rx="8" fill="#1a2634" stroke="#22c55e" stroke-width="2"/>
+                        <text x="370" y="45" text-anchor="middle" fill="#22c55e" font-size="10">extract_topics</text>
+                        <line x1="260" y1="65" x2="315" y2="40" stroke="#22c55e" stroke-width="2" marker-end="url(#routeArr)"/>
+                        <text x="280" y="40" fill="#22c55e" font-size="9">True</text>
+                        <!-- simple path -->
+                        <rect x="320" y="90" width="100" height="40" rx="8" fill="#1a2634" stroke="#f97316" stroke-width="2"/>
+                        <text x="370" y="115" text-anchor="middle" fill="#f97316" font-size="10">format_doc</text>
+                        <line x1="260" y1="85" x2="315" y2="110" stroke="#f97316" stroke-width="2" marker-end="url(#routeArr)"/>
+                        <text x="280" y="115" fill="#f97316" font-size="9">False</text>
+                    </svg>
                 </div>
             </div>
 
@@ -1299,57 +1627,117 @@ llm = ChatVertexAI(model=<span class="st">"gemini-1.5-flash"</span>, temperature
                 <div class="card-header">
                     <div class="card-icon orange">🔗</div>
                     <h3 class="card-title">Step 5: グラフを組み立てる</h3>
-                    <span class="tag orange" style="margin-left: auto;">完成！</span>
+                    <span class="tag orange" style="margin-left: auto;">組み立て</span>
                 </div>
-                <p>すべてを組み合わせてグラフを完成させます。</p>
+
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
+                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 グラフ組み立ての流れ</div>
+                    <p>1. <code>StateGraph(State型)</code> でグラフ作成<br>
+                    2. <code>add_node("名前", 関数)</code> でNodeを登録<br>
+                    3. <code>add_edge("A", "B")</code> でA→Bの接続<br>
+                    4. <code>add_conditional_edges()</code> で条件分岐<br>
+                    5. <code>compile()</code> で実行可能なグラフに変換</p>
+                </div>
+
                 <div class="code-block">
-                    <div class="code-header">Python - main.py</div>
+                    <div class="code-header">Python - main.py（グラフ組み立て）</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span><span>57</span><span>58</span><span>59</span><span>60</span><span>61</span><span>62</span><span>63</span><span>64</span><span>65</span><span>66</span><span>67</span><span>68</span><span>69</span><span>70</span><span>71</span><span>72</span><span>73</span><span>74</span><span>75</span></div>
                         <div class="code-content">
-<pre><span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
-<span class="kw">import</span> os
+<pre><span class="st">"""
+メインファイル - グラフの組み立てと実行
 
-<span class="cm"># Google CloudプロジェクトIDを設定</span>
-os.environ[<span class="st">"GOOGLE_CLOUD_PROJECT"</span>] = <span class="st">"your-project-id"</span>
+【このファイルの役割】
+1. 各パーツ（State, Node, Routing）をimport
+2. グラフを組み立てる
+3. 実行する
+"""</span>
 
-<span class="kw">def</span> <span class="fn">create_support_graph</span>():
-    <span class="st">"""カスタマーサポートグラフを構築"""</span>
+<span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
 
+<span class="cm"># 自作モジュールをimport</span>
+<span class="kw">from</span> state <span class="kw">import</span> MeetingState
+<span class="kw">from</span> nodes <span class="kw">import</span> (
+    summarize_node,
+    check_length_node,
+    extract_topics_node,
+    extract_actions_node,
+    format_doc_node,
+)
+<span class="kw">from</span> routing <span class="kw">import</span> route_by_length
+
+
+<span class="kw">def</span> <span class="fn">create_meeting_graph</span>():
+    <span class="st">"""
+    議事録要約グラフを構築する
+
+    【グラフの流れ】
+    START → summarize → check_length → [分岐]
+        → (長い) extract_topics → extract_actions → format_doc → END
+        → (短い) format_doc → END
+    """</span>
+
+    <span class="cm"># ============================================</span>
     <span class="cm"># 1. グラフを作成（Stateの型を指定）</span>
-    workflow = StateGraph(<span class="cl">SupportState</span>)
+    <span class="cm">#    → この型に従ってデータが流れる</span>
+    <span class="cm"># ============================================</span>
+    workflow = StateGraph(MeetingState)
 
+    <span class="cm"># ============================================</span>
     <span class="cm"># 2. ノードを追加</span>
-    workflow.add_node(<span class="st">"classifier"</span>, classifier_node)
-    workflow.add_node(<span class="st">"refund"</span>, refund_node)
-    workflow.add_node(<span class="st">"shipping"</span>, shipping_node)
-    workflow.add_node(<span class="st">"general"</span>, general_node)
-    workflow.add_node(<span class="st">"clarification"</span>, clarification_node)
+    <span class="cm">#    add_node("表示名", 関数)</span>
+    <span class="cm">#    表示名はエッジ接続時に使う</span>
+    <span class="cm"># ============================================</span>
+    workflow.add_node(<span class="st">"summarize"</span>, summarize_node)
+    workflow.add_node(<span class="st">"check_length"</span>, check_length_node)
+    workflow.add_node(<span class="st">"extract_topics"</span>, extract_topics_node)
+    workflow.add_node(<span class="st">"extract_actions"</span>, extract_actions_node)
+    workflow.add_node(<span class="st">"format_doc"</span>, format_doc_node)
 
-    <span class="cm"># 3. エッジを追加</span>
-    workflow.add_edge(START, <span class="st">"classifier"</span>)  <span class="cm"># 開始 → 分類</span>
+    <span class="cm"># ============================================</span>
+    <span class="cm"># 3. エッジを追加（固定の接続）</span>
+    <span class="cm">#    START: 処理の開始点（特殊なNode）</span>
+    <span class="cm">#    END: 処理の終了点（特殊なNode）</span>
+    <span class="cm"># ============================================</span>
+    workflow.add_edge(START, <span class="st">"summarize"</span>)        <span class="cm"># 開始 → 要約</span>
+    workflow.add_edge(<span class="st">"summarize"</span>, <span class="st">"check_length"</span>)  <span class="cm"># 要約 → 長さチェック</span>
 
+    <span class="cm"># ============================================</span>
     <span class="cm"># 4. 条件分岐を追加</span>
+    <span class="cm">#    add_conditional_edges(分岐元, 条件関数, マッピング)</span>
+    <span class="cm"># ============================================</span>
     workflow.add_conditional_edges(
-        <span class="st">"classifier"</span>,      <span class="cm"># 分岐元</span>
-        route_by_category, <span class="cm"># 条件関数</span>
-        {                  <span class="cm"># 戻り値 → 行き先</span>
-            <span class="st">"refund"</span>: <span class="st">"refund"</span>,
-            <span class="st">"shipping"</span>: <span class="st">"shipping"</span>,
-            <span class="st">"general"</span>: <span class="st">"general"</span>,
-            <span class="st">"clarification"</span>: <span class="st">"clarification"</span>,
+        <span class="st">"check_length"</span>,     <span class="cm"># どのNodeから分岐するか</span>
+        route_by_length,    <span class="cm"># 条件を判定する関数</span>
+        {
+            <span class="cm"># 条件関数の戻り値 → 次に進むNode</span>
+            <span class="st">"detailed"</span>: <span class="st">"extract_topics"</span>,  <span class="cm"># 長い → 議題抽出へ</span>
+            <span class="st">"simple"</span>: <span class="st">"format_doc"</span>,       <span class="cm"># 短い → 整形へ直行</span>
         }
     )
 
-    <span class="cm"># 5. 全ての応答ノードからENDへ</span>
-    workflow.add_edge(<span class="st">"refund"</span>, END)
-    workflow.add_edge(<span class="st">"shipping"</span>, END)
-    workflow.add_edge(<span class="st">"general"</span>, END)
-    workflow.add_edge(<span class="st">"clarification"</span>, END)
+    <span class="cm"># 詳細モードの続き: 議題 → アクション → 整形</span>
+    workflow.add_edge(<span class="st">"extract_topics"</span>, <span class="st">"extract_actions"</span>)
+    workflow.add_edge(<span class="st">"extract_actions"</span>, <span class="st">"format_doc"</span>)
 
+    <span class="cm"># 最後は全てENDへ</span>
+    workflow.add_edge(<span class="st">"format_doc"</span>, END)
+
+    <span class="cm"># ============================================</span>
+    <span class="cm"># 5. compile()で実行可能なグラフに変換</span>
+    <span class="cm"># ============================================</span>
     <span class="kw">return</span> workflow.compile()</pre>
                         </div>
                     </div>
+                </div>
+
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
+                    <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 AIエンジニア視点</div>
+                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
+                        <li><strong>add_nodeは順番不問</strong>: 登録順は関係なく、エッジで接続順が決まる</li>
+                        <li><strong>compile()は最後に1回</strong>: 変更するたびに再compile必要</li>
+                        <li><strong>グラフの可視化</strong>: <code>graph.get_graph().draw_mermaid()</code>で図を出力可能</li>
+                    </ul>
                 </div>
             </div>
 
@@ -1358,37 +1746,126 @@ os.environ[<span class="st">"GOOGLE_CLOUD_PROJECT"</span>] = <span class="st">"y
                 <div class="card-header">
                     <div class="card-icon green">▶️</div>
                     <h3 class="card-title">Step 6: 実行してみる</h3>
-                    <span class="tag green" style="margin-left: auto;">テスト</span>
+                    <span class="tag green" style="margin-left: auto;">完成！</span>
                 </div>
+
+                <p>いよいよ実行です！サンプルの会議テキストで動作確認しましょう。</p>
+
                 <div class="code-block">
-                    <div class="code-header">Python - 実行コード</div>
+                    <div class="code-header">Python - main.py（実行部分を追加）</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span></div>
                         <div class="code-content">
-<pre><span class="cm"># グラフを作成</span>
-graph = create_support_graph()
+<pre><span class="cm"># main.pyの末尾に追加</span>
 
-<span class="cm"># テスト1: 返品の質問</span>
-result = graph.invoke({
-    <span class="st">"user_question"</span>: <span class="st">"商品を返品したいのですが"</span>,
-    <span class="st">"history"</span>: []
-})
-<span class="bi">print</span>(<span class="st">f"カテゴリ: {result['category']}"</span>)
-<span class="bi">print</span>(<span class="st">f"回答: {result['response']}"</span>)
+<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
+    <span class="cm"># ============================================</span>
+    <span class="cm"># サンプル会議テキスト（長いバージョン）</span>
+    <span class="cm"># 実際にはZoomの文字起こしや議事メモを入れる</span>
+    <span class="cm"># ============================================</span>
+    sample_meeting = <span class="st">"""
+    【プロジェクト進捗会議】2024年1月15日
 
-<span class="cm"># テスト2: 配送の質問</span>
-result2 = graph.invoke({
-    <span class="st">"user_question"</span>: <span class="st">"荷物はいつ届きますか？"</span>,
-    <span class="st">"history"</span>: []
-})
-<span class="bi">print</span>(<span class="st">f"カテゴリ: {result2['category']}"</span>)
-<span class="bi">print</span>(<span class="st">f"回答: {result2['response']}"</span>)</pre>
+    田中: 今週の進捗を報告します。フロントエンドのUI改修は80%完了。
+    残りはモバイル対応です。来週水曜までに完了予定。
+
+    鈴木: バックエンドのAPI改修は予定より遅れています。
+    認証周りで問題が発生し、解決に2日かかりました。
+    来週金曜までには完了できる見込みです。
+
+    山田: QAテストの準備は完了しています。
+    来週月曜からテスト開始できます。
+    テスト項目は150件、3日間で実施予定です。
+
+    田中: 予算について確認です。追加で10万円必要になりそうです。
+    理由はサーバー増強のため。
+
+    鈴木: 承認します。経理に連絡しておきます。
+
+    次回の会議は来週月曜10時から。
+    """</span>
+
+    <span class="cm"># ============================================</span>
+    <span class="cm"># グラフを作成して実行</span>
+    <span class="cm"># ============================================</span>
+    graph = create_meeting_graph()
+
+    <span class="cm"># invoke()で実行（入力はdictで渡す）</span>
+    result = graph.invoke({
+        <span class="st">"raw_text"</span>: sample_meeting,  <span class="cm"># 必須: 会議テキスト</span>
+        <span class="st">"logs"</span>: []                    <span class="cm"># 必須: 空リストで初期化</span>
+    })
+
+    <span class="cm"># ============================================</span>
+    <span class="cm"># 結果を表示</span>
+    <span class="cm"># ============================================</span>
+    <span class="bi">print</span>(<span class="st">"="</span> * <span class="cl">50</span>)
+    <span class="bi">print</span>(<span class="st">"【生成された議事録】"</span>)
+    <span class="bi">print</span>(<span class="st">"="</span> * <span class="cl">50</span>)
+    <span class="bi">print</span>(result[<span class="st">"final_doc"</span>])
+
+    <span class="bi">print</span>(<span class="st">"\n【処理ログ】"</span>)
+    <span class="kw">for</span> log <span class="kw">in</span> result[<span class="st">"logs"</span>]:
+        <span class="bi">print</span>(<span class="st">f"  {log}"</span>)
+
+    <span class="cm"># ファイルに保存したい場合</span>
+    <span class="kw">with</span> <span class="bi">open</span>(<span class="st">"meeting_notes.md"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
+        f.write(result[<span class="st">"final_doc"</span>])
+    <span class="bi">print</span>(<span class="st">"\n✅ meeting_notes.md に保存しました"</span>)</pre>
                         </div>
                     </div>
                 </div>
+
                 <div class="highlight-box success">
+                    <div class="highlight-title">📤 実行結果の例</div>
+                    <div class="code-block" style="margin-top: 0.5rem; border-left: none;">
+                        <div class="code-body" style="background: #0d1117;">
+                            <div class="code-content">
+<pre style="color: #e6edf3;"># 議事録
+**作成日時**: 2024-01-15 15:30
+
+## 要約
+プロジェクト進捗会議では、フロントエンドUI改修が80%完了し
+来週水曜完了予定。バックエンドは認証問題で遅延、来週金曜完了見込み。
+QAテストは来週月曜から3日間で150件実施予定。
+サーバー増強のため追加予算10万円が承認された。
+
+## 議題
+- フロントエンドUI改修の進捗
+- バックエンドAPI改修の遅延
+- QAテストの準備状況
+- 追加予算の承認
+
+## アクションアイテム
+- [ ] 田中: モバイル対応を来週水曜までに完了
+- [ ] 鈴木: API改修を来週金曜までに完了
+- [ ] 鈴木: 経理に追加予算10万円を連絡
+- [ ] 山田: 来週月曜からQAテスト開始</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
+                    <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 次のステップ</div>
+                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
+                        <li><strong>Streamlitでウェブアプリ化</strong>: テキスト入力→議事録生成のUIを作る</li>
+                        <li><strong>Slackボット化</strong>: チャンネルの会話を自動で議事録化</li>
+                        <li><strong>音声入力対応</strong>: Whisper APIで文字起こし→議事録化</li>
+                        <li><strong>PDFエクスポート</strong>: markdownからPDFを生成して配布</li>
+                    </ul>
+                </div>
+
+                <div class="highlight-box success" style="margin-top: 1.5rem;">
                     <div class="highlight-title">🎉 おめでとうございます！</div>
-                    <p>これでLangGraphを使ったカスタマーサポートAIが完成しました！</p>
+                    <p style="margin-bottom: 1rem;">LangGraphを使った<strong>議事録要約AI</strong>が完成しました！</p>
+                    <p style="color: var(--text-secondary);">学んだこと:</p>
+                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
+                        <li>State: Node間でデータを受け渡す箱</li>
+                        <li>Node: Stateを受け取り、更新を返す関数</li>
+                        <li>Edge: Nodeの接続（固定/条件分岐）</li>
+                        <li>グラフ: Node + Edge を組み合わせたワークフロー</li>
+                    </ul>
                 </div>
             </div>
 
