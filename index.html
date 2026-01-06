@@ -431,6 +431,29 @@
             stroke: #10b981 !important;
         }
 
+        /* Step 3 サブステップ（個別ノード）のアクティブ状態 */
+        .substep-node.substep-active .step3-rect {
+            fill: rgba(34, 197, 94, 0.3) !important;
+            stroke: #22c55e !important;
+            stroke-width: 3 !important;
+            filter: drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 16px #22c55e);
+        }
+        .substep-node.substep-active .step3-text {
+            fill: #22c55e !important;
+            font-weight: bold;
+        }
+        /* Step 3 サブステップの完了状態 */
+        .substep-node.substep-completed .step3-rect {
+            fill: rgba(16, 185, 129, 0.2) !important;
+            stroke: #10b981 !important;
+            stroke-width: 2 !important;
+            filter: none !important;
+        }
+        .substep-node.substep-completed .step3-text {
+            fill: #10b981 !important;
+            font-weight: normal !important;
+        }
+
         @media (max-width: 1024px) {
             .tutorial-layout {
                 grid-template-columns: 1fr;
@@ -1458,7 +1481,7 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
                     議事録AIでは「要約する」「議題を抽出する」「アクションを抽出する」など、それぞれがNodeになります。</p>
                 </div>
 
-                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-1. 要約ノード（summarize_node）</h4>
+                <h4 id="substep-3-1" style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-1. 要約ノード（summarize_node）</h4>
                 <p style="margin-bottom: 1rem; color: var(--text-secondary);">会議テキストを300文字程度に要約します。LLMを使う典型的なパターンです。</p>
 
                 <div class="code-block">
@@ -1524,7 +1547,7 @@ llm = ChatVertexAI(
                     </div>
                 </div>
 
-                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-2. 長さチェックノード（check_length_node）</h4>
+                <h4 id="substep-3-2" style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-2. 長さチェックノード（check_length_node）</h4>
                 <p style="margin-bottom: 1rem; color: var(--text-secondary);">LLMを使わない処理もNodeにできます。条件分岐に使うフラグを設定します。</p>
 
                 <div class="code-block">
@@ -1556,7 +1579,7 @@ llm = ChatVertexAI(
                     </div>
                 </div>
 
-                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-3. 議題抽出ノード / アクション抽出ノード</h4>
+                <h4 id="substep-3-3" style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-3. 議題抽出ノード / アクション抽出ノード</h4>
                 <p style="margin-bottom: 1rem; color: var(--text-secondary);">同じパターンで複数のNodeを作ります。抽出結果はリストで返します。</p>
 
                 <div class="code-block">
@@ -1624,7 +1647,7 @@ llm = ChatVertexAI(
                     </div>
                 </div>
 
-                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-4. 整形ノード（format_doc_node）</h4>
+                <h4 id="substep-3-4" style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-4. 整形ノード（format_doc_node）</h4>
                 <p style="margin-bottom: 1rem; color: var(--text-secondary);">最後に、すべての情報をMarkdown形式に整形します。</p>
 
                 <div class="code-block">
@@ -2400,33 +2423,43 @@ console.log(result.final_doc);  <span class="cm">// 整形された議事録</sp
                             <!-- タイトル -->
                             <text x="140" y="145" text-anchor="middle" font-size="10" class="step3-title">⚙️ Nodes（処理関数）</text>
 
-                            <!-- summarize_node -->
-                            <rect x="75" y="155" width="130" height="35" rx="6" class="step3-rect"/>
-                            <text x="140" y="177" text-anchor="middle" font-size="10" class="step3-text">summarize_node</text>
+                            <!-- summarize_node (3-1) -->
+                            <g class="substep-node" data-substep="3-1">
+                                <rect x="75" y="155" width="130" height="35" rx="6" class="step3-rect"/>
+                                <text x="140" y="177" text-anchor="middle" font-size="10" class="step3-text">summarize_node</text>
+                            </g>
 
                             <line x1="140" y1="190" x2="140" y2="205" class="step3-line" marker-end="url(#sidebarArr)"/>
 
-                            <!-- check_length_node -->
-                            <rect x="75" y="210" width="130" height="35" rx="6" class="step3-rect"/>
-                            <text x="140" y="232" text-anchor="middle" font-size="10" class="step3-text">check_length_node</text>
+                            <!-- check_length_node (3-2) -->
+                            <g class="substep-node" data-substep="3-2">
+                                <rect x="75" y="210" width="130" height="35" rx="6" class="step3-rect"/>
+                                <text x="140" y="232" text-anchor="middle" font-size="10" class="step3-text">check_length_node</text>
+                            </g>
 
                             <line x1="140" y1="245" x2="140" y2="260" class="step3-line" marker-end="url(#sidebarArr)"/>
 
-                            <!-- extract_topics_node -->
-                            <rect x="75" y="265" width="130" height="35" rx="6" class="step3-rect"/>
-                            <text x="140" y="287" text-anchor="middle" font-size="10" class="step3-text">extract_topics_node</text>
+                            <!-- extract_topics_node / extract_actions_node (3-3) -->
+                            <g class="substep-node" data-substep="3-3">
+                                <rect x="75" y="265" width="130" height="35" rx="6" class="step3-rect"/>
+                                <text x="140" y="287" text-anchor="middle" font-size="10" class="step3-text">extract_topics_node</text>
+                            </g>
 
                             <line x1="140" y1="300" x2="140" y2="315" class="step3-line" marker-end="url(#sidebarArr)"/>
 
-                            <!-- extract_actions_node -->
-                            <rect x="75" y="320" width="130" height="35" rx="6" class="step3-rect"/>
-                            <text x="140" y="342" text-anchor="middle" font-size="10" class="step3-text">extract_actions_node</text>
+                            <!-- extract_actions_node も3-3に含める -->
+                            <g class="substep-node" data-substep="3-3">
+                                <rect x="75" y="320" width="130" height="35" rx="6" class="step3-rect"/>
+                                <text x="140" y="342" text-anchor="middle" font-size="10" class="step3-text">extract_actions_node</text>
+                            </g>
 
                             <line x1="140" y1="355" x2="140" y2="370" class="step3-line" marker-end="url(#sidebarArr)"/>
 
-                            <!-- format_doc_node -->
-                            <rect x="75" y="375" width="130" height="35" rx="6" class="step3-rect"/>
-                            <text x="140" y="397" text-anchor="middle" font-size="10" class="step3-text">format_doc_node</text>
+                            <!-- format_doc_node (3-4) -->
+                            <g class="substep-node" data-substep="3-4">
+                                <rect x="75" y="375" width="130" height="35" rx="6" class="step3-rect"/>
+                                <text x="140" y="397" text-anchor="middle" font-size="10" class="step3-text">format_doc_node</text>
+                            </g>
                         </g>
 
                         <line x1="140" y1="410" x2="140" y2="430" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
@@ -3056,84 +3089,136 @@ logger = logging.getLogger(__name__)
 
         // サイドバーSVGの更新関数
         function updateSidebarSVG(currentStep) {
+            // Step 3以外に移動した場合、サブステップのハイライトをリセット
+            if (currentStep !== 3) {
+                document.querySelectorAll('.substep-node').forEach(node => {
+                    node.classList.remove('substep-active', 'substep-completed');
+                });
+            }
+
             document.querySelectorAll('.sidebar-step').forEach(stepEl => {
                 const stepNum = parseInt(stepEl.dataset.step);
                 stepEl.classList.remove('active', 'completed');
 
-                // 各要素のスタイルをリセット
-                const rects = stepEl.querySelectorAll('rect');
-                const texts = stepEl.querySelectorAll('text');
+                // Step 3は個別ノードのハイライト（サブステップ）で制御するため、
+                // ここでは全体的な状態のみ設定
+                const isStep3 = stepNum === 3;
+
+                // 各要素のスタイルをリセット（Step 3のrectとtextはCSSクラスで制御）
+                const rects = isStep3 ? [] : stepEl.querySelectorAll('rect');
+                const texts = isStep3 ? stepEl.querySelectorAll('.step3-title') : stepEl.querySelectorAll('text');
                 const lines = stepEl.querySelectorAll('line');
                 const polygons = stepEl.querySelectorAll('polygon');
 
                 if (stepNum === currentStep) {
                     // アクティブ: 緑色に光らせる
                     stepEl.classList.add('active');
-                    rects.forEach(rect => {
-                        rect.style.fill = 'rgba(34, 197, 94, 0.3)';
-                        rect.style.stroke = '#22c55e';
-                        rect.style.strokeWidth = '3';
-                        rect.style.filter = 'drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 16px #22c55e)';
-                    });
-                    texts.forEach(text => {
-                        text.style.fill = '#22c55e';
-                        text.style.fontWeight = 'bold';
-                    });
-                    lines.forEach(line => {
-                        line.style.stroke = '#22c55e';
-                        line.style.filter = 'drop-shadow(0 0 4px #22c55e)';
-                    });
-                    polygons.forEach(polygon => {
-                        polygon.style.fill = 'rgba(34, 197, 94, 0.3)';
-                        polygon.style.stroke = '#22c55e';
-                        polygon.style.strokeWidth = '3';
-                        polygon.style.filter = 'drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 16px #22c55e)';
-                    });
+
+                    // Step 3の場合、タイトルとラインのみJSで制御
+                    if (isStep3) {
+                        texts.forEach(text => {
+                            text.style.fill = '#22c55e';
+                            text.style.fontWeight = 'bold';
+                        });
+                        lines.forEach(line => {
+                            line.style.stroke = '#22c55e';
+                            line.style.filter = 'drop-shadow(0 0 4px #22c55e)';
+                        });
+                    } else {
+                        rects.forEach(rect => {
+                            rect.style.fill = 'rgba(34, 197, 94, 0.3)';
+                            rect.style.stroke = '#22c55e';
+                            rect.style.strokeWidth = '3';
+                            rect.style.filter = 'drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 16px #22c55e)';
+                        });
+                        texts.forEach(text => {
+                            text.style.fill = '#22c55e';
+                            text.style.fontWeight = 'bold';
+                        });
+                        lines.forEach(line => {
+                            line.style.stroke = '#22c55e';
+                            line.style.filter = 'drop-shadow(0 0 4px #22c55e)';
+                        });
+                        polygons.forEach(polygon => {
+                            polygon.style.fill = 'rgba(34, 197, 94, 0.3)';
+                            polygon.style.stroke = '#22c55e';
+                            polygon.style.strokeWidth = '3';
+                            polygon.style.filter = 'drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 16px #22c55e)';
+                        });
+                    }
                 } else if (stepNum < currentStep) {
                     // 完了: 薄い緑
                     stepEl.classList.add('completed');
-                    rects.forEach(rect => {
-                        rect.style.fill = 'rgba(16, 185, 129, 0.2)';
-                        rect.style.stroke = '#10b981';
-                        rect.style.strokeWidth = '2';
-                        rect.style.filter = 'none';
-                    });
-                    texts.forEach(text => {
-                        text.style.fill = '#10b981';
-                        text.style.fontWeight = 'normal';
-                    });
-                    lines.forEach(line => {
-                        line.style.stroke = '#10b981';
-                        line.style.filter = 'none';
-                    });
-                    polygons.forEach(polygon => {
-                        polygon.style.fill = 'rgba(16, 185, 129, 0.2)';
-                        polygon.style.stroke = '#10b981';
-                        polygon.style.strokeWidth = '2';
-                        polygon.style.filter = 'none';
-                    });
+
+                    if (isStep3) {
+                        // Step 3が完了状態: 全ノードを完了スタイルに
+                        document.querySelectorAll('.substep-node').forEach(node => {
+                            node.classList.remove('substep-active');
+                            node.classList.add('substep-completed');
+                        });
+                        texts.forEach(text => {
+                            text.style.fill = '#10b981';
+                            text.style.fontWeight = 'normal';
+                        });
+                        lines.forEach(line => {
+                            line.style.stroke = '#10b981';
+                            line.style.filter = 'none';
+                        });
+                    } else {
+                        rects.forEach(rect => {
+                            rect.style.fill = 'rgba(16, 185, 129, 0.2)';
+                            rect.style.stroke = '#10b981';
+                            rect.style.strokeWidth = '2';
+                            rect.style.filter = 'none';
+                        });
+                        texts.forEach(text => {
+                            text.style.fill = '#10b981';
+                            text.style.fontWeight = 'normal';
+                        });
+                        lines.forEach(line => {
+                            line.style.stroke = '#10b981';
+                            line.style.filter = 'none';
+                        });
+                        polygons.forEach(polygon => {
+                            polygon.style.fill = 'rgba(16, 185, 129, 0.2)';
+                            polygon.style.stroke = '#10b981';
+                            polygon.style.strokeWidth = '2';
+                            polygon.style.filter = 'none';
+                        });
+                    }
                 } else {
                     // 未処理: 元の色に戻す
-                    rects.forEach(rect => {
-                        rect.style.fill = '';
-                        rect.style.stroke = '';
-                        rect.style.strokeWidth = '';
-                        rect.style.filter = '';
-                    });
-                    texts.forEach(text => {
-                        text.style.fill = '';
-                        text.style.fontWeight = '';
-                    });
-                    lines.forEach(line => {
-                        line.style.stroke = '';
-                        line.style.filter = '';
-                    });
-                    polygons.forEach(polygon => {
-                        polygon.style.fill = '';
-                        polygon.style.stroke = '';
-                        polygon.style.strokeWidth = '';
-                        polygon.style.filter = '';
-                    });
+                    if (isStep3) {
+                        texts.forEach(text => {
+                            text.style.fill = '';
+                            text.style.fontWeight = '';
+                        });
+                        lines.forEach(line => {
+                            line.style.stroke = '';
+                            line.style.filter = '';
+                        });
+                    } else {
+                        rects.forEach(rect => {
+                            rect.style.fill = '';
+                            rect.style.stroke = '';
+                            rect.style.strokeWidth = '';
+                            rect.style.filter = '';
+                        });
+                        texts.forEach(text => {
+                            text.style.fill = '';
+                            text.style.fontWeight = '';
+                        });
+                        lines.forEach(line => {
+                            line.style.stroke = '';
+                            line.style.filter = '';
+                        });
+                        polygons.forEach(polygon => {
+                            polygon.style.fill = '';
+                            polygon.style.stroke = '';
+                            polygon.style.strokeWidth = '';
+                            polygon.style.filter = '';
+                        });
+                    }
                 }
             });
 
@@ -3215,6 +3300,59 @@ logger = logging.getLogger(__name__)
         }, { threshold: 0.3 });
 
         document.querySelectorAll('[id^="tut-step"]').forEach(el => observer.observe(el));
+
+        // Step 3 サブステップのハイライト用Observer
+        let currentSubstep = null;
+        const substepOrder = ['3-1', '3-2', '3-3', '3-4'];
+
+        function updateSubstepHighlight(activeSubstep) {
+            if (currentSubstep === activeSubstep) return;
+            currentSubstep = activeSubstep;
+
+            // 全サブステップノードをリセット
+            document.querySelectorAll('.substep-node').forEach(node => {
+                node.classList.remove('substep-active', 'substep-completed');
+            });
+
+            if (!activeSubstep) return;
+
+            const activeIndex = substepOrder.indexOf(activeSubstep);
+
+            document.querySelectorAll('.substep-node').forEach(node => {
+                const nodeSubstep = node.dataset.substep;
+                const nodeIndex = substepOrder.indexOf(nodeSubstep);
+
+                if (nodeSubstep === activeSubstep) {
+                    // アクティブなサブステップ
+                    node.classList.add('substep-active');
+                } else if (nodeIndex < activeIndex) {
+                    // 完了したサブステップ
+                    node.classList.add('substep-completed');
+                }
+            });
+        }
+
+        const substepObserver = new IntersectionObserver((entries) => {
+            let mostVisibleSubstep = null;
+            let maxRatio = 0;
+
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio > maxRatio) {
+                    maxRatio = entry.intersectionRatio;
+                    const match = entry.target.id.match(/substep-(\d-\d)/);
+                    if (match) {
+                        mostVisibleSubstep = match[1];
+                    }
+                }
+            });
+
+            if (mostVisibleSubstep) {
+                updateSubstepHighlight(mostVisibleSubstep);
+            }
+        }, { threshold: [0, 0.25, 0.5, 0.75, 1], rootMargin: '-100px 0px -50% 0px' });
+
+        // サブステップ要素を監視
+        document.querySelectorAll('[id^="substep-"]').forEach(el => substepObserver.observe(el));
 
         // Step 6 実行方法タブ切り替え
         function switchExecTab(targetId) {
