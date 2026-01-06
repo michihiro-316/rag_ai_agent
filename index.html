@@ -649,7 +649,8 @@ result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今
                 </div>
                 <div class="highlight-box success">
                     <div class="highlight-title">💡 ポイント</div>
-                    <p>Stateは「バケツリレーのバケツ」。各頂点がバケツを受け取り、中身を更新して次に渡します。</p>
+                    <p>Stateは<strong>「ワークフロー全体を包む箱」</strong>。各Node（処理）がこの箱の中身を見て、結果を書き込んでいきます。<br>
+                    最初は空欄が多いですが、処理が進むにつれて箱の中身が埋まっていくイメージです。</p>
                 </div>
             </div>
 
@@ -1356,9 +1357,38 @@ ls -la</pre>
                 </div>
 
                 <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
-                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 なぜStateが必要？</div>
-                    <p>LangGraphでは、<strong>Nodeの間でデータを受け渡す</strong>ために「State」を使います。<br>
-                    「会議テキスト」から始まり、「要約」→「議題」→「アクションアイテム」と加工されていくデータの<strong>箱</strong>です。</p>
+                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 Stateとは？</div>
+                    <p>Stateは<strong>「ワークフロー全体を包む箱」</strong>です。<br>
+                    この箱には「入力データ」「処理結果」「最終出力」などの<strong>全フィールド</strong>が定義されています。<br>
+                    各Nodeはこの箱を受け取り、自分の担当フィールドに結果を書き込んで返します。</p>
+                </div>
+
+                <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid var(--accent-green); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
+                    <div style="color: var(--accent-green); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">📦 Stateのイメージ図</div>
+                    <div style="display: grid; grid-template-columns: 1fr 60px 1fr; align-items: center; gap: 0.5rem;">
+                        <div style="background: #0f1419; border: 2px dashed var(--border-color); border-radius: 8px; padding: 1rem;">
+                            <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">🚀 処理開始時</div>
+                            <div style="font-family: monospace; font-size: 0.8rem; line-height: 1.6;">
+                                <div style="color: var(--accent-green);">raw_text: <span style="color: var(--accent-cyan);">"会議テキスト..."</span></div>
+                                <div style="color: var(--text-muted);">summary: <span style="color: #666;">（空）</span></div>
+                                <div style="color: var(--text-muted);">topics: <span style="color: #666;">（空）</span></div>
+                                <div style="color: var(--text-muted);">final_doc: <span style="color: #666;">（空）</span></div>
+                            </div>
+                        </div>
+                        <div style="text-align: center; color: var(--accent-green); font-size: 1.5rem;">→</div>
+                        <div style="background: #0f1419; border: 2px solid var(--accent-green); border-radius: 8px; padding: 1rem;">
+                            <div style="color: var(--accent-green); font-size: 0.85rem; margin-bottom: 0.5rem;">✅ 処理完了後</div>
+                            <div style="font-family: monospace; font-size: 0.8rem; line-height: 1.6;">
+                                <div style="color: var(--accent-green);">raw_text: <span style="color: var(--accent-cyan);">"会議テキスト..."</span></div>
+                                <div style="color: var(--accent-green);">summary: <span style="color: var(--accent-cyan);">"要約結果..."</span></div>
+                                <div style="color: var(--accent-green);">topics: <span style="color: var(--accent-cyan);">["議題1", "議題2"]</span></div>
+                                <div style="color: var(--accent-green);">final_doc: <span style="color: var(--accent-cyan);">"# 議事録..."</span></div>
+                            </div>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 1rem; text-align: center;">
+                        各Nodeが順番にStateの中身を埋めていく → 最終的に全フィールドが完成
+                    </p>
                 </div>
 
                 <div class="code-block">
