@@ -9,40 +9,41 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-gradient-start: #667eea;
-            --bg-gradient-end: #764ba2;
-            --bg-card: rgba(255, 255, 255, 0.95);
-            --accent-green: #10b981;
-            --accent-emerald: #059669;
+            /* トップページと統一したダークテーマ */
+            --bg-dark: #0f1419;
+            --bg-card: #1a2634;
+            --bg-card-hover: #243447;
+            --accent-green: #22c55e;
+            --accent-emerald: #10b981;
             --accent-teal: #14b8a6;
             --accent-cyan: #06b6d4;
             --accent-blue: #3b82f6;
             --accent-purple: #8b5cf6;
             --accent-orange: #f97316;
             --accent-pink: #ec4899;
-            --text-primary: #1f2937;
-            --text-secondary: #4b5563;
-            --text-muted: #6b7280;
-            --border-color: #e5e7eb;
+            --text-primary: #f0fdf4;
+            --text-secondary: #86efac;
+            --text-muted: #4ade80;
+            --border-color: #22543d;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            background: linear-gradient(135deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 100%);
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a2634 100%);
             background-attachment: fixed;
             color: var(--text-primary);
             line-height: 1.8;
             min-height: 100vh;
         }
         .header {
-            background: rgba(255, 255, 255, 0.9);
-            border-bottom: 1px solid var(--border-color);
+            background: rgba(15, 20, 25, 0.95);
+            border-bottom: 2px solid var(--border-color);
             padding: 1.5rem 2rem;
             position: sticky;
             top: 0;
             z-index: 100;
             backdrop-filter: blur(20px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
         }
         .header-content {
             max-width: 1400px;
@@ -56,15 +57,15 @@
         .logo { display: flex; align-items: center; gap: 1rem; }
         .logo-icon {
             width: 48px; height: 48px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #22c55e, #10b981);
             border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
             font-size: 1.5rem;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
         }
         .logo-text h1 {
             font-size: 1.5rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #22c55e, #10b981);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
@@ -72,8 +73,8 @@
         .nav-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
         .nav-tab {
             padding: 0.75rem 1.5rem;
-            background: #f3f4f6;
-            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
             border-radius: 8px;
             color: var(--text-secondary);
             cursor: pointer;
@@ -82,12 +83,18 @@
             font-weight: 500;
             transition: all 0.3s ease;
         }
-        .nav-tab:hover { background: #e5e7eb; color: var(--text-primary); transform: translateY(-2px); }
+        .nav-tab:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-green);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
         .nav-tab.active {
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #22c55e, #10b981);
             border-color: transparent;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            color: #0f1419;
+            font-weight: 700;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
             transform: translateY(-2px);
         }
         .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
@@ -97,30 +104,32 @@
         .section-header { margin-bottom: 3rem; text-align: center; }
         .section-number {
             display: inline-block; width: 60px; height: 60px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #22c55e, #10b981);
             border-radius: 50%; line-height: 60px;
             font-size: 1.5rem; font-weight: 900; margin-bottom: 1rem;
-            color: white;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            color: #0f1419;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
         }
         .section-title {
             font-size: 2.5rem; font-weight: 900; margin-bottom: 0.5rem;
-            color: white;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
-        .section-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 1.125rem; }
+        .section-subtitle { color: var(--text-secondary); font-size: 1.125rem; }
         .card {
             background: var(--bg-card);
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--border-color);
             border-radius: 16px;
             padding: 2rem;
             margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
         }
         .card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border-color: var(--accent-green);
+            box-shadow: 0 20px 60px rgba(34, 197, 94, 0.2);
         }
         .card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
         .card-icon {
@@ -181,8 +190,8 @@
         .cl { color: #79c0ff; }
         .bi { color: #ffa657; }
         .diagram-container {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
-            border: 1px solid rgba(102, 126, 234, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid var(--border-color);
             border-radius: 16px;
             padding: 2rem;
             margin: 2rem 0;
@@ -192,37 +201,47 @@
             text-align: center;
             font-size: 1.125rem;
             font-weight: 600;
-            color: #667eea;
+            color: var(--accent-green);
             margin-bottom: 1.5rem;
         }
         .svg-diagram { width: 100%; max-width: 900px; margin: 0 auto; display: block; }
 
         /* SVGアニメーション */
         @keyframes nodeGlow {
-            0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
-            50% { filter: drop-shadow(0 0 20px currentColor); }
+            0%, 100% { filter: drop-shadow(0 0 8px #22c55e); }
+            50% { filter: drop-shadow(0 0 25px #22c55e) drop-shadow(0 0 50px #22c55e); }
         }
         @keyframes nodePulse {
             0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            50% { transform: scale(1.08); }
         }
         @keyframes flowDash {
-            to { stroke-dashoffset: -20; }
+            to { stroke-dashoffset: -30; }
         }
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes borderPulse {
+            0%, 100% { stroke-width: 2; }
+            50% { stroke-width: 4; }
         }
         .svg-node-animated {
             animation: nodePulse 2s ease-in-out infinite;
             transform-origin: center;
         }
         .svg-flow-animated {
-            stroke-dasharray: 10 5;
-            animation: flowDash 1s linear infinite;
+            stroke-dasharray: 15 8;
+            animation: flowDash 0.8s linear infinite;
         }
         .svg-glow {
-            animation: nodeGlow 2s ease-in-out infinite;
+            animation: nodeGlow 1.5s ease-in-out infinite;
+        }
+        .node-circle {
+            transition: all 0.5s ease;
+        }
+        .node-active {
+            animation: nodeGlow 1.5s ease-in-out infinite, nodePulse 2s ease-in-out infinite;
         }
         .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
         .concept-card {
@@ -248,38 +267,38 @@
         .tag.purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
         .tag.orange { background: rgba(249, 115, 22, 0.2); color: var(--accent-orange); }
         .highlight-box {
-            background: linear-gradient(135deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.05));
-            border-left: 4px solid #667eea;
+            background: rgba(34, 197, 94, 0.1);
+            border-left: 4px solid var(--accent-green);
             border-radius: 0 12px 12px 0;
             padding: 1.5rem;
             margin: 1.5rem 0;
         }
-        .highlight-box.warning { border-left-color: var(--accent-orange); background: linear-gradient(135deg, rgba(249, 115, 22, 0.1), rgba(249, 115, 22, 0.05)); }
-        .highlight-box.success { border-left-color: var(--accent-green); background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05)); }
-        .highlight-title { font-weight: 700; color: #667eea; margin-bottom: 0.5rem; }
+        .highlight-box.warning { border-left-color: var(--accent-orange); background: rgba(249, 115, 22, 0.1); }
+        .highlight-box.success { border-left-color: var(--accent-green); background: rgba(34, 197, 94, 0.15); }
+        .highlight-title { font-weight: 700; color: var(--accent-green); margin-bottom: 0.5rem; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1rem 0; }
         th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
-        th { background: rgba(102, 126, 234, 0.1); font-weight: 600; color: #667eea; }
+        th { background: rgba(34, 197, 94, 0.2); font-weight: 600; color: var(--accent-green); }
         code:not(pre code) {
-            background: rgba(102, 126, 234, 0.15);
+            background: rgba(34, 197, 94, 0.2);
             padding: 0.2rem 0.5rem;
             border-radius: 4px;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85em;
-            color: #667eea;
+            color: var(--accent-green);
         }
         .steps { display: flex; flex-direction: column; gap: 1.5rem; }
         .step { display: flex; gap: 1.5rem; align-items: flex-start; }
         .step-number {
             width: 40px; height: 40px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #22c55e, #10b981);
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; flex-shrink: 0;
-            color: white;
-            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+            color: #0f1419;
+            box-shadow: 0 4px 10px rgba(34, 197, 94, 0.4);
         }
-        .step-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+        .step-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); }
         @media (max-width: 768px) {
             .header-content { flex-direction: column; }
             .section-title { font-size: 1.75rem; }
@@ -380,14 +399,14 @@ result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今
                         <!-- 左側：グラフ構造 -->
                         <text x="180" y="30" text-anchor="middle" fill="#667eea" font-size="16" font-weight="700">グラフ構造の基本</text>
                         <circle cx="100" cy="120" r="40" fill="#667eea" fill-opacity="0.2" stroke="#667eea" stroke-width="3"/>
-                        <text x="100" y="115" text-anchor="middle" fill="#1f2937" font-size="12" font-weight="600">頂点</text>
-                        <text x="100" y="130" text-anchor="middle" fill="#1f2937" font-size="12" font-weight="600">(Node)</text>
+                        <text x="100" y="115" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
+                        <text x="100" y="130" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
                         <circle cx="260" cy="120" r="40" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="3"/>
-                        <text x="260" y="115" text-anchor="middle" fill="#1f2937" font-size="12" font-weight="600">頂点</text>
-                        <text x="260" y="130" text-anchor="middle" fill="#1f2937" font-size="12" font-weight="600">(Node)</text>
+                        <text x="260" y="115" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
+                        <text x="260" y="130" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
                         <circle cx="180" cy="240" r="40" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899" stroke-width="3"/>
-                        <text x="180" y="235" text-anchor="middle" fill="#1f2937" font-size="12" font-weight="600">頂点</text>
-                        <text x="180" y="250" text-anchor="middle" fill="#1f2937" font-size="12" font-weight="600">(Node)</text>
+                        <text x="180" y="235" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
+                        <text x="180" y="250" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
                         <!-- 辺 -->
                         <line x1="140" y1="120" x2="215" y2="120" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
                         <line x1="115" y1="155" x2="150" y2="205" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
@@ -690,10 +709,10 @@ graph = workflow.compile()</pre>
                     </g>
                 </svg>
                 <div style="text-align: center; margin-top: 1rem;">
-                    <button id="flowPrevBtn" style="padding: 0.5rem 1.5rem; margin: 0.25rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">◀ 前へ</button>
-                    <span id="flowStepIndicator" style="padding: 0.5rem 1rem; color: #667eea; font-weight: 700;">Step 0 / 3</span>
-                    <button id="flowNextBtn" style="padding: 0.5rem 1.5rem; margin: 0.25rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">次へ ▶</button>
-                    <button id="flowAutoBtn" style="padding: 0.5rem 1.5rem; margin: 0.25rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">▶ 自動再生</button>
+                    <button id="flowPrevBtn" style="padding: 0.75rem 2rem; margin: 0.25rem; background: linear-gradient(135deg, #22c55e, #10b981); color: #0f1419; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;">◀ 前へ</button>
+                    <span id="flowStepIndicator" style="padding: 0.5rem 1rem; color: #22c55e; font-weight: 700;">Step 0 / 3</span>
+                    <button id="flowNextBtn" style="padding: 0.75rem 2rem; margin: 0.25rem; background: linear-gradient(135deg, #22c55e, #10b981); color: #0f1419; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;">次へ ▶</button>
+                    <button id="flowAutoBtn" style="padding: 0.75rem 2rem; margin: 0.25rem; background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;">▶ 自動再生</button>
                 </div>
             </div>
 
@@ -1291,30 +1310,54 @@ result2 = graph.invoke({
         const maxFlowStep = 3;
         let autoPlayInterval = null;
 
+        // ノードの色設定
+        const nodeColors = {
+            0: '#10b981', // START - green
+            1: '#22c55e', // process - bright green
+            2: '#8b5cf6', // output - purple
+            3: '#ec4899'  // END - pink
+        };
+
         function updateFlowDiagram() {
             // ノードのハイライト
             document.querySelectorAll('#flowSvg .flow-step').forEach(g => {
                 const step = parseInt(g.dataset.step);
                 const circle = g.querySelector('.node-circle');
+                const color = nodeColors[step];
+
                 if (step === currentFlowStep) {
-                    circle.style.filter = 'url(#glow)';
-                    circle.style.fillOpacity = '0.6';
+                    // アクティブなノード：光らせる
+                    circle.classList.add('node-active');
+                    circle.style.filter = `drop-shadow(0 0 15px ${color}) drop-shadow(0 0 30px ${color})`;
+                    circle.style.fillOpacity = '0.8';
+                    circle.style.strokeWidth = '4';
                 } else if (step < currentFlowStep) {
+                    // 完了したノード
+                    circle.classList.remove('node-active');
                     circle.style.filter = 'none';
-                    circle.style.fillOpacity = '0.5';
+                    circle.style.fillOpacity = '0.6';
+                    circle.style.strokeWidth = '3';
                 } else {
+                    // 未処理ノード
+                    circle.classList.remove('node-active');
                     circle.style.filter = 'none';
                     circle.style.fillOpacity = '0.2';
+                    circle.style.strokeWidth = '2';
                 }
             });
+
             // 説明ボックスの表示切り替え
             document.querySelectorAll('#flowSvg .state-box').forEach(g => {
                 const step = parseInt(g.dataset.step);
                 g.style.opacity = step === currentFlowStep ? '1' : '0';
                 g.style.transition = 'opacity 0.5s ease';
             });
+
             // ステップ表示
-            document.getElementById('flowStepIndicator').textContent = `Step ${currentFlowStep} / ${maxFlowStep}`;
+            const indicator = document.getElementById('flowStepIndicator');
+            if (indicator) {
+                indicator.textContent = `Step ${currentFlowStep} / ${maxFlowStep}`;
+            }
         }
 
         document.getElementById('flowPrevBtn')?.addEventListener('click', () => {
@@ -1336,7 +1379,7 @@ result2 = graph.invoke({
                 clearInterval(autoPlayInterval);
                 autoPlayInterval = null;
                 this.textContent = '▶ 自動再生';
-                this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                this.style.background = 'linear-gradient(135deg, #06b6d4, #0891b2)';
             } else {
                 currentFlowStep = 0;
                 updateFlowDiagram();
@@ -1350,7 +1393,7 @@ result2 = graph.invoke({
                         clearInterval(autoPlayInterval);
                         autoPlayInterval = null;
                         document.getElementById('flowAutoBtn').textContent = '▶ 自動再生';
-                        document.getElementById('flowAutoBtn').style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                        document.getElementById('flowAutoBtn').style.background = 'linear-gradient(135deg, #06b6d4, #0891b2)';
                     }
                 }, 2000);
             }
