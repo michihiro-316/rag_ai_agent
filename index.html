@@ -1172,6 +1172,102 @@ gcloud config set project YOUR_PROJECT_ID</pre>
                     3. 「有効にする」をクリック<br>
                     <strong>※ 無料枠あり</strong>: Gemini 1.5 Flashは月100万トークンまで無料</p>
                 </div>
+
+                <!-- ファイル構成ガイド -->
+                <div class="highlight-box" style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border-left-color: var(--accent-purple); margin-top: 2rem;">
+                    <div class="highlight-title" style="color: var(--accent-purple);">🏗️ AIエンジニアのプロジェクト構成（重要！）</div>
+                    <p style="margin-bottom: 1rem;">初心者は全部を1ファイルに書きがちですが、<strong>プロは役割ごとにファイルを分けます</strong>。<br>
+                    理由: 保守性、再利用性、チーム開発のしやすさが格段に上がるからです。</p>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">📂 推奨プロジェクト構成</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span></div>
+                        <div class="code-content">
+<pre>meeting_summarizer/          <span class="cm"># プロジェクトルート</span>
+├── <span class="fn">main.py</span>                  <span class="cm"># エントリーポイント（実行するファイル）</span>
+│                            <span class="cm"># → グラフの組み立てと実行</span>
+│
+├── <span class="fn">state.py</span>                 <span class="cm"># State定義</span>
+│                            <span class="cm"># → MeetingStateクラスを定義</span>
+│
+├── <span class="fn">nodes.py</span>                 <span class="cm"># Node関数群</span>
+│                            <span class="cm"># → summarize_node, check_length_node など</span>
+│
+├── <span class="fn">routing.py</span>               <span class="cm"># ルーティング関数</span>
+│                            <span class="cm"># → route_by_length など条件分岐ロジック</span>
+│
+├── <span class="fn">requirements.txt</span>         <span class="cm"># 依存ライブラリ一覧</span>
+│                            <span class="cm"># → pip install -r requirements.txt で一括インストール</span>
+│
+├── <span class="fn">sample_input.txt</span>         <span class="cm"># テスト用の会議テキスト</span>
+│                            <span class="cm"># → 開発中のテストに使用</span>
+│
+└── output/                  <span class="cm"># 出力ディレクトリ</span>
+    └── <span class="fn">meeting_notes.md</span>    <span class="cm"># 生成された議事録</span>
+                             <span class="cm"># → git ignoreに追加（生成物なので）</span>
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
+                    <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem;">
+                        <div style="color: var(--accent-green); font-weight: 700; margin-bottom: 0.5rem;">✅ なぜ分けるの？</div>
+                        <ul style="margin: 0; padding-left: 1.2rem; color: var(--text-secondary); font-size: 0.9rem;">
+                            <li><strong>state.py</strong>を変えれば型定義だけ変更</li>
+                            <li><strong>nodes.py</strong>は処理ロジックだけに集中</li>
+                            <li>バグが起きても<strong>影響範囲が限定</strong>される</li>
+                            <li>他プロジェクトに<strong>ノードを再利用</strong>できる</li>
+                        </ul>
+                    </div>
+                    <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem;">
+                        <div style="color: var(--accent-orange); font-weight: 700; margin-bottom: 0.5rem;">❌ 1ファイルだとどうなる？</div>
+                        <ul style="margin: 0; padding-left: 1.2rem; color: var(--text-secondary); font-size: 0.9rem;">
+                            <li>500行超えると<strong>迷子になる</strong></li>
+                            <li>State変更 → 全体を確認する羽目に</li>
+                            <li>チーム開発で<strong>コンフリクト地獄</strong></li>
+                            <li>テストが書きにくい</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">Terminal - ファイル作成コマンド</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span></div>
+                        <div class="code-content">
+<pre><span class="cm"># ============================================</span>
+<span class="cm"># プロジェクト構成を作成</span>
+<span class="cm"># ============================================</span>
+cd meeting_summarizer
+
+<span class="cm"># 空のPythonファイルを作成</span>
+touch state.py nodes.py routing.py main.py
+
+<span class="cm"># 出力ディレクトリを作成</span>
+mkdir -p output
+
+<span class="cm"># requirements.txtを作成</span>
+echo <span class="st">"langgraph>=0.2.0"</span> > requirements.txt
+echo <span class="st">"langchain-google-vertexai>=2.0.0"</span> >> requirements.txt
+
+<span class="cm"># 構成確認</span>
+ls -la</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box success">
+                    <div class="highlight-title">💡 AIエンジニアからのアドバイス</div>
+                    <p style="margin: 0;">このチュートリアルでは各ステップで<strong>どのファイルを編集するか</strong>を明示します。<br>
+                    Step 2 → <code style="background: #0d1117; padding: 0.2rem 0.5rem; border-radius: 4px;">state.py</code>、
+                    Step 3 → <code style="background: #0d1117; padding: 0.2rem 0.5rem; border-radius: 4px;">nodes.py</code>、
+                    Step 4 → <code style="background: #0d1117; padding: 0.2rem 0.5rem; border-radius: 4px;">routing.py</code>、
+                    Step 5-6 → <code style="background: #0d1117; padding: 0.2rem 0.5rem; border-radius: 4px;">main.py</code><br>
+                    <strong>最終的にはこの4ファイルでAIエージェントが完成します！</strong></p>
+                </div>
             </div>
 
             <!-- ステップ2 -->
