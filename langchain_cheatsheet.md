@@ -2,7 +2,7 @@
 
 電車で覚える用。現場で使うものだけに絞りました。
 
-**最終更新日:** 2026-01-04（タブ構成を6分割に変更）
+**最終更新日:** 2026-01-06（LangGraphタブを追加、7タブ構成に変更）
 
 ---
 
@@ -54,6 +54,7 @@
   <button class="tab-button" onclick="openTab(event, 'tools')">ツール</button>
   <button class="tab-button" onclick="openTab(event, 'practice')">実践</button>
   <button class="tab-button" onclick="openTab(event, 'reference')">補足</button>
+  <button class="tab-button" onclick="openTab(event, 'langgraph')">LangGraph</button>
 </div>
 
 <!-- ==================== 基礎タブ ==================== -->
@@ -2154,6 +2155,341 @@ query = "りんごの産地は？"
 ```
 
 SQLで言うと `WHERE query LIKE '%りんご%'` と同じ意味。
+
+</div>
+</div>
+
+<!-- ==================== LangGraphタブ ==================== -->
+<div id="langgraph" class="tab-content">
+
+## LangGraph - 複雑なAIワークフロー構築
+
+LangChain学習済みの方向けに、LangGraphの概念から実装まで解説。
+
+---
+
+### LangChainの限界とLangGraph
+
+LCELは直線的な処理に強い：
+
+```python
+chain = prompt | llm | output_parser
+result = chain.invoke({"question": "..."})
+```
+
+しかし、**条件分岐**や**複数経路の合流**が必要な場合、LCELだけでは辛い。
+
+```
+              ユーザーの質問
+                    |
+              +----------+
+              | 意図判定  |
+              +----------+
+                    |
+      +-------------+-------------+
+      v             v             v
+  +--------+   +--------+    +--------+
+  |データ  |   |比較    |    |一般    |
+  |取得    |   |分析    |    |回答    |
+  +--------+   +--------+    +--------+
+      |             |             |
+      +-------------+-------------+
+                    v
+              +----------+
+              | 回答生成  |
+              +----------+
+```
+
+---
+
+### LangGraphの3つの基本概念
+
+| 概念 | 説明 | 役割 |
+|------|------|------|
+| **State** | ノード間で共有するデータの入れ物 | 辞書のようなもの |
+| **Node** | 処理の単位（関数） | Stateを受け取り、更新して返す |
+| **Edge** | ノード間の接続（矢印） | 条件分岐も可能 |
+
+---
+
+### 最もシンプルなLangGraphの例
+
+```python
+from typing import TypedDict
+from langgraph.graph import StateGraph, START, END
+
+# --- Step 1: Stateを定義 ---
+class SimpleState(TypedDict):
+    message: str      # 入力メッセージ
+    result: str       # 処理結果
+
+# --- Step 2: Nodeを定義 ---
+def process_node(state: SimpleState) -> dict:
+    """メッセージを処理するノード"""
+    msg = state["message"]
+    processed = f"処理済み: {msg}"
+    return {"result": processed}  # resultを更新
+
+def output_node(state: SimpleState) -> dict:
+    """結果を出力するノード"""
+    print(f"最終結果: {state['result']}")
+    return {}  # 更新なし
+
+# --- Step 3: Graphを構築 ---
+workflow = StateGraph(SimpleState)
+
+# ノードを追加
+workflow.add_node("process", process_node)
+workflow.add_node("output", output_node)
+
+# エッジを追加（流れを定義）
+workflow.add_edge(START, "process")    # 開始 → process
+workflow.add_edge("process", "output") # process → output
+workflow.add_edge("output", END)       # output → 終了
+
+# グラフをコンパイル
+graph = workflow.compile()
+
+# --- Step 4: 実行 ---
+initial_state = {"message": "こんにちは", "result": ""}
+final_state = graph.invoke(initial_state)
+
+print(final_state)
+# {'message': 'こんにちは', 'result': '処理済み: こんにちは'}
+```
+
+**重要ポイント**: Nodeの戻り値は「部分更新」。全部返す必要はない！
+
+---
+
+### 条件分岐を追加する
+
+```python
+from typing import TypedDict, Literal
+from langgraph.graph import StateGraph, START, END
+
+class ChatState(TypedDict):
+    message: str
+    intent: str       # 意図（追加）
+    response: str
+
+def classifier_node(state: ChatState) -> dict:
+    """メッセージの意図を分類"""
+    msg = state["message"]
+    if "天気" in msg:
+        intent = "weather"
+    elif "時間" in msg:
+        intent = "time"
+    else:
+        intent = "general"
+    return {"intent": intent}
+
+def weather_node(state: ChatState) -> dict:
+    return {"response": "今日は晴れです"}
+
+def time_node(state: ChatState) -> dict:
+    return {"response": "現在15時です"}
+
+def general_node(state: ChatState) -> dict:
+    return {"response": "すみません、よくわかりません"}
+
+# --- 条件分岐の関数 ---
+def route_by_intent(state: ChatState) -> Literal["weather", "time", "general"]:
+    """intentに基づいて次のノードを決定"""
+    intent = state["intent"]
+    if intent == "weather":
+        return "weather"
+    elif intent == "time":
+        return "time"
+    else:
+        return "general"
+
+# --- Graph構築 ---
+workflow = StateGraph(ChatState)
+
+workflow.add_node("classifier", classifier_node)
+workflow.add_node("weather", weather_node)
+workflow.add_node("time", time_node)
+workflow.add_node("general", general_node)
+
+workflow.add_edge(START, "classifier")
+
+# 条件分岐エッジ
+workflow.add_conditional_edges(
+    "classifier",        # 分岐元のノード
+    route_by_intent,     # 条件関数
+    {                    # 戻り値 → 行き先ノード
+        "weather": "weather",
+        "time": "time",
+        "general": "general",
+    }
+)
+
+workflow.add_edge("weather", END)
+workflow.add_edge("time", END)
+workflow.add_edge("general", END)
+
+graph = workflow.compile()
+```
+
+---
+
+### Stateの自動マージ（Annotated + reducer）
+
+会話履歴のように「追加していきたい」データがある場合：
+
+```python
+from typing import TypedDict, Annotated, List
+from operator import add
+
+class ChatState(TypedDict):
+    message: str
+    response: str
+    # ここがポイント！
+    history: Annotated[List[str], add]  # addで自動マージ
+```
+
+| 種類 | 挙動 | 例 |
+|------|------|-----|
+| reducer なし | 上書き | `state["response"] = "新"` → 古い値は消える |
+| reducer あり | マージ | `state["history"] = ["新"]` → 既存 + 新 |
+
+**カスタムreducer**:
+
+```python
+def merge_history(current: List, new: List) -> List:
+    """会話履歴をマージし、直近15件に制限"""
+    merged = (current or []) + (new or [])
+    return merged[-15:]  # 直近15件のみ
+
+class ChatState(TypedDict):
+    history: Annotated[List[Dict], merge_history]
+```
+
+---
+
+### Pythonモジュール構成（相対インポート）
+
+```
+app/
+├── __init__.py         # パッケージの目印
+├── config.py           # 設定
+├── agents/             # サブパッケージ
+│   ├── __init__.py
+│   ├── state.py
+│   ├── nodes.py
+│   └── workflow.py
+└── tools/
+    ├── __init__.py
+    └── bigquery.py
+```
+
+| 記号 | 意味 | 例 |
+|------|------|-----|
+| `.` | 同じディレクトリ | `from .state import ChatState` |
+| `..` | 1つ上のディレクトリ | `from ..config import get_settings` |
+
+---
+
+### 実際のワークフロー例
+
+```python
+from langgraph.graph import StateGraph, START, END
+from .state import ChatState
+from .nodes import router_node, planner_node, executor_node, responder_node
+
+def create_chatbot_graph() -> StateGraph:
+    workflow = StateGraph(ChatState)
+
+    # ノードを追加
+    workflow.add_node("router", router_node)
+    workflow.add_node("planner", planner_node)
+    workflow.add_node("executor", executor_node)
+    workflow.add_node("responder", responder_node)
+
+    # エッジを追加
+    workflow.add_edge(START, "router")
+
+    # Router → Planner（条件分岐）
+    def route_after_router(state: ChatState) -> str:
+        if state.get("intent") == "clarification":
+            return "responder"
+        return "planner"
+
+    workflow.add_conditional_edges(
+        "router",
+        route_after_router,
+        {"responder": "responder", "planner": "planner"}
+    )
+
+    # Planner → Executor or Responder
+    def should_execute(state: ChatState) -> str:
+        plan = state.get("query_plan")
+        if plan and plan.get("tables_needed"):
+            return "executor"
+        return "responder"
+
+    workflow.add_conditional_edges(
+        "planner",
+        should_execute,
+        {"executor": "executor", "responder": "responder"}
+    )
+
+    workflow.add_edge("executor", "responder")
+    workflow.add_edge("responder", END)
+
+    return workflow
+
+# コンパイル済みグラフをキャッシュ（シングルトン）
+_graph = None
+
+def get_compiled_graph():
+    global _graph
+    if _graph is None:
+        workflow = create_chatbot_graph()
+        _graph = workflow.compile()
+    return _graph
+```
+
+---
+
+### よく使うパターン
+
+**エラーハンドリング**:
+```python
+def some_node(state: ChatState) -> dict:
+    try:
+        result = do_something()
+        return {"result": result}
+    except Exception as e:
+        return {"error": str(e)}
+```
+
+**条件によってスキップ**:
+```python
+def executor_node(state: ChatState) -> dict:
+    if not state.get("query_plan"):
+        return {}  # 空のdictを返す = 更新なし
+    # 処理を実行...
+```
+
+**前のノードの結果を利用**:
+```python
+def responder_node(state: ChatState) -> dict:
+    intent = state["intent"]           # Routerが設定
+    data = state.get("query_results")  # Executorが設定
+    # それらを使って処理...
+```
+
+---
+
+### LangChainエコシステムまとめ
+
+| ツール | 役割 | 例え |
+|--------|------|------|
+| LangChain | 部品（LLM、プロンプト、ツール等） | レゴブロック |
+| LangGraph | 部品を組み立てるフレームワーク | 設計図 |
+| LangSmith | 動作を監視・デバッグするツール | 検査機器 |
 
 </div>
 </div>
