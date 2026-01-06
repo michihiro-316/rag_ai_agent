@@ -300,6 +300,96 @@
             box-shadow: 0 4px 10px rgba(34, 197, 94, 0.4);
         }
         .step-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); }
+
+        /* 実践セクション2カラムレイアウト */
+        .tutorial-layout {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 2rem;
+            align-items: start;
+        }
+        .tutorial-content {
+            min-width: 0;
+        }
+        .tutorial-sidebar {
+            position: sticky;
+            top: 100px;
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 16px;
+            padding: 1.5rem;
+            max-height: calc(100vh - 120px);
+            overflow: hidden;
+        }
+        .tutorial-sidebar-title {
+            color: var(--accent-green);
+            font-weight: 700;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        .tutorial-sidebar svg {
+            width: 100%;
+            height: auto;
+        }
+        .tutorial-sidebar .current-step-label {
+            text-align: center;
+            margin-top: 1rem;
+            padding: 0.75rem;
+            background: rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            color: var(--accent-green);
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        /* サイドバーSVGのスタイル */
+        .sidebar-step rect,
+        .sidebar-step circle,
+        .sidebar-step polygon {
+            transition: all 0.4s ease;
+        }
+        .sidebar-step.active rect,
+        .sidebar-step.active circle,
+        .sidebar-step.active polygon {
+            fill: rgba(34, 197, 94, 0.3);
+            stroke: #22c55e;
+            stroke-width: 3;
+            filter: drop-shadow(0 0 10px #22c55e) drop-shadow(0 0 20px #22c55e);
+        }
+        .sidebar-step.active text {
+            fill: #22c55e;
+            font-weight: bold;
+        }
+        .sidebar-step.completed rect,
+        .sidebar-step.completed circle,
+        .sidebar-step.completed polygon {
+            fill: rgba(16, 185, 129, 0.2);
+            stroke: #10b981;
+        }
+        .sidebar-step.completed text {
+            fill: #10b981;
+        }
+        @keyframes sidebarPulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        .sidebar-step.active {
+            animation: sidebarPulse 1.5s ease-in-out infinite;
+            transform-origin: center;
+        }
+
+        @media (max-width: 1024px) {
+            .tutorial-layout {
+                grid-template-columns: 1fr;
+            }
+            .tutorial-sidebar {
+                position: relative;
+                top: 0;
+                max-height: none;
+                order: -1;
+                margin-bottom: 2rem;
+            }
+        }
         @media (max-width: 768px) {
             .header-content { flex-direction: column; }
             .section-title { font-size: 1.75rem; }
@@ -978,6 +1068,11 @@ workflow.add_conditional_edges(
                 </div>
             </div>
 
+            <!-- チュートリアル2カラムレイアウト -->
+            <div class="tutorial-layout">
+                <!-- 左側: チュートリアルコンテンツ -->
+                <div class="tutorial-content">
+
             <!-- ステップ1 -->
             <div class="card" id="tut-step1">
                 <div class="card-header">
@@ -1297,6 +1392,91 @@ result2 = graph.invoke({
                 </div>
             </div>
 
+                </div><!-- /.tutorial-content -->
+
+                <!-- 右側: スティッキーサイドバー -->
+                <div class="tutorial-sidebar">
+                    <div class="tutorial-sidebar-title">📍 現在の位置</div>
+                    <svg viewBox="0 0 280 400" class="sidebar-architecture-svg">
+                        <defs>
+                            <marker id="sidebarArr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+                                <polygon points="0 0, 8 3, 0 6" fill="#667eea"/>
+                            </marker>
+                            <filter id="glowFilter" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                                <feMerge>
+                                    <feMergeNode in="coloredBlur"/>
+                                    <feMergeNode in="SourceGraphic"/>
+                                </feMerge>
+                            </filter>
+                        </defs>
+
+                        <!-- Step 1: 環境準備（上部） -->
+                        <g id="sidebar-step1" class="sidebar-step" data-step="1">
+                            <rect x="90" y="15" width="100" height="40" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="40" text-anchor="middle" fill="#86efac" font-size="11">環境準備</text>
+                        </g>
+
+                        <!-- 矢印 -->
+                        <line x1="140" y1="55" x2="140" y2="75" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+
+                        <!-- Step 2: State -->
+                        <g id="sidebar-step2" class="sidebar-step" data-step="2">
+                            <rect x="70" y="80" width="140" height="45" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="100" text-anchor="middle" fill="#86efac" font-size="11">State</text>
+                            <text x="140" y="115" text-anchor="middle" fill="#4ade80" font-size="9">(共有データ構造)</text>
+                        </g>
+
+                        <!-- 矢印 -->
+                        <line x1="140" y1="125" x2="140" y2="145" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+
+                        <!-- Step 3: Node（複数） -->
+                        <g id="sidebar-step3" class="sidebar-step" data-step="3">
+                            <circle cx="70" cy="175" r="28" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="70" y="172" text-anchor="middle" fill="#86efac" font-size="9">classifier</text>
+                            <text x="70" y="184" text-anchor="middle" fill="#86efac" font-size="9">_node</text>
+
+                            <circle cx="140" cy="175" r="28" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="172" text-anchor="middle" fill="#86efac" font-size="9">responder</text>
+                            <text x="140" y="184" text-anchor="middle" fill="#86efac" font-size="9">_node</text>
+
+                            <circle cx="210" cy="175" r="28" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="210" y="172" text-anchor="middle" fill="#86efac" font-size="9">handler</text>
+                            <text x="210" y="184" text-anchor="middle" fill="#86efac" font-size="9">_nodes</text>
+                        </g>
+
+                        <!-- 矢印 -->
+                        <line x1="140" y1="205" x2="140" y2="225" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+
+                        <!-- Step 4: 条件分岐 -->
+                        <g id="sidebar-step4" class="sidebar-step" data-step="4">
+                            <polygon points="140,230 175,260 140,290 105,260" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="257" text-anchor="middle" fill="#86efac" font-size="9">条件</text>
+                            <text x="140" y="269" text-anchor="middle" fill="#86efac" font-size="9">分岐</text>
+                        </g>
+
+                        <!-- 矢印 -->
+                        <line x1="140" y1="290" x2="140" y2="310" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+
+                        <!-- Step 5: グラフ組立 -->
+                        <g id="sidebar-step5" class="sidebar-step" data-step="5">
+                            <rect x="60" y="315" width="160" height="40" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="340" text-anchor="middle" fill="#86efac" font-size="11">グラフ組立 (compile)</text>
+                        </g>
+
+                        <!-- 矢印 -->
+                        <line x1="140" y1="355" x2="140" y2="370" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+
+                        <!-- Step 6: 実行 -->
+                        <g id="sidebar-step6" class="sidebar-step" data-step="6">
+                            <rect x="80" y="375" width="120" height="35" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="397" text-anchor="middle" fill="#86efac" font-size="11">▶ 実行</text>
+                        </g>
+                    </svg>
+                    <div class="current-step-label" id="sidebarStepLabel">Step 1: 環境準備</div>
+                </div>
+            </div><!-- /.tutorial-layout -->
+
             <div class="highlight-box success" style="margin-top: 2rem;">
                 <div class="highlight-title">🎓 このチュートリアルで学んだこと</div>
                 <div class="steps">
@@ -1458,6 +1638,29 @@ result2 = graph.invoke({
             6: { icon: '▶️', name: '実行テスト', desc: '動作確認して完成！' }
         };
 
+        // サイドバーSVGの更新関数
+        function updateSidebarSVG(currentStep) {
+            document.querySelectorAll('.sidebar-step').forEach(stepEl => {
+                const stepNum = parseInt(stepEl.dataset.step);
+                stepEl.classList.remove('active', 'completed');
+
+                if (stepNum === currentStep) {
+                    stepEl.classList.add('active');
+                } else if (stepNum < currentStep) {
+                    stepEl.classList.add('completed');
+                }
+            });
+
+            // ラベル更新
+            const label = document.getElementById('sidebarStepLabel');
+            if (label && tutorialSteps[currentStep]) {
+                label.textContent = `Step ${currentStep}: ${tutorialSteps[currentStep].name}`;
+            }
+        }
+
+        // 初期化: サイドバーSVGのStep 1をアクティブに
+        updateSidebarSVG(1);
+
         document.querySelectorAll('.tut-step-btn').forEach(btn => {
             btn.addEventListener('click', function() {
                 const step = parseInt(this.dataset.step);
@@ -1488,6 +1691,9 @@ result2 = graph.invoke({
                         target.style.animation = 'fadeIn 0.5s ease';
                     }, 10);
                 }
+
+                // サイドバーSVGも更新
+                updateSidebarSVG(step);
             });
         });
 
@@ -1514,6 +1720,9 @@ result2 = graph.invoke({
                         document.getElementById('tutorialIcon').textContent = tutorialSteps[step].icon;
                         document.getElementById('tutorialStepName').textContent = tutorialSteps[step].name;
                         document.getElementById('tutorialStepDesc').textContent = tutorialSteps[step].desc;
+
+                        // サイドバーSVGも更新
+                        updateSidebarSVG(step);
                     }
                 }
             });
