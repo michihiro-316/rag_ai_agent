@@ -385,6 +385,51 @@
             animation: sidebarPulse 1.5s ease-in-out infinite;
             transform-origin: center;
         }
+        /* Step 3 専用スタイル（デフォルト） */
+        .step3-rect {
+            fill: #1a2634;
+            stroke: #667eea;
+            stroke-width: 2;
+        }
+        .step3-text {
+            fill: #86efac;
+        }
+        .step3-title {
+            fill: #86efac;
+        }
+        .step3-line {
+            stroke: #667eea;
+            stroke-width: 1.5;
+        }
+        /* Step 3 アクティブ時 */
+        .sidebar-step.active .step3-rect {
+            fill: rgba(34, 197, 94, 0.3) !important;
+            stroke: #22c55e !important;
+            stroke-width: 3 !important;
+            filter: drop-shadow(0 0 8px #22c55e) drop-shadow(0 0 16px #22c55e);
+        }
+        .sidebar-step.active .step3-text,
+        .sidebar-step.active .step3-title {
+            fill: #22c55e !important;
+            font-weight: bold;
+        }
+        .sidebar-step.active .step3-line {
+            stroke: #22c55e !important;
+            stroke-width: 2 !important;
+            filter: drop-shadow(0 0 4px #22c55e);
+        }
+        /* Step 3 完了時 */
+        .sidebar-step.completed .step3-rect {
+            fill: rgba(16, 185, 129, 0.2) !important;
+            stroke: #10b981 !important;
+        }
+        .sidebar-step.completed .step3-text,
+        .sidebar-step.completed .step3-title {
+            fill: #10b981 !important;
+        }
+        .sidebar-step.completed .step3-line {
+            stroke: #10b981 !important;
+        }
 
         @media (max-width: 1024px) {
             .tutorial-layout {
@@ -2353,35 +2398,35 @@ console.log(result.final_doc);  <span class="cm">// 整形された議事録</sp
                         <!-- Step 3: Nodes（縦に直列配置） -->
                         <g id="sidebar-step3" class="sidebar-step" data-step="3">
                             <!-- タイトル -->
-                            <text x="140" y="145" text-anchor="middle" fill="#86efac" font-size="10">⚙️ Nodes（処理関数）</text>
+                            <text x="140" y="145" text-anchor="middle" font-size="10" class="step3-title">⚙️ Nodes（処理関数）</text>
 
                             <!-- summarize_node -->
-                            <rect x="75" y="155" width="130" height="35" rx="6" fill="#1a2634" stroke="#667eea" stroke-width="2"/>
-                            <text x="140" y="177" text-anchor="middle" fill="#667eea" font-size="10">summarize_node</text>
+                            <rect x="75" y="155" width="130" height="35" rx="6" class="step3-rect"/>
+                            <text x="140" y="177" text-anchor="middle" font-size="10" class="step3-text">summarize_node</text>
 
-                            <line x1="140" y1="190" x2="140" y2="205" stroke="#667eea" stroke-width="1.5" marker-end="url(#sidebarArr)"/>
+                            <line x1="140" y1="190" x2="140" y2="205" class="step3-line" marker-end="url(#sidebarArr)"/>
 
                             <!-- check_length_node -->
-                            <rect x="75" y="210" width="130" height="35" rx="6" fill="#1a2634" stroke="#06b6d4" stroke-width="2"/>
-                            <text x="140" y="232" text-anchor="middle" fill="#06b6d4" font-size="10">check_length_node</text>
+                            <rect x="75" y="210" width="130" height="35" rx="6" class="step3-rect"/>
+                            <text x="140" y="232" text-anchor="middle" font-size="10" class="step3-text">check_length_node</text>
 
-                            <line x1="140" y1="245" x2="140" y2="260" stroke="#667eea" stroke-width="1.5" marker-end="url(#sidebarArr)"/>
+                            <line x1="140" y1="245" x2="140" y2="260" class="step3-line" marker-end="url(#sidebarArr)"/>
 
                             <!-- extract_topics_node -->
-                            <rect x="75" y="265" width="130" height="35" rx="6" fill="#1a2634" stroke="#22c55e" stroke-width="2"/>
-                            <text x="140" y="287" text-anchor="middle" fill="#22c55e" font-size="10">extract_topics_node</text>
+                            <rect x="75" y="265" width="130" height="35" rx="6" class="step3-rect"/>
+                            <text x="140" y="287" text-anchor="middle" font-size="10" class="step3-text">extract_topics_node</text>
 
-                            <line x1="140" y1="300" x2="140" y2="315" stroke="#667eea" stroke-width="1.5" marker-end="url(#sidebarArr)"/>
+                            <line x1="140" y1="300" x2="140" y2="315" class="step3-line" marker-end="url(#sidebarArr)"/>
 
                             <!-- extract_actions_node -->
-                            <rect x="75" y="320" width="130" height="35" rx="6" fill="#1a2634" stroke="#f97316" stroke-width="2"/>
-                            <text x="140" y="342" text-anchor="middle" fill="#f97316" font-size="10">extract_actions_node</text>
+                            <rect x="75" y="320" width="130" height="35" rx="6" class="step3-rect"/>
+                            <text x="140" y="342" text-anchor="middle" font-size="10" class="step3-text">extract_actions_node</text>
 
-                            <line x1="140" y1="355" x2="140" y2="370" stroke="#667eea" stroke-width="1.5" marker-end="url(#sidebarArr)"/>
+                            <line x1="140" y1="355" x2="140" y2="370" class="step3-line" marker-end="url(#sidebarArr)"/>
 
                             <!-- format_doc_node -->
-                            <rect x="75" y="375" width="130" height="35" rx="6" fill="#1a2634" stroke="#ec4899" stroke-width="2"/>
-                            <text x="140" y="397" text-anchor="middle" fill="#ec4899" font-size="10">format_doc_node</text>
+                            <rect x="75" y="375" width="130" height="35" rx="6" class="step3-rect"/>
+                            <text x="140" y="397" text-anchor="middle" font-size="10" class="step3-text">format_doc_node</text>
                         </g>
 
                         <line x1="140" y1="410" x2="140" y2="430" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
