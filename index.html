@@ -469,6 +469,140 @@
         @media (max-width: 768px) {
             .header-content { flex-direction: column; }
             .section-title { font-size: 1.75rem; }
+
+            /* ナビゲーションタブ */
+            .nav-tabs {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+                justify-content: center;
+            }
+            .nav-tab {
+                font-size: 0.75rem;
+                padding: 0.5rem 0.75rem;
+            }
+
+            /* メインコンテンツ */
+            .main {
+                padding: 1rem;
+            }
+
+            /* カード */
+            .card {
+                padding: 1.25rem;
+            }
+            .card-title {
+                font-size: 1.1rem;
+            }
+
+            /* コードブロック - 横スクロール対応 */
+            .code-block {
+                margin: 1rem -1.25rem;
+                border-radius: 0;
+            }
+            .code-body {
+                font-size: 0.75rem;
+            }
+            .code-content pre {
+                white-space: pre;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            .line-nums {
+                font-size: 0.7rem;
+                padding: 1rem 0.5rem;
+            }
+
+            /* ハイライトボックス */
+            .highlight-box {
+                padding: 1rem;
+            }
+
+            /* SVG図 */
+            .svg-diagram {
+                max-width: 100%;
+            }
+            .diagram-container {
+                padding: 1rem;
+                overflow-x: auto;
+            }
+        }
+
+        /* スマホ向け追加スタイル (480px以下) */
+        @media (max-width: 480px) {
+            /* ヘッダー */
+            .logo-text h1 {
+                font-size: 1.25rem;
+            }
+            .logo-text span {
+                font-size: 0.65rem;
+            }
+            .logo-icon {
+                font-size: 2rem;
+            }
+
+            /* セクションヘッダー */
+            .section-header {
+                padding: 1.5rem 1rem;
+            }
+            .section-number {
+                font-size: 2.5rem;
+            }
+            .section-title {
+                font-size: 1.4rem;
+            }
+            .section-subtitle {
+                font-size: 0.85rem;
+            }
+
+            /* ナビタブ */
+            .nav-tab {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.6rem;
+            }
+
+            /* チュートリアルステップボタン - 2行に */
+            .tut-step-buttons {
+                display: grid !important;
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 0.5rem !important;
+            }
+            .tut-step-btn {
+                min-width: unset !important;
+                font-size: 0.7rem !important;
+                padding: 0.4rem !important;
+            }
+
+            /* 会社の例え - 縦並び */
+            [style*="grid-template-columns: 1fr 60px 1fr"] {
+                grid-template-columns: 1fr !important;
+                gap: 1rem !important;
+            }
+            [style*="text-align: center; color: var(--accent-green); font-size: 1.5rem"] {
+                transform: rotate(90deg);
+                margin: 0.5rem 0;
+            }
+
+            /* カード内のグリッド */
+            [style*="grid-template-columns: repeat(auto-fit"] {
+                grid-template-columns: 1fr !important;
+            }
+
+            /* コードブロック */
+            .code-body {
+                font-size: 0.65rem;
+            }
+            .line-nums {
+                display: none;
+            }
+            .code-content {
+                padding: 1rem;
+            }
+
+            /* タグ */
+            .tag {
+                font-size: 0.65rem;
+                padding: 0.2rem 0.5rem;
+            }
         }
     </style>
 </head>
@@ -1094,7 +1228,7 @@ workflow.add_conditional_edges(
                     <span style="color: var(--accent-green); font-weight: 700;">📍 現在の進行状況</span>
                     <span id="tutorialProgress" style="color: var(--text-secondary);">Step 1 / 6</span>
                 </div>
-                <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <div class="tut-step-buttons" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                     <button class="tut-step-btn active" data-step="1" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--accent-green); background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">1. 環境</button>
                     <button class="tut-step-btn" data-step="2" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">2. State</button>
                     <button class="tut-step-btn" data-step="3" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">3. Node</button>
