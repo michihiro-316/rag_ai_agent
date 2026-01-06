@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangGraph 完全学習ガイド</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f1419;
+            --bg-card: #1a1f26;
+            --accent-green: #22c55e;
+            --accent-emerald: #10b981;
+            --accent-teal: #14b8a6;
+            --accent-cyan: #06b6d4;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f97316;
+            --accent-pink: #ec4899;
+            --text-primary: #f0fdf4;
+            --text-secondary: #86efac;
+            --text-muted: #4ade80;
+            --border-color: #22543d;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.8;
+        }
+        .header {
+            background: linear-gradient(180deg, rgba(34, 197, 94, 0.15), transparent);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.5rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+        }
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .logo { display: flex; align-items: center; gap: 1rem; }
+        .logo-icon {
+            width: 48px; height: 48px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            border-radius: 12px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem;
+        }
+        .logo-text h1 {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .logo-text span { font-size: 0.75rem; color: var(--text-secondary); letter-spacing: 0.1em; }
+        .nav-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .nav-tab {
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        .nav-tab:hover { background: var(--bg-card); color: var(--text-primary); }
+        .nav-tab.active {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+            color: #0f1419;
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+        }
+        .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
+        .section { display: none; animation: fadeIn 0.4s ease; }
+        .section.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .section-header { margin-bottom: 3rem; text-align: center; }
+        .section-number {
+            display: inline-block; width: 60px; height: 60px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            border-radius: 50%; line-height: 60px;
+            font-size: 1.5rem; font-weight: 900; margin-bottom: 1rem;
+            color: #0f1419;
+        }
+        .section-title {
+            font-size: 2.5rem; font-weight: 900; margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .section-subtitle { color: var(--text-secondary); font-size: 1.125rem; }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        .card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
+        .card-icon {
+            width: 48px; height: 48px; border-radius: 12px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.5rem;
+        }
+        .card-icon.green { background: rgba(34, 197, 94, 0.2); }
+        .card-icon.emerald { background: rgba(16, 185, 129, 0.2); }
+        .card-icon.blue { background: rgba(59, 130, 246, 0.2); }
+        .card-icon.purple { background: rgba(139, 92, 246, 0.2); }
+        .card-icon.orange { background: rgba(249, 115, 22, 0.2); }
+        .card-title { font-size: 1.5rem; font-weight: 700; }
+        .code-block {
+            background: #0d1117;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            overflow: hidden;
+        }
+        .code-header {
+            background: #161b22;
+            padding: 0.6rem 1rem;
+            border-bottom: 1px solid #30363d;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .code-body { display: flex; }
+        .line-nums {
+            padding: 1rem 0;
+            background: #0d1117;
+            border-right: 1px solid #30363d;
+            text-align: right;
+            user-select: none;
+            color: #484f58;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        .line-nums span { display: block; padding: 0 0.75rem; }
+        .code-content {
+            flex: 1;
+            padding: 1rem 1.25rem;
+            overflow-x: auto;
+        }
+        .code-content pre {
+            margin: 0;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: #e6edf3;
+            white-space: pre;
+        }
+        .cm { color: #8b949e; }
+        .kw { color: #ff7b72; }
+        .st { color: #a5d6ff; }
+        .fn { color: #d2a8ff; }
+        .cl { color: #79c0ff; }
+        .bi { color: #ffa657; }
+        .diagram-container {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.05), rgba(16, 185, 129, 0.05));
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+            overflow-x: auto;
+        }
+        .diagram-title {
+            text-align: center;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--accent-emerald);
+            margin-bottom: 1.5rem;
+        }
+        .svg-diagram { width: 100%; max-width: 900px; margin: 0 auto; display: block; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+        .concept-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+        .concept-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .concept-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.5rem; }
+        .concept-desc { color: var(--text-secondary); font-size: 0.9rem; }
+        .tag {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        .tag.green { background: rgba(34, 197, 94, 0.2); color: var(--accent-green); }
+        .tag.emerald { background: rgba(16, 185, 129, 0.2); color: var(--accent-emerald); }
+        .tag.blue { background: rgba(59, 130, 246, 0.2); color: var(--accent-blue); }
+        .tag.purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
+        .tag.orange { background: rgba(249, 115, 22, 0.2); color: var(--accent-orange); }
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(16, 185, 129, 0.1));
+            border-left: 4px solid var(--accent-green);
+            border-radius: 0 12px 12px 0;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .highlight-box.warning { border-left-color: var(--accent-orange); }
+        .highlight-box.success { border-left-color: var(--accent-emerald); }
+        .highlight-title { font-weight: 700; color: var(--accent-emerald); margin-bottom: 0.5rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1rem 0; }
+        th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
+        th { background: var(--bg-card); font-weight: 600; color: var(--accent-emerald); }
+        code:not(pre code) {
+            background: rgba(34, 197, 94, 0.15);
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            color: var(--accent-emerald);
+        }
+        .steps { display: flex; flex-direction: column; gap: 1.5rem; }
+        .step { display: flex; gap: 1.5rem; align-items: flex-start; }
+        .step-number {
+            width: 40px; height: 40px;
+            background: linear-gradient(135deg, #22c55e, #10b981);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; flex-shrink: 0;
+            color: #0f1419;
+        }
+        .step-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; }
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; }
+            .section-title { font-size: 1.75rem; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon">🔗</div>
+                <div class="logo-text">
+                    <h1>LangGraph 完全学習ガイド</h1>
+                    <span>FOR AI AGENT DEVELOPMENT</span>
+                </div>
+            </div>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-section="intro">概要</button>
+                <button class="nav-tab" data-section="basics">基礎概念</button>
+                <button class="nav-tab" data-section="minimal">最小構成</button>
+                <button class="nav-tab" data-section="branch">条件分岐</button>
+                <button class="nav-tab" data-section="state">State管理</button>
+                <button class="nav-tab" data-section="project">実践</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="main">
+        <!-- 概要セクション -->
+        <section class="section active" id="intro">
+            <div class="section-header">
+                <div class="section-number">1</div>
+                <h2 class="section-title">LangGraphとは何か</h2>
+                <p class="section-subtitle">LangChain学習済みの方向けに解説</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">⚠️</div>
+                    <h3 class="card-title">LangChainの限界</h3>
+                </div>
+                <p>LangChainのLCELは<strong>直線的な処理</strong>に強いです：</p>
+                <div class="code-block">
+                    <div class="code-header">Python</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span></div>
+                        <div class="code-content">
+<pre><span class="cm"># LCEL: パイプラインで繋ぐ</span>
+chain = prompt | llm | output_parser
+result = chain.invoke({<span class="st">"question"</span>: <span class="st">"..."</span>})</pre>
+                        </div>
+                    </div>
+                </div>
+                <p>しかし、<strong>条件分岐</strong>や<strong>複数経路の合流</strong>が必要な場合、LCELだけでは辛くなります。</p>
+            </div>
+
+            <!-- グラフ理論の図解 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">🎯</div>
+                    <h3 class="card-title">グラフ理論の基本：頂点と辺</h3>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-title">LangGraphはグラフ構造でワークフローを定義する</div>
+                    <svg class="svg-diagram" viewBox="0 0 800 320">
+                        <defs>
+                            <marker id="arr1" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6"/>
+                            </marker>
+                        </defs>
+                        <!-- 左側：グラフ構造 -->
+                        <text x="180" y="30" text-anchor="middle" fill="#10b981" font-size="16" font-weight="700">グラフ構造の基本</text>
+                        <circle cx="100" cy="120" r="40" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="3"/>
+                        <text x="100" y="115" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
+                        <text x="100" y="130" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
+                        <circle cx="260" cy="120" r="40" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="3"/>
+                        <text x="260" y="115" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
+                        <text x="260" y="130" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
+                        <circle cx="180" cy="240" r="40" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="3"/>
+                        <text x="180" y="235" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
+                        <text x="180" y="250" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
+                        <!-- 辺 -->
+                        <line x1="140" y1="120" x2="215" y2="120" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
+                        <line x1="115" y1="155" x2="150" y2="205" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
+                        <line x1="245" y1="155" x2="210" y2="205" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
+                        <text x="180" y="105" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="600">辺(Edge)</text>
+                        <!-- 右側：対応表 -->
+                        <line x1="380" y1="50" x2="380" y2="280" stroke="#30363d" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text x="590" y="30" text-anchor="middle" fill="#10b981" font-size="16" font-weight="700">LangGraphでの対応</text>
+                        <rect x="430" y="60" width="320" height="65" rx="10" fill="#1a2234" stroke="#22c55e" stroke-width="2"/>
+                        <circle cx="470" cy="92" r="20" fill="#22c55e" fill-opacity="0.4" stroke="#22c55e" stroke-width="2"/>
+                        <text x="510" y="85" fill="#22c55e" font-size="14" font-weight="700">Node（頂点）</text>
+                        <text x="510" y="105" fill="#86efac" font-size="12">= 処理の単位（関数）</text>
+                        <rect x="430" y="140" width="320" height="65" rx="10" fill="#1a2234" stroke="#8b5cf6" stroke-width="2"/>
+                        <line x1="450" y1="172" x2="490" y2="172" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
+                        <text x="510" y="165" fill="#8b5cf6" font-size="14" font-weight="700">Edge（辺）</text>
+                        <text x="510" y="185" fill="#86efac" font-size="12">= 頂点間の接続（矢印）</text>
+                        <rect x="430" y="220" width="320" height="65" rx="10" fill="#1a2234" stroke="#10b981" stroke-width="2"/>
+                        <rect x="455" y="245" width="30" height="25" rx="4" fill="#10b981" fill-opacity="0.4" stroke="#10b981" stroke-width="2"/>
+                        <text x="470" y="262" text-anchor="middle" fill="#fff" font-size="10">{ }</text>
+                        <text x="510" y="250" fill="#10b981" font-size="14" font-weight="700">State（状態）</text>
+                        <text x="510" y="270" fill="#86efac" font-size="12">= 全頂点で共有するデータ</text>
+                    </svg>
+                </div>
+                <div class="grid-3" style="margin-top: 1.5rem;">
+                    <div class="concept-card">
+                        <div class="concept-icon">⚫</div>
+                        <div class="concept-title">Node（頂点）</div>
+                        <div class="concept-desc">処理の単位（関数）<br><span class="tag green">グラフの「点」</span></div>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-icon">➡️</div>
+                        <div class="concept-title">Edge（辺）</div>
+                        <div class="concept-desc">頂点間の接続<br><span class="tag purple">グラフの「線」</span></div>
+                    </div>
+                    <div class="concept-card">
+                        <div class="concept-icon">📦</div>
+                        <div class="concept-title">State（状態）</div>
+                        <div class="concept-desc">共有データの入れ物<br><span class="tag emerald">頂点間で共有</span></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 基礎概念セクション -->
+        <section class="section" id="basics">
+            <div class="section-header">
+                <div class="section-number">2</div>
+                <h2 class="section-title">基礎概念の深堀り</h2>
+                <p class="section-subtitle">State, Node, Edgeを詳しく理解する</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">📦</div>
+                    <h3 class="card-title">State（状態）とは？</h3>
+                </div>
+                <p>Stateは<strong>全頂点（Node）で共有されるデータ構造</strong>です。</p>
+                <div class="code-block">
+                    <div class="code-header">Python</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> typing <span class="kw">import</span> TypedDict
+
+<span class="kw">class</span> <span class="cl">ChatState</span>(TypedDict):
+    <span class="st">"""全頂点で共有される状態"""</span>
+    user_message: <span class="cl">str</span>      <span class="cm"># ユーザーの質問</span>
+    intent: <span class="cl">str</span>            <span class="cm"># 意図分類結果</span>
+    response: <span class="cl">str</span>          <span class="cm"># 最終回答</span></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box success">
+                    <div class="highlight-title">💡 ポイント</div>
+                    <p>Stateは「バケツリレーのバケツ」。各頂点がバケツを受け取り、中身を更新して次に渡します。</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon emerald">⚙️</div>
+                    <h3 class="card-title">Node（頂点）とは？</h3>
+                </div>
+                <p>Nodeは<strong>Stateを受け取り、更新内容を返す関数</strong>です。</p>
+                <div class="code-block">
+                    <div class="code-header">Python</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span></div>
+                        <div class="code-content">
+<pre><span class="kw">def</span> <span class="fn">router_node</span>(state: <span class="cl">ChatState</span>) -> <span class="cl">dict</span>:
+    <span class="st">"""ユーザーの意図を分類する頂点"""</span>
+    msg = state[<span class="st">"user_message"</span>]
+
+    <span class="cm"># 意図を判定</span>
+    <span class="kw">if</span> <span class="st">"データ"</span> <span class="kw">in</span> msg:
+        intent = <span class="st">"data_query"</span>
+    <span class="kw">else</span>:
+        intent = <span class="st">"general"</span>
+
+    <span class="cm"># intentだけを返す（部分更新）</span>
+    <span class="kw">return</span> {<span class="st">"intent"</span>: intent}</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box warning">
+                    <div class="highlight-title">⚠️ 重要</div>
+                    <p><strong>戻り値は「部分更新」</strong>。更新したいフィールドだけ返せばOK！</p>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">🔗</div>
+                    <h3 class="card-title">Edge（辺）とは？</h3>
+                </div>
+                <p>Edgeは<strong>頂点間の接続</strong>を定義します。</p>
+                <div class="diagram-container">
+                    <div class="diagram-title">🔀 2種類の辺（Edge）</div>
+                    <svg class="svg-diagram" viewBox="0 0 800 180">
+                        <defs>
+                            <marker id="arr2" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
+                            </marker>
+                            <marker id="arr3" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6"/>
+                            </marker>
+                        </defs>
+                        <!-- 左：通常の辺 -->
+                        <text x="150" y="25" text-anchor="middle" fill="#22c55e" font-size="14" font-weight="700">通常の辺（add_edge）</text>
+                        <circle cx="80" cy="90" r="30" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="2"/>
+                        <text x="80" y="95" text-anchor="middle" fill="#f0fdf4" font-size="12">A</text>
+                        <line x1="115" y1="90" x2="175" y2="90" stroke="#22c55e" stroke-width="3" marker-end="url(#arr2)"/>
+                        <circle cx="220" cy="90" r="30" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="2"/>
+                        <text x="220" y="95" text-anchor="middle" fill="#f0fdf4" font-size="12">B</text>
+                        <text x="150" y="150" text-anchor="middle" fill="#86efac" font-size="12">常に A → B へ</text>
+                        <!-- 区切り -->
+                        <line x1="350" y1="20" x2="350" y2="170" stroke="#30363d" stroke-width="2" stroke-dasharray="5,5"/>
+                        <!-- 右：条件分岐 -->
+                        <text x="580" y="25" text-anchor="middle" fill="#8b5cf6" font-size="14" font-weight="700">条件分岐の辺（add_conditional_edges）</text>
+                        <circle cx="420" cy="90" r="30" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
+                        <text x="420" y="95" text-anchor="middle" fill="#f0fdf4" font-size="12">A</text>
+                        <line x1="455" y1="75" x2="530" y2="50" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr3)"/>
+                        <line x1="455" y1="90" x2="530" y2="90" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr3)"/>
+                        <line x1="455" y1="105" x2="530" y2="130" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr3)"/>
+                        <circle cx="565" cy="45" r="22" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="2"/>
+                        <text x="565" y="50" text-anchor="middle" fill="#f0fdf4" font-size="11">B</text>
+                        <circle cx="565" cy="90" r="22" fill="#06b6d4" fill-opacity="0.3" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="565" y="95" text-anchor="middle" fill="#f0fdf4" font-size="11">C</text>
+                        <circle cx="565" cy="135" r="22" fill="#f97316" fill-opacity="0.3" stroke="#f97316" stroke-width="2"/>
+                        <text x="565" y="140" text-anchor="middle" fill="#f0fdf4" font-size="11">D</text>
+                        <text x="680" y="50" fill="#10b981" font-size="10">条件1</text>
+                        <text x="680" y="95" fill="#06b6d4" font-size="10">条件2</text>
+                        <text x="680" y="140" fill="#f97316" font-size="10">その他</text>
+                        <text x="580" y="170" text-anchor="middle" fill="#86efac" font-size="12">条件で行き先が変わる</text>
+                    </svg>
+                </div>
+                <table>
+                    <thead><tr><th>種類</th><th>用途</th><th>コード</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="tag green">通常の辺</span></td><td>常に同じ頂点へ</td><td><code>add_edge("A", "B")</code></td></tr>
+                        <tr><td><span class="tag purple">条件分岐の辺</span></td><td>条件で分岐</td><td><code>add_conditional_edges(...)</code></td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- 最小構成セクション -->
+        <section class="section" id="minimal">
+            <div class="section-header">
+                <div class="section-number">3</div>
+                <h2 class="section-title">最小構成で理解する</h2>
+                <p class="section-subtitle">2頂点だけの最小構成</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">🚀</div>
+                    <h3 class="card-title">最もシンプルなLangGraph</h3>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Python</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span></div>
+                        <div class="code-content">
+<pre><span class="cm"># === 最小構成のLangGraph ===</span>
+
+<span class="kw">from</span> typing <span class="kw">import</span> TypedDict
+<span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
+
+<span class="cm"># --- Step 1: Stateを定義 ---</span>
+<span class="kw">class</span> <span class="cl">SimpleState</span>(TypedDict):
+    message: <span class="cl">str</span>      <span class="cm"># 入力メッセージ</span>
+    result: <span class="cl">str</span>       <span class="cm"># 処理結果</span>
+
+<span class="cm"># --- Step 2: Node（頂点）を定義 ---</span>
+<span class="kw">def</span> <span class="fn">process_node</span>(state: <span class="cl">SimpleState</span>) -> <span class="cl">dict</span>:
+    <span class="st">"""メッセージを処理する頂点"""</span>
+    msg = state[<span class="st">"message"</span>]
+    processed = <span class="st">f"処理済み: {msg}"</span>
+    <span class="kw">return</span> {<span class="st">"result"</span>: processed}
+
+<span class="kw">def</span> <span class="fn">output_node</span>(state: <span class="cl">SimpleState</span>) -> <span class="cl">dict</span>:
+    <span class="st">"""結果を出力する頂点"""</span>
+    <span class="bi">print</span>(<span class="st">f"最終結果: {state['result']}"</span>)
+    <span class="kw">return</span> {}  <span class="cm"># 更新なし</span>
+
+<span class="cm"># --- Step 3: Graphを構築 ---</span>
+workflow = StateGraph(<span class="cl">SimpleState</span>)
+
+workflow.add_node(<span class="st">"process"</span>, process_node)   <span class="cm"># 頂点を追加</span>
+workflow.add_node(<span class="st">"output"</span>, output_node)     <span class="cm"># 頂点を追加</span>
+
+workflow.add_edge(START, <span class="st">"process"</span>)          <span class="cm"># 辺を追加</span>
+workflow.add_edge(<span class="st">"process"</span>, <span class="st">"output"</span>)       <span class="cm"># 辺を追加</span>
+workflow.add_edge(<span class="st">"output"</span>, END)              <span class="cm"># 辺を追加</span>
+
+graph = workflow.compile()</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diagram-container">
+                <div class="diagram-title">🔄 実行フロー（グラフ構造）</div>
+                <svg class="svg-diagram" viewBox="0 0 700 350">
+                    <defs>
+                        <marker id="arr4" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
+                        </marker>
+                    </defs>
+                    <!-- START -->
+                    <circle cx="150" cy="50" r="35" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="3"/>
+                    <text x="150" y="55" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">START</text>
+                    <line x1="150" y1="85" x2="150" y2="115" stroke="#22c55e" stroke-width="2" marker-end="url(#arr4)"/>
+                    <!-- process_node -->
+                    <circle cx="150" cy="160" r="45" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="3"/>
+                    <text x="150" y="155" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">process</text>
+                    <text x="150" y="170" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">_node</text>
+                    <line x1="150" y1="205" x2="150" y2="235" stroke="#22c55e" stroke-width="2" marker-end="url(#arr4)"/>
+                    <!-- output_node -->
+                    <circle cx="150" cy="280" r="45" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="3"/>
+                    <text x="150" y="275" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">output</text>
+                    <text x="150" y="290" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">_node</text>
+                    <line x1="150" y1="325" x2="150" y2="355" stroke="#22c55e" stroke-width="2"/>
+                    <!-- END -->
+                    <circle cx="150" cy="390" r="35" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="3"/>
+                    <text x="150" y="395" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">END</text>
+                    <!-- 右側：説明 -->
+                    <rect x="280" y="30" width="380" height="70" rx="10" fill="#1a2234" stroke="#10b981" stroke-width="2"/>
+                    <text x="300" y="55" fill="#10b981" font-size="13" font-weight="700">initial_state</text>
+                    <text x="300" y="75" fill="#86efac" font-family="JetBrains Mono" font-size="11">message: "こんにちは", result: ""</text>
+                    <rect x="280" y="130" width="380" height="80" rx="10" fill="#1a2234" stroke="#22c55e" stroke-width="2"/>
+                    <text x="300" y="155" fill="#22c55e" font-size="13" font-weight="700">process_node の処理</text>
+                    <text x="300" y="180" fill="#86efac" font-size="11">result を更新</text>
+                    <text x="300" y="200" fill="#10b981" font-family="JetBrains Mono" font-size="11">return {"result": "処理済み: こんにちは"}</text>
+                    <rect x="280" y="250" width="380" height="80" rx="10" fill="#1a2234" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="300" y="275" fill="#8b5cf6" font-size="13" font-weight="700">output_node の処理</text>
+                    <text x="300" y="300" fill="#86efac" font-size="11">更新された result を参照</text>
+                    <text x="300" y="320" fill="#10b981" font-family="JetBrains Mono" font-size="11">return {} （更新なし）</text>
+                    <!-- 矢印 -->
+                    <line x1="200" y1="65" x2="275" y2="65" stroke="#4ade80" stroke-width="1" stroke-dasharray="4"/>
+                    <line x1="200" y1="160" x2="275" y2="170" stroke="#4ade80" stroke-width="1" stroke-dasharray="4"/>
+                    <line x1="200" y1="280" x2="275" y2="290" stroke="#4ade80" stroke-width="1" stroke-dasharray="4"/>
+                </svg>
+            </div>
+
+            <div class="highlight-box success">
+                <div class="highlight-title">💡 部分更新のポイント</div>
+                <div class="code-block">
+                    <div class="code-header">Python</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+                        <div class="code-content">
+<pre><span class="cm"># OK: 更新したいフィールドだけ返す</span>
+<span class="kw">return</span> {<span class="st">"result"</span>: processed}
+
+<span class="cm"># NG: 全部返す必要はない</span>
+<span class="cm"># return {"message": state["message"], "result": processed}</span>
+<span class="cm"># messageは自動的に引き継がれる！</span></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 条件分岐セクション -->
+        <section class="section" id="branch">
+            <div class="section-header">
+                <div class="section-number">4</div>
+                <h2 class="section-title">条件分岐を追加する</h2>
+                <p class="section-subtitle">条件によって処理を分ける</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">🔀</div>
+                    <h3 class="card-title">条件分岐の実装</h3>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Python</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> typing <span class="kw">import</span> Literal
+
+<span class="cm"># --- 条件分岐の関数 ---</span>
+<span class="kw">def</span> <span class="fn">route_by_intent</span>(state: <span class="cl">ChatState</span>) -> Literal[<span class="st">"weather"</span>, <span class="st">"time"</span>, <span class="st">"general"</span>]:
+    <span class="st">"""intentに基づいて次の頂点を決定"""</span>
+    intent = state[<span class="st">"intent"</span>]
+    <span class="kw">if</span> intent == <span class="st">"weather"</span>:
+        <span class="kw">return</span> <span class="st">"weather"</span>
+    <span class="kw">elif</span> intent == <span class="st">"time"</span>:
+        <span class="kw">return</span> <span class="st">"time"</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="st">"general"</span>
+
+<span class="cm"># --- 条件分岐の辺を追加 ---</span>
+workflow.add_conditional_edges(
+    <span class="st">"classifier"</span>,        <span class="cm"># 分岐元の頂点</span>
+    route_by_intent,     <span class="cm"># 条件関数</span>
+    {                    <span class="cm"># 戻り値 → 行き先の頂点</span>
+        <span class="st">"weather"</span>: <span class="st">"weather"</span>,
+        <span class="st">"time"</span>: <span class="st">"time"</span>,
+        <span class="st">"general"</span>: <span class="st">"general"</span>,
+    }
+)</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="diagram-container">
+                <div class="diagram-title">🔀 条件分岐のグラフ構造</div>
+                <svg class="svg-diagram" viewBox="0 0 700 400">
+                    <defs>
+                        <marker id="arr5" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                            <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6"/>
+                        </marker>
+                    </defs>
+                    <!-- START -->
+                    <circle cx="350" cy="40" r="30" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="3"/>
+                    <text x="350" y="45" text-anchor="middle" fill="#f0fdf4" font-size="12">START</text>
+                    <line x1="350" y1="70" x2="350" y2="100" stroke="#22c55e" stroke-width="2" marker-end="url(#arr5)"/>
+                    <!-- classifier -->
+                    <circle cx="350" cy="140" r="45" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="3"/>
+                    <text x="350" y="135" text-anchor="middle" fill="#f0fdf4" font-size="11">classifier</text>
+                    <text x="350" y="150" text-anchor="middle" fill="#f0fdf4" font-size="11">_node</text>
+                    <!-- 条件分岐 -->
+                    <polygon points="350,195 390,230 350,265 310,230" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="350" y="235" text-anchor="middle" fill="#8b5cf6" font-size="10">分岐</text>
+                    <!-- 分岐線 -->
+                    <line x1="310" y1="230" x2="150" y2="300" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr5)"/>
+                    <line x1="350" y1="265" x2="350" y2="300" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr5)"/>
+                    <line x1="390" y1="230" x2="550" y2="300" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr5)"/>
+                    <!-- ラベル -->
+                    <text x="200" y="265" fill="#06b6d4" font-size="10">"weather"</text>
+                    <text x="330" y="290" fill="#f97316" font-size="10">"time"</text>
+                    <text x="480" y="265" fill="#ec4899" font-size="10">"general"</text>
+                    <!-- 分岐先 -->
+                    <circle cx="150" cy="340" r="40" fill="#06b6d4" fill-opacity="0.3" stroke="#06b6d4" stroke-width="3"/>
+                    <text x="150" y="335" text-anchor="middle" fill="#f0fdf4" font-size="10">weather</text>
+                    <text x="150" y="350" text-anchor="middle" fill="#f0fdf4" font-size="10">_node</text>
+                    <circle cx="350" cy="340" r="40" fill="#f97316" fill-opacity="0.3" stroke="#f97316" stroke-width="3"/>
+                    <text x="350" y="335" text-anchor="middle" fill="#f0fdf4" font-size="10">time</text>
+                    <text x="350" y="350" text-anchor="middle" fill="#f0fdf4" font-size="10">_node</text>
+                    <circle cx="550" cy="340" r="40" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="3"/>
+                    <text x="550" y="335" text-anchor="middle" fill="#f0fdf4" font-size="10">general</text>
+                    <text x="550" y="350" text-anchor="middle" fill="#f0fdf4" font-size="10">_node</text>
+                    <!-- END への合流 -->
+                    <line x1="150" y1="380" x2="350" y2="420" stroke="#8b5cf6" stroke-width="2"/>
+                    <line x1="350" y1="380" x2="350" y2="420" stroke="#8b5cf6" stroke-width="2"/>
+                    <line x1="550" y1="380" x2="350" y2="420" stroke="#8b5cf6" stroke-width="2"/>
+                    <circle cx="350" cy="450" r="25" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="3"/>
+                    <text x="350" y="455" text-anchor="middle" fill="#f0fdf4" font-size="11">END</text>
+                </svg>
+            </div>
+        </section>
+
+        <!-- State管理セクション -->
+        <section class="section" id="state">
+            <div class="section-header">
+                <div class="section-number">5</div>
+                <h2 class="section-title">State管理の応用</h2>
+                <p class="section-subtitle">Annotatedとreducer</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">🔄</div>
+                    <h3 class="card-title">reducer（自動マージ）</h3>
+                </div>
+                <p>会話履歴のように「追加していきたい」データには<strong>reducer</strong>を使います。</p>
+                <table>
+                    <thead><tr><th>種類</th><th>挙動</th><th>例</th></tr></thead>
+                    <tbody>
+                        <tr><td><span class="tag orange">reducer なし</span></td><td>上書き</td><td>古い値が消える</td></tr>
+                        <tr><td><span class="tag emerald">reducer あり</span></td><td>マージ</td><td>既存 + 新しい値</td></tr>
+                    </tbody>
+                </table>
+                <div class="code-block">
+                    <div class="code-header">Python</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> typing <span class="kw">import</span> Annotated, List
+<span class="kw">from</span> operator <span class="kw">import</span> add
+
+<span class="kw">class</span> <span class="cl">ChatState</span>(TypedDict):
+    message: <span class="cl">str</span>
+    response: <span class="cl">str</span>
+    <span class="cm"># addで自動マージ！</span>
+    history: Annotated[List[<span class="cl">str</span>], add]</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">✨</div>
+                    <h3 class="card-title">カスタムreducer</h3>
+                </div>
+                <p>履歴を<strong>直近15件に制限</strong>するカスタムreducer：</p>
+                <div class="code-block">
+                    <div class="code-header">Python - app/agents/state.py</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
+                        <div class="code-content">
+<pre><span class="kw">def</span> <span class="fn">merge_history</span>(current: List, new: List) -> List:
+    <span class="st">"""会話履歴をマージし、直近15件に制限"""</span>
+    merged = (current <span class="kw">or</span> []) + (new <span class="kw">or</span> [])
+    <span class="kw">return</span> merged[<span class="cl">-15</span>:]  <span class="cm"># 直近15件のみ</span>
+
+<span class="kw">class</span> <span class="cl">ChatState</span>(TypedDict):
+    history: Annotated[List[Dict], merge_history]</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 実践セクション -->
+        <section class="section" id="project">
+            <div class="section-header">
+                <div class="section-number">6</div>
+                <h2 class="section-title">実践プロジェクト</h2>
+                <p class="section-subtitle">広告分析AIチャットボット</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">⚙️</div>
+                    <h3 class="card-title">Workflowの構築</h3>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Python - app/agents/workflow.py</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span></div>
+                        <div class="code-content">
+<pre><span class="kw">def</span> <span class="fn">create_chatbot_graph</span>() -> StateGraph:
+    <span class="st">"""LangGraphワークフローを構築"""</span>
+
+    workflow = StateGraph(<span class="cl">ChatState</span>)
+
+    <span class="cm"># === 頂点（Node）を追加 ===</span>
+    workflow.add_node(<span class="st">"router"</span>, router_node)
+    workflow.add_node(<span class="st">"clarification"</span>, clarification_node)
+    workflow.add_node(<span class="st">"planner"</span>, planner_node)
+    workflow.add_node(<span class="st">"executor"</span>, executor_node)
+    workflow.add_node(<span class="st">"responder"</span>, responder_node)
+
+    <span class="cm"># === 辺（Edge）を追加 ===</span>
+    workflow.add_edge(START, <span class="st">"router"</span>)
+
+    <span class="cm"># Router → 条件分岐</span>
+    workflow.add_conditional_edges(
+        <span class="st">"router"</span>,
+        route_after_router,
+        {<span class="st">"clarification"</span>: <span class="st">"clarification"</span>, <span class="st">"planner"</span>: <span class="st">"planner"</span>}
+    )
+
+    workflow.add_edge(<span class="st">"clarification"</span>, <span class="st">"responder"</span>)
+    workflow.add_edge(<span class="st">"planner"</span>, <span class="st">"executor"</span>)
+    workflow.add_edge(<span class="st">"executor"</span>, <span class="st">"responder"</span>)
+    workflow.add_edge(<span class="st">"responder"</span>, END)
+
+    <span class="kw">return</span> workflow</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="highlight-box success">
+                <div class="highlight-title">🎓 まとめ</div>
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <div class="step-content">
+                            <div class="step-title">State = 共有データ</div>
+                            <p>全頂点で共有。TypedDictで型定義。</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <div class="step-content">
+                            <div class="step-title">Node（頂点）= 処理単位</div>
+                            <p>Stateを受け取り、部分更新を返す関数。</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <div class="step-content">
+                            <div class="step-title">Edge（辺）= 接続</div>
+                            <p>頂点間の流れ。条件分岐も可能。</p>
+                        </div>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <div class="step-content">
+                            <div class="step-title">Annotated = 自動マージ</div>
+                            <p>reducerで履歴などを自動マージ。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        document.querySelectorAll('.nav-tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+                document.getElementById(tab.dataset.section).classList.add('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+        document.addEventListener('keydown', (e) => {
+            const tabs = document.querySelectorAll('.nav-tab');
+            const i = Array.from(tabs).findIndex(t => t.classList.contains('active'));
+            if (e.key === 'ArrowRight' && i < tabs.length - 1) tabs[i + 1].click();
+            if (e.key === 'ArrowLeft' && i > 0) tabs[i - 1].click();
+        });
+    </script>
+</body>
+</html>
