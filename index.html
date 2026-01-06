@@ -759,41 +759,60 @@ result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今
                 <div class="code-block">
                     <div class="code-header">Python</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span></div>
                         <div class="code-content">
-<pre><span class="cm"># === 最小構成のLangGraph ===</span>
+<pre><span class="cm"># ==========================================</span>
+<span class="cm"># 🏢 最小構成のLangGraph（2人の社員がいる会社）</span>
+<span class="cm"># ==========================================</span>
 
 <span class="kw">from</span> typing <span class="kw">import</span> TypedDict
 <span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
 
-<span class="cm"># --- Step 1: Stateを定義 ---</span>
+<span class="cm"># ==========================================</span>
+<span class="cm"># 📋 Step 1: 回覧ファイル（State）を作る</span>
+<span class="cm"># → 社員間で共有する「クリップボード」の項目を定義</span>
+<span class="cm"># ==========================================</span>
 <span class="kw">class</span> <span class="cl">SimpleState</span>(TypedDict):
-    message: <span class="cl">str</span>      <span class="cm"># 入力メッセージ</span>
-    result: <span class="cl">str</span>       <span class="cm"># 処理結果</span>
+    message: <span class="cl">str</span>      <span class="cm"># 📥 最初に書いてある情報（入力）</span>
+    result: <span class="cl">str</span>       <span class="cm"># 📝 社員が記入する欄（出力）</span>
 
-<span class="cm"># --- Step 2: Node（頂点）を定義 ---</span>
+<span class="cm"># ==========================================</span>
+<span class="cm"># 👤 Step 2: 社員（Node）を定義する</span>
+<span class="cm"># → 回覧ファイルを受け取り、自分の担当欄を埋めて返す</span>
+<span class="cm"># ==========================================</span>
 <span class="kw">def</span> <span class="fn">process_node</span>(state: <span class="cl">SimpleState</span>) -> <span class="cl">dict</span>:
-    <span class="st">"""メッセージを処理する頂点"""</span>
-    msg = state[<span class="st">"message"</span>]
-    processed = <span class="st">f"処理済み: {msg}"</span>
-    <span class="kw">return</span> {<span class="st">"result"</span>: processed}
+    <span class="st">"""
+    👤 1人目の社員：加工担当の田中さん
+    回覧ファイルの「message」を読んで、「result」欄に記入する
+    """</span>
+    msg = state[<span class="st">"message"</span>]         <span class="cm"># 📋 回覧ファイルから読む</span>
+    processed = <span class="st">f"処理済み: {msg}"</span>  <span class="cm"># 🔧 自分の仕事をする</span>
+    <span class="kw">return</span> {<span class="st">"result"</span>: processed}    <span class="cm"># 📝 result欄に記入して返す</span>
 
 <span class="kw">def</span> <span class="fn">output_node</span>(state: <span class="cl">SimpleState</span>) -> <span class="cl">dict</span>:
-    <span class="st">"""結果を出力する頂点"""</span>
-    <span class="bi">print</span>(<span class="st">f"最終結果: {state['result']}"</span>)
-    <span class="kw">return</span> {}  <span class="cm"># 更新なし</span>
+    <span class="st">"""
+    👤 2人目の社員：報告担当の鈴木さん
+    回覧ファイルの「result」を見て、最終報告する
+    """</span>
+    <span class="bi">print</span>(<span class="st">f"最終結果: {state['result']}"</span>)  <span class="cm"># 📢 報告する</span>
+    <span class="kw">return</span> {}  <span class="cm"># 記入する欄がないので空で返す</span>
 
-<span class="cm"># --- Step 3: Graphを構築 ---</span>
-workflow = StateGraph(<span class="cl">SimpleState</span>)
+<span class="cm"># ==========================================</span>
+<span class="cm"># 🏢 Step 3: 会社（Graph）を組み立てる</span>
+<span class="cm"># → 社員を登録し、回覧ルートを決める</span>
+<span class="cm"># ==========================================</span>
+workflow = StateGraph(<span class="cl">SimpleState</span>)  <span class="cm"># 🏢 会社を作る（回覧ファイルの形式を指定）</span>
 
-workflow.add_node(<span class="st">"process"</span>, process_node)   <span class="cm"># 頂点を追加</span>
-workflow.add_node(<span class="st">"output"</span>, output_node)     <span class="cm"># 頂点を追加</span>
+<span class="cm"># 👤 社員を登録</span>
+workflow.add_node(<span class="st">"process"</span>, process_node)   <span class="cm"># 田中さんを「process」という名前で登録</span>
+workflow.add_node(<span class="st">"output"</span>, output_node)     <span class="cm"># 鈴木さんを「output」という名前で登録</span>
 
-workflow.add_edge(START, <span class="st">"process"</span>)          <span class="cm"># 辺を追加</span>
-workflow.add_edge(<span class="st">"process"</span>, <span class="st">"output"</span>)       <span class="cm"># 辺を追加</span>
-workflow.add_edge(<span class="st">"output"</span>, END)              <span class="cm"># 辺を追加</span>
+<span class="cm"># 🔀 回覧ルートを設定（業務フロー）</span>
+workflow.add_edge(START, <span class="st">"process"</span>)          <span class="cm"># 開始 → 田中さん</span>
+workflow.add_edge(<span class="st">"process"</span>, <span class="st">"output"</span>)       <span class="cm"># 田中さん → 鈴木さん</span>
+workflow.add_edge(<span class="st">"output"</span>, END)              <span class="cm"># 鈴木さん → 終了</span>
 
-graph = workflow.compile()</pre>
+graph = workflow.compile()  <span class="cm"># 🚀 会社を稼働開始！</span></pre>
                         </div>
                     </div>
                 </div>
