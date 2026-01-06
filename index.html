@@ -649,8 +649,9 @@ result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今
                 </div>
                 <div class="highlight-box success">
                     <div class="highlight-title">💡 ポイント</div>
-                    <p>Stateは<strong>「ワークフロー全体を包む箱」</strong>。各Node（処理）がこの箱の中身を見て、結果を書き込んでいきます。<br>
-                    最初は空欄が多いですが、処理が進むにつれて箱の中身が埋まっていくイメージです。</p>
+                    <p>Stateは<strong>「会社を回覧するクリップボード」</strong>のようなもの。<br>
+                    各社員（Node）が順番に自分の担当欄を埋めて、次の人に回していきます。<br>
+                    最後には全欄が埋まった完成版になります。</p>
                 </div>
             </div>
 
@@ -1356,39 +1357,93 @@ ls -la</pre>
                     <span class="tag emerald" style="margin-left: auto;">最重要</span>
                 </div>
 
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
-                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 Stateとは？</div>
-                    <p>Stateは<strong>「ワークフロー全体を包む箱」</strong>です。<br>
-                    この箱には「入力データ」「処理結果」「最終出力」などの<strong>全フィールド</strong>が定義されています。<br>
-                    各Nodeはこの箱を受け取り、自分の担当フィールドに結果を書き込んで返します。</p>
+                <!-- 会社に例えた説明 -->
+                <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid var(--accent-purple); border-radius: 12px; padding: 1.5rem; margin: 1rem 0;">
+                    <div style="color: var(--accent-purple); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">🏢 LangGraphを「会社」に例えると...</div>
+
+                    <div style="display: grid; gap: 1rem;">
+                        <!-- StateGraph = 会社 -->
+                        <div style="background: #0f1419; border-radius: 12px; padding: 1.25rem; border: 2px solid var(--accent-green);">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="font-size: 1.5rem;">🏢</span>
+                                <span style="color: var(--accent-green); font-weight: 700; font-size: 1.1rem;">StateGraph = 会社そのもの</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;">
+                                「議事録要約株式会社」という<strong>会社全体</strong>のイメージ。<br>
+                                社員（Node）がいて、業務フロー（Edge）があって、書類（State）が回覧される。
+                            </p>
+                        </div>
+
+                        <!-- State = 回覧ファイル -->
+                        <div style="background: #0f1419; border-radius: 12px; padding: 1.25rem; border: 2px solid var(--accent-cyan);">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="font-size: 1.5rem;">📋</span>
+                                <span style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">State = 回覧ファイル（クリップボード）</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;">
+                                社員の間を回る<strong>クリップボード</strong>。<br>
+                                最初は「元の会議テキスト」だけ。各社員が自分の担当欄に記入して次に回す。<br>
+                                最後には「要約」「議題」「アクション」全部が埋まった完成版になる。
+                            </p>
+                        </div>
+
+                        <!-- Node = 社員 -->
+                        <div style="background: #0f1419; border-radius: 12px; padding: 1.25rem; border: 2px solid var(--accent-orange);">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="font-size: 1.5rem;">👤</span>
+                                <span style="color: var(--accent-orange); font-weight: 700; font-size: 1.1rem;">Node = 社員（担当者）</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;">
+                                「要約担当の田中さん」「議題抽出担当の鈴木さん」のように、<br>
+                                それぞれ<strong>専門の仕事</strong>を持つ社員。回覧ファイルを受け取り、自分の欄を埋めて次に回す。
+                            </p>
+                        </div>
+
+                        <!-- Edge = 業務フロー -->
+                        <div style="background: #0f1419; border-radius: 12px; padding: 1.25rem; border: 2px solid #8b5cf6;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                                <span style="font-size: 1.5rem;">🔀</span>
+                                <span style="color: #8b5cf6; font-weight: 700; font-size: 1.1rem;">Edge = 業務フロー（回覧順序）</span>
+                            </div>
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;">
+                                「田中さん → 鈴木さん → 佐藤さん」という<strong>回覧ルート</strong>。<br>
+                                「会議が長い場合は詳細チームへ」のような<strong>条件分岐</strong>もここで決める。
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-green);">
+                    <div class="highlight-title" style="color: var(--accent-green);">💡 つまりStateとは？</div>
+                    <p style="font-size: 1.05rem; line-height: 1.8;">
+                        <strong>「全社員が共有する回覧ファイル」</strong>のこと。<br>
+                        最初は空欄だらけ → 各社員（Node）が順番に自分の欄を埋める → 完成！
+                    </p>
                 </div>
 
                 <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid var(--accent-green); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
-                    <div style="color: var(--accent-green); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">📦 Stateのイメージ図</div>
+                    <div style="color: var(--accent-green); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">📋 回覧ファイル（State）の変化</div>
                     <div style="display: grid; grid-template-columns: 1fr 60px 1fr; align-items: center; gap: 0.5rem;">
                         <div style="background: #0f1419; border: 2px dashed var(--border-color); border-radius: 8px; padding: 1rem;">
-                            <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">🚀 処理開始時</div>
+                            <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">🚀 回覧スタート</div>
                             <div style="font-family: monospace; font-size: 0.8rem; line-height: 1.6;">
-                                <div style="color: var(--accent-green);">raw_text: <span style="color: var(--accent-cyan);">"会議テキスト..."</span></div>
-                                <div style="color: var(--text-muted);">summary: <span style="color: #666;">（空）</span></div>
-                                <div style="color: var(--text-muted);">topics: <span style="color: #666;">（空）</span></div>
-                                <div style="color: var(--text-muted);">final_doc: <span style="color: #666;">（空）</span></div>
+                                <div style="color: var(--accent-green);">会議テキスト: <span style="color: var(--accent-cyan);">✅ 記入済み</span></div>
+                                <div style="color: var(--text-muted);">要約欄: <span style="color: #666;">___（空欄）</span></div>
+                                <div style="color: var(--text-muted);">議題欄: <span style="color: #666;">___（空欄）</span></div>
+                                <div style="color: var(--text-muted);">最終議事録: <span style="color: #666;">___（空欄）</span></div>
                             </div>
                         </div>
                         <div style="text-align: center; color: var(--accent-green); font-size: 1.5rem;">→</div>
                         <div style="background: #0f1419; border: 2px solid var(--accent-green); border-radius: 8px; padding: 1rem;">
-                            <div style="color: var(--accent-green); font-size: 0.85rem; margin-bottom: 0.5rem;">✅ 処理完了後</div>
+                            <div style="color: var(--accent-green); font-size: 0.85rem; margin-bottom: 0.5rem;">✅ 回覧完了！</div>
                             <div style="font-family: monospace; font-size: 0.8rem; line-height: 1.6;">
-                                <div style="color: var(--accent-green);">raw_text: <span style="color: var(--accent-cyan);">"会議テキスト..."</span></div>
-                                <div style="color: var(--accent-green);">summary: <span style="color: var(--accent-cyan);">"要約結果..."</span></div>
-                                <div style="color: var(--accent-green);">topics: <span style="color: var(--accent-cyan);">["議題1", "議題2"]</span></div>
-                                <div style="color: var(--accent-green);">final_doc: <span style="color: var(--accent-cyan);">"# 議事録..."</span></div>
+                                <div style="color: var(--accent-green);">会議テキスト: <span style="color: var(--accent-cyan);">✅</span></div>
+                                <div style="color: var(--accent-green);">要約欄: <span style="color: var(--accent-cyan);">✅ 田中が記入</span></div>
+                                <div style="color: var(--accent-green);">議題欄: <span style="color: var(--accent-cyan);">✅ 鈴木が記入</span></div>
+                                <div style="color: var(--accent-green);">最終議事録: <span style="color: var(--accent-cyan);">✅ 佐藤が記入</span></div>
                             </div>
                         </div>
                     </div>
-                    <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 1rem; text-align: center;">
-                        各Nodeが順番にStateの中身を埋めていく → 最終的に全フィールドが完成
-                    </p>
                 </div>
 
                 <div class="code-block">
