@@ -105,11 +105,10 @@
         }
         .section-title {
             font-size: 2.5rem; font-weight: 900; margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: white;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
-        .section-subtitle { color: var(--text-secondary); font-size: 1.125rem; }
+        .section-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 1.125rem; }
         .card {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -197,6 +196,34 @@
             margin-bottom: 1.5rem;
         }
         .svg-diagram { width: 100%; max-width: 900px; margin: 0 auto; display: block; }
+
+        /* SVGアニメーション */
+        @keyframes nodeGlow {
+            0%, 100% { filter: drop-shadow(0 0 5px currentColor); }
+            50% { filter: drop-shadow(0 0 20px currentColor); }
+        }
+        @keyframes nodePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        @keyframes flowDash {
+            to { stroke-dashoffset: -20; }
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .svg-node-animated {
+            animation: nodePulse 2s ease-in-out infinite;
+            transform-origin: center;
+        }
+        .svg-flow-animated {
+            stroke-dasharray: 10 5;
+            animation: flowDash 1s linear infinite;
+        }
+        .svg-glow {
+            animation: nodeGlow 2s ease-in-out infinite;
+        }
         .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
         .concept-card {
             background: var(--bg-card);
@@ -291,22 +318,49 @@
 
             <div class="card">
                 <div class="card-header">
+                    <div class="card-icon blue">🤔</div>
+                    <h3 class="card-title">なぜLangGraphを学ぶのか？</h3>
+                </div>
+                <p>AIエージェントを作るとき、こんな経験はありませんか？</p>
+                <div class="highlight-box warning" style="margin: 1rem 0;">
+                    <p>「ユーザーの質問によって、違う処理をしたい...」</p>
+                    <p>「複数のAIを連携させて、もっと賢いシステムを作りたい...」</p>
+                    <p>「エラーが起きたら、リトライしたい...」</p>
+                </div>
+                <p><strong>LangGraph</strong>は、これらすべてを<strong>シンプルなコード</strong>で実現できるフレームワークです。</p>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
                     <div class="card-icon orange">⚠️</div>
-                    <h3 class="card-title">LangChainの限界</h3>
+                    <h3 class="card-title">LangChainだけでは限界がある</h3>
                 </div>
                 <p>LangChainのLCELは<strong>直線的な処理</strong>に強いです：</p>
                 <div class="code-block">
-                    <div class="code-header">Python</div>
+                    <div class="code-header">Python - LangChainの基本（LCEL）</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
                         <div class="code-content">
-<pre><span class="cm"># LCEL: パイプラインで繋ぐ</span>
+<pre><span class="cm"># LCEL: パイプライン（直線的な流れ）</span>
+<span class="cm"># 入力 → プロンプト → LLM → パーサー → 出力</span>
 chain = prompt | llm | output_parser
-result = chain.invoke({<span class="st">"question"</span>: <span class="st">"..."</span>})</pre>
+
+<span class="cm"># 実行（シンプル！）</span>
+result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今日の天気は？"</span>})</pre>
                         </div>
                     </div>
                 </div>
-                <p>しかし、<strong>条件分岐</strong>や<strong>複数経路の合流</strong>が必要な場合、LCELだけでは辛くなります。</p>
+                <p style="margin-top: 1rem;">この「パイプライン」は簡単で分かりやすいですが...</p>
+                <div class="highlight-box" style="margin: 1rem 0;">
+                    <div class="highlight-title">😰 LCELだけでは難しいこと</div>
+                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                        <li><strong>条件分岐</strong>：「天気の質問」と「ニュースの質問」で違う処理をしたい</li>
+                        <li><strong>ループ</strong>：ユーザーが満足するまで繰り返したい</li>
+                        <li><strong>並列処理</strong>：複数のAPIを同時に呼びたい</li>
+                        <li><strong>状態管理</strong>：会話履歴を持ち回りたい</li>
+                    </ul>
+                </div>
+                <p><strong>→ これらを解決するのがLangGraphです！</strong></p>
             </div>
 
             <!-- グラフ理論の図解 -->
@@ -557,47 +611,90 @@ graph = workflow.compile()</pre>
             </div>
 
             <div class="diagram-container">
-                <div class="diagram-title">🔄 実行フロー（グラフ構造）</div>
-                <svg class="svg-diagram" viewBox="0 0 700 350">
+                <div class="diagram-title">🔄 実行フロー（グラフ構造）- クリックでステップを進む</div>
+                <svg class="svg-diagram" viewBox="0 0 700 450" id="flowSvg">
                     <defs>
                         <marker id="arr4" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
                             <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
                         </marker>
+                        <filter id="glow">
+                            <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+                            <feMerge>
+                                <feMergeNode in="coloredBlur"/>
+                                <feMergeNode in="SourceGraphic"/>
+                            </feMerge>
+                        </filter>
                     </defs>
                     <!-- START -->
-                    <circle cx="150" cy="50" r="35" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="3"/>
-                    <text x="150" y="55" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">START</text>
-                    <line x1="150" y1="85" x2="150" y2="115" stroke="#22c55e" stroke-width="2" marker-end="url(#arr4)"/>
+                    <g class="flow-step" data-step="0">
+                        <circle cx="150" cy="50" r="35" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="3" class="node-circle"/>
+                        <text x="150" y="55" text-anchor="middle" fill="#10b981" font-size="12" font-weight="600">START</text>
+                    </g>
+                    <line x1="150" y1="85" x2="150" y2="115" stroke="#22c55e" stroke-width="3" class="flow-line svg-flow-animated"/>
                     <!-- process_node -->
-                    <circle cx="150" cy="160" r="45" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="3"/>
-                    <text x="150" y="155" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">process</text>
-                    <text x="150" y="170" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">_node</text>
-                    <line x1="150" y1="205" x2="150" y2="235" stroke="#22c55e" stroke-width="2" marker-end="url(#arr4)"/>
+                    <g class="flow-step" data-step="1">
+                        <circle cx="150" cy="160" r="45" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="3" class="node-circle"/>
+                        <text x="150" y="155" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="600">process</text>
+                        <text x="150" y="170" text-anchor="middle" fill="#22c55e" font-size="11" font-weight="600">_node</text>
+                    </g>
+                    <line x1="150" y1="205" x2="150" y2="235" stroke="#22c55e" stroke-width="3" class="flow-line svg-flow-animated"/>
                     <!-- output_node -->
-                    <circle cx="150" cy="280" r="45" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="3"/>
-                    <text x="150" y="275" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">output</text>
-                    <text x="150" y="290" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">_node</text>
-                    <line x1="150" y1="325" x2="150" y2="355" stroke="#22c55e" stroke-width="2"/>
+                    <g class="flow-step" data-step="2">
+                        <circle cx="150" cy="280" r="45" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="3" class="node-circle"/>
+                        <text x="150" y="275" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="600">output</text>
+                        <text x="150" y="290" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="600">_node</text>
+                    </g>
+                    <line x1="150" y1="325" x2="150" y2="355" stroke="#22c55e" stroke-width="3" class="flow-line svg-flow-animated"/>
                     <!-- END -->
-                    <circle cx="150" cy="390" r="35" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="3"/>
-                    <text x="150" y="395" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">END</text>
-                    <!-- 右側：説明 -->
-                    <rect x="280" y="30" width="380" height="70" rx="10" fill="#1a2234" stroke="#10b981" stroke-width="2"/>
-                    <text x="300" y="55" fill="#10b981" font-size="13" font-weight="700">initial_state</text>
-                    <text x="300" y="75" fill="#86efac" font-family="JetBrains Mono" font-size="11">message: "こんにちは", result: ""</text>
-                    <rect x="280" y="130" width="380" height="80" rx="10" fill="#1a2234" stroke="#22c55e" stroke-width="2"/>
-                    <text x="300" y="155" fill="#22c55e" font-size="13" font-weight="700">process_node の処理</text>
-                    <text x="300" y="180" fill="#86efac" font-size="11">result を更新</text>
-                    <text x="300" y="200" fill="#10b981" font-family="JetBrains Mono" font-size="11">return {"result": "処理済み: こんにちは"}</text>
-                    <rect x="280" y="250" width="380" height="80" rx="10" fill="#1a2234" stroke="#8b5cf6" stroke-width="2"/>
-                    <text x="300" y="275" fill="#8b5cf6" font-size="13" font-weight="700">output_node の処理</text>
-                    <text x="300" y="300" fill="#86efac" font-size="11">更新された result を参照</text>
-                    <text x="300" y="320" fill="#10b981" font-family="JetBrains Mono" font-size="11">return {} （更新なし）</text>
-                    <!-- 矢印 -->
-                    <line x1="200" y1="65" x2="275" y2="65" stroke="#4ade80" stroke-width="1" stroke-dasharray="4"/>
-                    <line x1="200" y1="160" x2="275" y2="170" stroke="#4ade80" stroke-width="1" stroke-dasharray="4"/>
-                    <line x1="200" y1="280" x2="275" y2="290" stroke="#4ade80" stroke-width="1" stroke-dasharray="4"/>
+                    <g class="flow-step" data-step="3">
+                        <circle cx="150" cy="390" r="35" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="3" class="node-circle"/>
+                        <text x="150" y="395" text-anchor="middle" fill="#ec4899" font-size="12" font-weight="600">END</text>
+                    </g>
+                    <!-- 右側：説明（インタラクティブ） -->
+                    <g class="state-box" data-step="0" opacity="1">
+                        <rect x="280" y="30" width="380" height="90" rx="12" fill="white" stroke="#10b981" stroke-width="3">
+                            <animate attributeName="stroke-width" values="3;5;3" dur="1.5s" repeatCount="indefinite"/>
+                        </rect>
+                        <text x="300" y="55" fill="#10b981" font-size="14" font-weight="700">📍 Step 0: 初期状態</text>
+                        <text x="300" y="80" fill="#4b5563" font-size="12">Stateが初期化されます</text>
+                        <text x="300" y="105" fill="#10b981" font-family="JetBrains Mono" font-size="11">{message: "こんにちは", result: ""}</text>
+                        <line x1="200" y1="50" x2="275" y2="65" stroke="#10b981" stroke-width="2" stroke-dasharray="6"/>
+                    </g>
+                    <g class="state-box" data-step="1" opacity="0">
+                        <rect x="280" y="130" width="380" height="100" rx="12" fill="white" stroke="#22c55e" stroke-width="3">
+                            <animate attributeName="stroke-width" values="3;5;3" dur="1.5s" repeatCount="indefinite"/>
+                        </rect>
+                        <text x="300" y="155" fill="#22c55e" font-size="14" font-weight="700">⚙️ Step 1: process_node 実行中</text>
+                        <text x="300" y="180" fill="#4b5563" font-size="12">messageを処理してresultを更新</text>
+                        <text x="300" y="205" fill="#22c55e" font-family="JetBrains Mono" font-size="11">return {"result": "処理済み: こんにちは"}</text>
+                        <text x="300" y="225" fill="#6b7280" font-size="10">※ messageは変更なし → 自動で引き継ぎ</text>
+                        <line x1="200" y1="160" x2="275" y2="170" stroke="#22c55e" stroke-width="2" stroke-dasharray="6"/>
+                    </g>
+                    <g class="state-box" data-step="2" opacity="0">
+                        <rect x="280" y="250" width="380" height="100" rx="12" fill="white" stroke="#8b5cf6" stroke-width="3">
+                            <animate attributeName="stroke-width" values="3;5;3" dur="1.5s" repeatCount="indefinite"/>
+                        </rect>
+                        <text x="300" y="275" fill="#8b5cf6" font-size="14" font-weight="700">📤 Step 2: output_node 実行中</text>
+                        <text x="300" y="300" fill="#4b5563" font-size="12">更新されたresultを参照して出力</text>
+                        <text x="300" y="325" fill="#8b5cf6" font-family="JetBrains Mono" font-size="11">print("最終結果: 処理済み: こんにちは")</text>
+                        <text x="300" y="345" fill="#6b7280" font-size="10">return {} → 更新なしでもOK!</text>
+                        <line x1="200" y1="280" x2="275" y2="290" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="6"/>
+                    </g>
+                    <g class="state-box" data-step="3" opacity="0">
+                        <rect x="280" y="370" width="380" height="70" rx="12" fill="white" stroke="#ec4899" stroke-width="3">
+                            <animate attributeName="stroke-width" values="3;5;3" dur="1.5s" repeatCount="indefinite"/>
+                        </rect>
+                        <text x="300" y="395" fill="#ec4899" font-size="14" font-weight="700">✅ Step 3: 完了!</text>
+                        <text x="300" y="420" fill="#4b5563" font-size="12">最終State: {message: "こんにちは", result: "処理済み: こんにちは"}</text>
+                        <line x1="200" y1="390" x2="275" y2="400" stroke="#ec4899" stroke-width="2" stroke-dasharray="6"/>
+                    </g>
                 </svg>
+                <div style="text-align: center; margin-top: 1rem;">
+                    <button id="flowPrevBtn" style="padding: 0.5rem 1.5rem; margin: 0.25rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">◀ 前へ</button>
+                    <span id="flowStepIndicator" style="padding: 0.5rem 1rem; color: #667eea; font-weight: 700;">Step 0 / 3</span>
+                    <button id="flowNextBtn" style="padding: 0.5rem 1.5rem; margin: 0.25rem; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">次へ ▶</button>
+                    <button id="flowAutoBtn" style="padding: 0.5rem 1.5rem; margin: 0.25rem; background: linear-gradient(135deg, #10b981, #059669); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">▶ 自動再生</button>
+                </div>
             </div>
 
             <div class="highlight-box success">
@@ -779,82 +876,391 @@ workflow.add_conditional_edges(
         <section class="section" id="project">
             <div class="section-header">
                 <div class="section-number">6</div>
-                <h2 class="section-title">実践プロジェクト</h2>
-                <p class="section-subtitle">広告分析AIチャットボット</p>
+                <h2 class="section-title">実践チュートリアル</h2>
+                <p class="section-subtitle">カスタマーサポートAIを一から作る</p>
             </div>
 
             <div class="card">
                 <div class="card-header">
-                    <div class="card-icon purple">⚙️</div>
-                    <h3 class="card-title">Workflowの構築</h3>
+                    <div class="card-icon blue">🎯</div>
+                    <h3 class="card-title">このチュートリアルで作るもの</h3>
                 </div>
+                <p>実際に動く<strong>カスタマーサポートAI</strong>を作ります。</p>
+                <div class="highlight-box success" style="margin: 1rem 0;">
+                    <div class="highlight-title">✅ 完成後にできること</div>
+                    <ul style="margin: 0.5rem 0 0 1.5rem;">
+                        <li>ユーザーの質問を<strong>自動分類</strong>（返品・配送・その他）</li>
+                        <li>分類に応じて<strong>適切な回答</strong>を生成</li>
+                        <li>曖昧な質問には<strong>確認質問</strong>を返す</li>
+                        <li>会話履歴を<strong>自動保存</strong></li>
+                    </ul>
+                </div>
+                <div class="diagram-container">
+                    <div class="diagram-title">完成イメージ</div>
+                    <svg class="svg-diagram" viewBox="0 0 700 200">
+                        <defs>
+                            <marker id="arrTut" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                                <polygon points="0 0, 10 3.5, 0 7" fill="#667eea"/>
+                            </marker>
+                        </defs>
+                        <circle cx="80" cy="100" r="35" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="2"/>
+                        <text x="80" y="105" text-anchor="middle" fill="#10b981" font-size="11">START</text>
+                        <line x1="115" y1="100" x2="165" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <circle cx="210" cy="100" r="40" fill="#667eea" fill-opacity="0.3" stroke="#667eea" stroke-width="2"/>
+                        <text x="210" y="95" text-anchor="middle" fill="#667eea" font-size="10">classifier</text>
+                        <text x="210" y="110" text-anchor="middle" fill="#667eea" font-size="10">_node</text>
+                        <polygon points="300,100 330,70 360,100 330,130" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
+                        <line x1="255" y1="100" x2="295" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <line x1="360" y1="100" x2="405" y2="60" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <line x1="360" y1="100" x2="405" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <line x1="360" y1="100" x2="405" y2="140" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <circle cx="450" cy="55" r="30" fill="#06b6d4" fill-opacity="0.3" stroke="#06b6d4" stroke-width="2"/>
+                        <text x="450" y="60" text-anchor="middle" fill="#06b6d4" font-size="9">返品対応</text>
+                        <circle cx="450" cy="100" r="30" fill="#f97316" fill-opacity="0.3" stroke="#f97316" stroke-width="2"/>
+                        <text x="450" y="105" text-anchor="middle" fill="#f97316" font-size="9">配送確認</text>
+                        <circle cx="450" cy="145" r="30" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="2"/>
+                        <text x="450" y="150" text-anchor="middle" fill="#ec4899" font-size="9">一般質問</text>
+                        <line x1="485" y1="60" x2="540" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <line x1="485" y1="100" x2="540" y2="100" stroke="#667eea" stroke-width="2"/>
+                        <line x1="485" y1="145" x2="540" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <circle cx="580" cy="100" r="35" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="2"/>
+                        <text x="580" y="95" text-anchor="middle" fill="#22c55e" font-size="10">responder</text>
+                        <text x="580" y="110" text-anchor="middle" fill="#22c55e" font-size="10">_node</text>
+                        <line x1="620" y1="100" x2="660" y2="100" stroke="#667eea" stroke-width="2" marker-end="url(#arrTut)"/>
+                        <circle cx="680" cy="100" r="20" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="2"/>
+                        <text x="680" y="105" text-anchor="middle" fill="#ec4899" font-size="9">END</text>
+                    </svg>
+                </div>
+            </div>
+
+            <!-- ステップ1 -->
+            <div class="card" id="tut-step1">
+                <div class="card-header">
+                    <div class="card-icon green">📁</div>
+                    <h3 class="card-title">Step 1: 環境準備</h3>
+                    <span class="tag green" style="margin-left: auto;">所要時間: 5分</span>
+                </div>
+                <p>まずはプロジェクトを作成し、必要なライブラリをインストールします。</p>
                 <div class="code-block">
-                    <div class="code-header">Python - app/agents/workflow.py</div>
+                    <div class="code-header">Terminal</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span></div>
                         <div class="code-content">
-<pre><span class="kw">def</span> <span class="fn">create_chatbot_graph</span>() -> StateGraph:
-    <span class="st">"""LangGraphワークフローを構築"""</span>
+<pre><span class="cm"># プロジェクトディレクトリを作成</span>
+mkdir customer_support_ai
+cd customer_support_ai
 
-    workflow = StateGraph(<span class="cl">ChatState</span>)
+<span class="cm"># 必要なライブラリをインストール</span>
+pip install langgraph langchain-openai python-dotenv
 
-    <span class="cm"># === 頂点（Node）を追加 ===</span>
-    workflow.add_node(<span class="st">"router"</span>, router_node)
-    workflow.add_node(<span class="st">"clarification"</span>, clarification_node)
-    workflow.add_node(<span class="st">"planner"</span>, planner_node)
-    workflow.add_node(<span class="st">"executor"</span>, executor_node)
-    workflow.add_node(<span class="st">"responder"</span>, responder_node)
+<span class="cm"># 環境変数ファイルを作成</span>
+echo "OPENAI_API_KEY=sk-your-key-here" > .env</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box warning">
+                    <div class="highlight-title">⚠️ APIキーについて</div>
+                    <p>OpenAI APIキーは<a href="https://platform.openai.com/api-keys" target="_blank">OpenAI Platform</a>から取得できます。<br><code>.env</code>ファイルは<strong>絶対にGitにコミットしない</strong>でください！</p>
+                </div>
+            </div>
 
-    <span class="cm"># === 辺（Edge）を追加 ===</span>
-    workflow.add_edge(START, <span class="st">"router"</span>)
+            <!-- ステップ2 -->
+            <div class="card" id="tut-step2">
+                <div class="card-header">
+                    <div class="card-icon emerald">📦</div>
+                    <h3 class="card-title">Step 2: Stateを定義する</h3>
+                    <span class="tag emerald" style="margin-left: auto;">最重要</span>
+                </div>
+                <p>まず「何のデータを持ち回るか」を決めます。これが<strong>State</strong>です。</p>
+                <div class="code-block">
+                    <div class="code-header">Python - state.py</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> typing <span class="kw">import</span> TypedDict, Literal, Annotated, List
+<span class="kw">from</span> operator <span class="kw">import</span> add
 
-    <span class="cm"># Router → 条件分岐</span>
-    workflow.add_conditional_edges(
-        <span class="st">"router"</span>,
-        route_after_router,
-        {<span class="st">"clarification"</span>: <span class="st">"clarification"</span>, <span class="st">"planner"</span>: <span class="st">"planner"</span>}
-    )
+<span class="kw">class</span> <span class="cl">SupportState</span>(TypedDict):
+    <span class="st">"""カスタマーサポートAIの状態"""</span>
 
-    workflow.add_edge(<span class="st">"clarification"</span>, <span class="st">"responder"</span>)
-    workflow.add_edge(<span class="st">"planner"</span>, <span class="st">"executor"</span>)
-    workflow.add_edge(<span class="st">"executor"</span>, <span class="st">"responder"</span>)
-    workflow.add_edge(<span class="st">"responder"</span>, END)
+    <span class="cm"># ユーザーからの質問（入力）</span>
+    user_question: <span class="cl">str</span>
 
-    <span class="kw">return</span> workflow</pre>
+    <span class="cm"># 質問の分類結果（返品/配送/一般/不明）</span>
+    category: Literal[<span class="st">"refund"</span>, <span class="st">"shipping"</span>, <span class="st">"general"</span>, <span class="st">"unclear"</span>]
+
+    <span class="cm"># AIからの回答（出力）</span>
+    response: <span class="cl">str</span>
+
+    <span class="cm"># 会話履歴（自動で追加されていく）</span>
+    history: Annotated[List[<span class="cl">str</span>], add]
+
+    <span class="cm"># 確信度（0.0〜1.0）</span>
+    confidence: <span class="cl">float</span></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box success">
+                    <div class="highlight-title">💡 ポイント解説</div>
+                    <ul style="margin: 0.5rem 0 0 1rem;">
+                        <li><code>TypedDict</code>: Pythonの辞書に型をつけたもの。IDEの補完が効く！</li>
+                        <li><code>Literal</code>: 決まった値しか入らないことを示す</li>
+                        <li><code>Annotated[..., add]</code>: 新しい値が「追加」される（上書きではない）</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- ステップ3 -->
+            <div class="card" id="tut-step3">
+                <div class="card-header">
+                    <div class="card-icon blue">⚙️</div>
+                    <h3 class="card-title">Step 3: Nodeを定義する</h3>
+                    <span class="tag blue" style="margin-left: auto;">処理ロジック</span>
+                </div>
+                <p>各Node（頂点）は「Stateを受け取って、更新内容を返す関数」です。</p>
+
+                <h4 style="margin: 1.5rem 0 1rem; color: #667eea;">3-1. 分類ノード（classifier_node）</h4>
+                <div class="code-block">
+                    <div class="code-header">Python - nodes.py（その1）</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> langchain_openai <span class="kw">import</span> ChatOpenAI
+<span class="kw">from</span> langchain_core.prompts <span class="kw">import</span> ChatPromptTemplate
+
+llm = ChatOpenAI(model=<span class="st">"gpt-4o-mini"</span>, temperature=<span class="cl">0</span>)
+
+<span class="kw">def</span> <span class="fn">classifier_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
+    <span class="st">"""ユーザーの質問を分類する"""</span>
+
+    prompt = ChatPromptTemplate.from_messages([
+        (<span class="st">"system"</span>, <span class="st">"""以下の質問を分類してください。
+- refund: 返品・返金に関する質問
+- shipping: 配送・配達に関する質問
+- general: その他の質問
+- unclear: 情報が不足している質問
+
+回答は分類名のみ（例: refund）"""</span>),
+        (<span class="st">"human"</span>, <span class="st">"{question}"</span>)
+    ])
+
+    chain = prompt | llm
+    result = chain.invoke({<span class="st">"question"</span>: state[<span class="st">"user_question"</span>]})
+    category = result.content.strip().lower()
+
+    <span class="cm"># categoryとhistoryを更新して返す</span>
+    <span class="kw">return</span> {
+        <span class="st">"category"</span>: category,
+        <span class="st">"history"</span>: [<span class="st">f"[分類] {category}"</span>],
+        <span class="st">"confidence"</span>: <span class="cl">0.9</span> <span class="kw">if</span> category != <span class="st">"unclear"</span> <span class="kw">else</span> <span class="cl">0.3</span>
+    }</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 1.5rem 0 1rem; color: #667eea;">3-2. 各カテゴリの応答ノード</h4>
+                <div class="code-block">
+                    <div class="code-header">Python - nodes.py（その2）</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span></div>
+                        <div class="code-content">
+<pre><span class="kw">def</span> <span class="fn">refund_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
+    <span class="st">"""返品・返金の問い合わせに対応"""</span>
+    prompt = ChatPromptTemplate.from_messages([
+        (<span class="st">"system"</span>, <span class="st">"返品・返金担当のサポートAIです。丁寧に対応してください。"</span>),
+        (<span class="st">"human"</span>, <span class="st">"{question}"</span>)
+    ])
+    chain = prompt | llm
+    result = chain.invoke({<span class="st">"question"</span>: state[<span class="st">"user_question"</span>]})
+    <span class="kw">return</span> {<span class="st">"response"</span>: result.content, <span class="st">"history"</span>: [<span class="st">"[返品対応]"</span>]}
+
+<span class="kw">def</span> <span class="fn">shipping_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
+    <span class="st">"""配送の問い合わせに対応"""</span>
+    prompt = ChatPromptTemplate.from_messages([
+        (<span class="st">"system"</span>, <span class="st">"配送担当のサポートAIです。配送状況を案内してください。"</span>),
+        (<span class="st">"human"</span>, <span class="st">"{question}"</span>)
+    ])
+    chain = prompt | llm
+    result = chain.invoke({<span class="st">"question"</span>: state[<span class="st">"user_question"</span>]})
+    <span class="kw">return</span> {<span class="st">"response"</span>: result.content, <span class="st">"history"</span>: [<span class="st">"[配送対応]"</span>]}
+
+<span class="kw">def</span> <span class="fn">general_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
+    <span class="st">"""一般的な問い合わせに対応"""</span>
+    <span class="kw">return</span> {<span class="st">"response"</span>: <span class="st">"お問い合わせありがとうございます。詳しい内容をお聞かせください。"</span>}
+
+<span class="kw">def</span> <span class="fn">clarification_node</span>(state: <span class="cl">SupportState</span>) -> <span class="cl">dict</span>:
+    <span class="st">"""情報不足時の確認"""</span>
+    <span class="kw">return</span> {<span class="st">"response"</span>: <span class="st">"申し訳ありません。もう少し詳しくお聞かせいただけますか？"</span>}</pre>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="highlight-box success">
-                <div class="highlight-title">🎓 まとめ</div>
+            <!-- ステップ4 -->
+            <div class="card" id="tut-step4">
+                <div class="card-header">
+                    <div class="card-icon purple">🔀</div>
+                    <h3 class="card-title">Step 4: 条件分岐を定義する</h3>
+                    <span class="tag purple" style="margin-left: auto;">ルーティング</span>
+                </div>
+                <p>categoryの値によって「次にどのNodeに進むか」を決めます。</p>
+                <div class="code-block">
+                    <div class="code-header">Python - routing.py</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> typing <span class="kw">import</span> Literal
+
+<span class="kw">def</span> <span class="fn">route_by_category</span>(state: <span class="cl">SupportState</span>) -> Literal[
+    <span class="st">"refund"</span>, <span class="st">"shipping"</span>, <span class="st">"general"</span>, <span class="st">"clarification"</span>
+]:
+    <span class="st">"""カテゴリに応じて次のNodeを決定"""</span>
+
+    category = state[<span class="st">"category"</span>]
+
+    <span class="kw">if</span> category == <span class="st">"refund"</span>:
+        <span class="kw">return</span> <span class="st">"refund"</span>
+    <span class="kw">elif</span> category == <span class="st">"shipping"</span>:
+        <span class="kw">return</span> <span class="st">"shipping"</span>
+    <span class="kw">elif</span> category == <span class="st">"unclear"</span>:
+        <span class="kw">return</span> <span class="st">"clarification"</span>
+    <span class="kw">else</span>:
+        <span class="kw">return</span> <span class="st">"general"</span></pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <div class="highlight-title">💡 条件分岐のコツ</div>
+                    <p>条件分岐関数は<strong>Stateを読むだけ</strong>で、更新はしません。<br>戻り値は「次に進むNodeの名前（文字列）」です。</p>
+                </div>
+            </div>
+
+            <!-- ステップ5 -->
+            <div class="card" id="tut-step5">
+                <div class="card-header">
+                    <div class="card-icon orange">🔗</div>
+                    <h3 class="card-title">Step 5: グラフを組み立てる</h3>
+                    <span class="tag orange" style="margin-left: auto;">完成！</span>
+                </div>
+                <p>すべてを組み合わせてグラフを完成させます。</p>
+                <div class="code-block">
+                    <div class="code-header">Python - main.py</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
+<span class="kw">from</span> dotenv <span class="kw">import</span> load_dotenv
+
+load_dotenv()  <span class="cm"># .envからAPIキーを読み込み</span>
+
+<span class="kw">def</span> <span class="fn">create_support_graph</span>():
+    <span class="st">"""カスタマーサポートグラフを構築"""</span>
+
+    <span class="cm"># 1. グラフを作成（Stateの型を指定）</span>
+    workflow = StateGraph(<span class="cl">SupportState</span>)
+
+    <span class="cm"># 2. ノードを追加</span>
+    workflow.add_node(<span class="st">"classifier"</span>, classifier_node)
+    workflow.add_node(<span class="st">"refund"</span>, refund_node)
+    workflow.add_node(<span class="st">"shipping"</span>, shipping_node)
+    workflow.add_node(<span class="st">"general"</span>, general_node)
+    workflow.add_node(<span class="st">"clarification"</span>, clarification_node)
+
+    <span class="cm"># 3. エッジを追加</span>
+    workflow.add_edge(START, <span class="st">"classifier"</span>)  <span class="cm"># 開始 → 分類</span>
+
+    <span class="cm"># 4. 条件分岐を追加</span>
+    workflow.add_conditional_edges(
+        <span class="st">"classifier"</span>,      <span class="cm"># 分岐元</span>
+        route_by_category, <span class="cm"># 条件関数</span>
+        {                  <span class="cm"># 戻り値 → 行き先</span>
+            <span class="st">"refund"</span>: <span class="st">"refund"</span>,
+            <span class="st">"shipping"</span>: <span class="st">"shipping"</span>,
+            <span class="st">"general"</span>: <span class="st">"general"</span>,
+            <span class="st">"clarification"</span>: <span class="st">"clarification"</span>,
+        }
+    )
+
+    <span class="cm"># 5. 全ての応答ノードからENDへ</span>
+    workflow.add_edge(<span class="st">"refund"</span>, END)
+    workflow.add_edge(<span class="st">"shipping"</span>, END)
+    workflow.add_edge(<span class="st">"general"</span>, END)
+    workflow.add_edge(<span class="st">"clarification"</span>, END)
+
+    <span class="kw">return</span> workflow.compile()</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ステップ6 -->
+            <div class="card" id="tut-step6">
+                <div class="card-header">
+                    <div class="card-icon green">▶️</div>
+                    <h3 class="card-title">Step 6: 実行してみる</h3>
+                    <span class="tag green" style="margin-left: auto;">テスト</span>
+                </div>
+                <div class="code-block">
+                    <div class="code-header">Python - 実行コード</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span></div>
+                        <div class="code-content">
+<pre><span class="cm"># グラフを作成</span>
+graph = create_support_graph()
+
+<span class="cm"># テスト1: 返品の質問</span>
+result = graph.invoke({
+    <span class="st">"user_question"</span>: <span class="st">"商品を返品したいのですが"</span>,
+    <span class="st">"history"</span>: []
+})
+<span class="bi">print</span>(<span class="st">f"カテゴリ: {result['category']}"</span>)
+<span class="bi">print</span>(<span class="st">f"回答: {result['response']}"</span>)
+
+<span class="cm"># テスト2: 配送の質問</span>
+result2 = graph.invoke({
+    <span class="st">"user_question"</span>: <span class="st">"荷物はいつ届きますか？"</span>,
+    <span class="st">"history"</span>: []
+})
+<span class="bi">print</span>(<span class="st">f"カテゴリ: {result2['category']}"</span>)
+<span class="bi">print</span>(<span class="st">f"回答: {result2['response']}"</span>)</pre>
+                        </div>
+                    </div>
+                </div>
+                <div class="highlight-box success">
+                    <div class="highlight-title">🎉 おめでとうございます！</div>
+                    <p>これでLangGraphを使ったカスタマーサポートAIが完成しました！</p>
+                </div>
+            </div>
+
+            <div class="highlight-box success" style="margin-top: 2rem;">
+                <div class="highlight-title">🎓 このチュートリアルで学んだこと</div>
                 <div class="steps">
                     <div class="step">
                         <div class="step-number">1</div>
                         <div class="step-content">
                             <div class="step-title">State = 共有データ</div>
-                            <p>全頂点で共有。TypedDictで型定義。</p>
+                            <p>全Node間で共有。TypedDictで型定義。Annotatedで自動マージ。</p>
                         </div>
                     </div>
                     <div class="step">
                         <div class="step-number">2</div>
                         <div class="step-content">
-                            <div class="step-title">Node（頂点）= 処理単位</div>
+                            <div class="step-title">Node = 処理単位</div>
                             <p>Stateを受け取り、部分更新を返す関数。</p>
                         </div>
                     </div>
                     <div class="step">
                         <div class="step-number">3</div>
                         <div class="step-content">
-                            <div class="step-title">Edge（辺）= 接続</div>
-                            <p>頂点間の流れ。条件分岐も可能。</p>
+                            <div class="step-title">条件分岐 = ルーティング</div>
+                            <p>Stateの値を見て、次のNodeを決定。</p>
                         </div>
                     </div>
                     <div class="step">
                         <div class="step-number">4</div>
                         <div class="step-content">
-                            <div class="step-title">Annotated = 自動マージ</div>
-                            <p>reducerで履歴などを自動マージ。</p>
+                            <div class="step-title">グラフ構築 = 組み立て</div>
+                            <p>add_node → add_edge → add_conditional_edges → compile</p>
                         </div>
                     </div>
                 </div>
@@ -863,6 +1269,7 @@ workflow.add_conditional_edges(
     </main>
 
     <script>
+        // ナビゲーションタブ
         document.querySelectorAll('.nav-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
@@ -878,6 +1285,79 @@ workflow.add_conditional_edges(
             if (e.key === 'ArrowRight' && i < tabs.length - 1) tabs[i + 1].click();
             if (e.key === 'ArrowLeft' && i > 0) tabs[i - 1].click();
         });
+
+        // フロー図インタラクション
+        let currentFlowStep = 0;
+        const maxFlowStep = 3;
+        let autoPlayInterval = null;
+
+        function updateFlowDiagram() {
+            // ノードのハイライト
+            document.querySelectorAll('#flowSvg .flow-step').forEach(g => {
+                const step = parseInt(g.dataset.step);
+                const circle = g.querySelector('.node-circle');
+                if (step === currentFlowStep) {
+                    circle.style.filter = 'url(#glow)';
+                    circle.style.fillOpacity = '0.6';
+                } else if (step < currentFlowStep) {
+                    circle.style.filter = 'none';
+                    circle.style.fillOpacity = '0.5';
+                } else {
+                    circle.style.filter = 'none';
+                    circle.style.fillOpacity = '0.2';
+                }
+            });
+            // 説明ボックスの表示切り替え
+            document.querySelectorAll('#flowSvg .state-box').forEach(g => {
+                const step = parseInt(g.dataset.step);
+                g.style.opacity = step === currentFlowStep ? '1' : '0';
+                g.style.transition = 'opacity 0.5s ease';
+            });
+            // ステップ表示
+            document.getElementById('flowStepIndicator').textContent = `Step ${currentFlowStep} / ${maxFlowStep}`;
+        }
+
+        document.getElementById('flowPrevBtn')?.addEventListener('click', () => {
+            if (currentFlowStep > 0) {
+                currentFlowStep--;
+                updateFlowDiagram();
+            }
+        });
+
+        document.getElementById('flowNextBtn')?.addEventListener('click', () => {
+            if (currentFlowStep < maxFlowStep) {
+                currentFlowStep++;
+                updateFlowDiagram();
+            }
+        });
+
+        document.getElementById('flowAutoBtn')?.addEventListener('click', function() {
+            if (autoPlayInterval) {
+                clearInterval(autoPlayInterval);
+                autoPlayInterval = null;
+                this.textContent = '▶ 自動再生';
+                this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            } else {
+                currentFlowStep = 0;
+                updateFlowDiagram();
+                this.textContent = '⏸ 停止';
+                this.style.background = 'linear-gradient(135deg, #f97316, #ea580c)';
+                autoPlayInterval = setInterval(() => {
+                    if (currentFlowStep < maxFlowStep) {
+                        currentFlowStep++;
+                        updateFlowDiagram();
+                    } else {
+                        clearInterval(autoPlayInterval);
+                        autoPlayInterval = null;
+                        document.getElementById('flowAutoBtn').textContent = '▶ 自動再生';
+                        document.getElementById('flowAutoBtn').style.background = 'linear-gradient(135deg, #10b981, #059669)';
+                    }
+                }, 2000);
+            }
+        });
+
+        // 初期表示
+        updateFlowDiagram();
     </script>
 </body>
 </html>
