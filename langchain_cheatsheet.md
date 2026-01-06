@@ -2162,45 +2162,79 @@ SQLで言うと `WHERE query LIKE '%りんご%'` と同じ意味。
 <!-- ==================== LangGraphタブ ==================== -->
 <div id="langgraph" class="tab-content">
 
-## LangGraph - 複雑なAIワークフロー構築
+## LangGraph 広告分析チャットボット 完全学習ガイド
 
-LangChain学習済みの方向けに、LangGraphの概念から実装まで解説。
+LangChain学習済みの方向けに、LangGraphの概念から実装まで段階的に解説します。
 
 ---
 
-### LangChainの限界とLangGraph
+## Part 1: LangGraphとは何か
 
-LCELは直線的な処理に強い：
+### LangChainの限界
+
+LangChainのLCEL（LangChain Expression Language）は直線的な処理に強いです：
 
 ```python
+# LCEL: パイプラインで繋ぐ
 chain = prompt | llm | output_parser
 result = chain.invoke({"question": "..."})
 ```
 
-しかし、**条件分岐**や**複数経路の合流**が必要な場合、LCELだけでは辛い。
+しかし、**条件分岐**や**複数経路の合流**が必要な場合、LCELだけでは辛くなります。
 
 ```
-              ユーザーの質問
-                    |
-              +----------+
-              | 意図判定  |
-              +----------+
-                    |
-      +-------------+-------------+
-      v             v             v
-  +--------+   +--------+    +--------+
-  |データ  |   |比較    |    |一般    |
-  |取得    |   |分析    |    |回答    |
-  +--------+   +--------+    +--------+
-      |             |             |
-      +-------------+-------------+
-                    v
-              +----------+
-              | 回答生成  |
-              +----------+
+                    ユーザーの質問
+                          |
+                          v
+                    +----------+
+                    | 意図判定  |
+                    +----------+
+                          |
+        +---------+-------+-------+---------+
+        |         |               |         |
+        v         v               v         v
+   +--------+ +--------+     +--------+ +--------+
+   |データ  | |比較    |     |一般    | |確認    |
+   |取得    | |分析    |     |回答    | |質問    |
+   +--------+ +--------+     +--------+ +--------+
+        |         |               |         |
+        +---------+-------+-------+---------+
+                          |
+                          v
+                    +----------+
+                    | 回答生成  |
+                    +----------+
 ```
 
----
+このような複雑なフローをLCELで書くのは大変です。
+
+### LangGraphの位置づけ
+
+```
++------------------------------------------------------------------+
+|                   LangChain エコシステム                          |
++------------------------------------------------------------------+
+|                                                                  |
+|  +------------------+  +------------------+  +------------------+ |
+|  |    LangChain     |  |    LangGraph     |  |    LangSmith     | |
+|  |     (部品)       |  |   (組み立て)     |  |     (監視)       | |
+|  +------------------+  +------------------+  +------------------+ |
+|  |                  |  |                  |  |                  | |
+|  |  - LLM          |  |  - State         |  |  - トレース      | |
+|  |  - Prompt       |  |  - Node          |  |  - 評価          | |
+|  |  - Chain        |  |  - Edge          |  |  - デバッグ      | |
+|  |  - Tool         |  |  - Graph         |  |                  | |
+|  |                  |  |                  |  |                  | |
+|  +------------------+  +------------------+  +------------------+ |
+|                                                                  |
++------------------------------------------------------------------+
+```
+
+| ツール | 役割 | 例え |
+|--------|------|------|
+| LangChain | 部品（LLM、プロンプト、ツール等） | レゴブロック |
+| LangGraph | 部品を組み立てるフレームワーク | 設計図 |
+| LangSmith | 動作を監視・デバッグするツール | 検査機器 |
 
 ### LangGraphの3つの基本概念
 
@@ -2212,18 +2246,27 @@ result = chain.invoke({"question": "..."})
 
 ---
 
-### 最もシンプルなLangGraphの例
+## Part 2: 最小構成で理解する
+
+### 2-1. 最もシンプルなLangGraphの例
+
+まず、**2ノードだけ**の最小構成を見てみましょう。
 
 ```python
+# === 最小構成のLangGraph ===
+
 from typing import TypedDict
 from langgraph.graph import StateGraph, START, END
 
 # --- Step 1: Stateを定義 ---
+# ノード間で共有するデータ構造
 class SimpleState(TypedDict):
     message: str      # 入力メッセージ
     result: str       # 処理結果
 
 # --- Step 2: Nodeを定義 ---
+# 関数として実装。Stateを受け取り、更新内容を返す
+
 def process_node(state: SimpleState) -> dict:
     """メッセージを処理するノード"""
     msg = state["message"]
@@ -2258,39 +2301,114 @@ print(final_state)
 # {'message': 'こんにちは', 'result': '処理済み: こんにちは'}
 ```
 
-**重要ポイント**: Nodeの戻り値は「部分更新」。全部返す必要はない！
+#### 実行の流れを図解
+
+```
++------------------------------------------+
+|             initial_state                |
+|  message: "こんにちは"                    |
+|  result: ""                              |
++------------------------------------------+
+                    |
+                    v
+              +-----------+
+              |   START   |
+              +-----------+
+                    |
+                    v
++------------------------------------------+
+|           process_node                   |
++------------------------------------------+
+|  入力: state                             |
+|    - message: "こんにちは"               |
+|    - result: ""                          |
+|                                          |
+|  処理: resultを更新                      |
+|                                          |
+|  出力: {"result": "処理済み: こんにちは"} |
++------------------------------------------+
+                    |
+                    | state が更新される
+                    v
++------------------------------------------+
+|           output_node                    |
++------------------------------------------+
+|  入力: 更新された state                  |
+|    - message: "こんにちは"               |
+|    - result: "処理済み: こんにちは"       |
+|                                          |
+|  処理: print で出力                      |
+|                                          |
+|  出力: {} (更新なし)                     |
++------------------------------------------+
+                    |
+                    v
+              +-----------+
+              |    END    |
+              +-----------+
+                    |
+                    v
++------------------------------------------+
+|              final_state                 |
+|  message: "こんにちは"                    |
+|  result: "処理済み: こんにちは"           |
++------------------------------------------+
+```
+
+#### 重要ポイント
+
+```python
+# Nodeの戻り値は「部分更新」
+def process_node(state: SimpleState) -> dict:
+    return {"result": processed}  # resultだけ更新
+    # messageは自動的に引き継がれる
+
+# 全部返す必要はない！
+# NG: return {"message": state["message"], "result": processed}
+# OK: return {"result": processed}
+```
 
 ---
 
-### 条件分岐を追加する
+### 2-2. 条件分岐を追加する
+
+次に、**条件によって処理を分ける**例を見てみましょう。
 
 ```python
 from typing import TypedDict, Literal
 from langgraph.graph import StateGraph, START, END
 
+# --- State ---
 class ChatState(TypedDict):
     message: str
     intent: str       # 意図（追加）
     response: str
 
+# --- Nodes ---
 def classifier_node(state: ChatState) -> dict:
     """メッセージの意図を分類"""
     msg = state["message"]
+
+    # シンプルな分類ロジック
     if "天気" in msg:
         intent = "weather"
     elif "時間" in msg:
         intent = "time"
     else:
         intent = "general"
+
     return {"intent": intent}
 
 def weather_node(state: ChatState) -> dict:
+    """天気の回答"""
     return {"response": "今日は晴れです"}
 
 def time_node(state: ChatState) -> dict:
+    """時間の回答"""
     return {"response": "現在15時です"}
 
 def general_node(state: ChatState) -> dict:
+    """一般的な回答"""
     return {"response": "すみません、よくわかりません"}
 
 # --- 条件分岐の関数 ---
@@ -2307,11 +2425,13 @@ def route_by_intent(state: ChatState) -> Literal["weather", "time", "general"]:
 # --- Graph構築 ---
 workflow = StateGraph(ChatState)
 
+# ノード追加
 workflow.add_node("classifier", classifier_node)
 workflow.add_node("weather", weather_node)
 workflow.add_node("time", time_node)
 workflow.add_node("general", general_node)
 
+# エッジ追加
 workflow.add_edge(START, "classifier")
 
 # 条件分岐エッジ
@@ -2325,16 +2445,103 @@ workflow.add_conditional_edges(
     }
 )
 
+# 各ノード → END
 workflow.add_edge("weather", END)
 workflow.add_edge("time", END)
 workflow.add_edge("general", END)
 
 graph = workflow.compile()
+
+# --- 実行 ---
+result1 = graph.invoke({"message": "今日の天気は？", "intent": "", "response": ""})
+print(result1["response"])  # → "今日は晴れです"
+
+result2 = graph.invoke({"message": "今何時？", "intent": "", "response": ""})
+print(result2["response"])  # → "現在15時です"
+```
+
+#### 条件分岐の図解
+
+```
+              +-----------+
+              |   START   |
+              +-----------+
+                    |
+                    v
+          +------------------+
+          | classifier_node  |
+          |   意図を分類     |
+          +------------------+
+                    |
+                    v
+          +------------------+
+          | route_by_intent  |
+          |    (条件関数)    |
+          +------------------+
+                    |
+      +-------------+-------------+
+      |             |             |
+      | weather     | time        | その他
+      v             v             v
++-----------+ +-----------+ +-----------+
+|  weather  | |   time    | |  general  |
+|   _node   | |   _node   | |   _node   |
++-----------+ +-----------+ +-----------+
+      |             |             |
+      +-------------+-------------+
+                    |
+                    v
+              +-----------+
+              |    END    |
+              +-----------+
 ```
 
 ---
 
-### Stateの自動マージ（Annotated + reducer）
+## Part 3: 段階的に機能を追加する
+
+### 3-1. 複数経路の合流
+
+条件分岐の後、**1つのノードに合流**させるパターン：
+
+```python
+# 条件分岐後、全て responder に合流
+workflow.add_edge("weather", "responder")
+workflow.add_edge("time", "responder")
+workflow.add_edge("general", "responder")
+workflow.add_edge("responder", END)
+```
+
+```
+          +------------------+
+          |    classifier    |
+          +------------------+
+                    |
+          +------------------+
+          |     条件分岐     |
+          +------------------+
+                    |
+      +-------------+-------------+
+      |             |             |
+      v             v             v
++-----------+ +-----------+ +-----------+
+|  weather  | |   time    | |  general  |
++-----------+ +-----------+ +-----------+
+      |             |             |
+      +-------------+-------------+
+                    |
+                    v
+          +------------------+
+          |    responder     |
+          +------------------+
+                    |
+                    v
+              +-----------+
+              |    END    |
+              +-----------+
+```
+
+### 3-2. Stateの自動マージ（Annotated + reducer）
 
 会話履歴のように「追加していきたい」データがある場合：
 
@@ -2349,80 +2556,586 @@ class ChatState(TypedDict):
     history: Annotated[List[str], add]  # addで自動マージ
 ```
 
+#### reducerの動作
+
 | 種類 | 挙動 | 例 |
 |------|------|-----|
 | reducer なし | 上書き | `state["response"] = "新"` → 古い値は消える |
 | reducer あり | マージ | `state["history"] = ["新"]` → 既存 + 新 |
 
-**カスタムreducer**:
+#### 実際の動き
 
 ```python
+# Node A が返す
+return {"history": ["A処理完了"]}
+# state["history"] = [] + ["A処理完了"] = ["A処理完了"]
+
+# Node B が返す
+return {"history": ["B処理完了"]}
+# state["history"] = ["A処理完了"] + ["B処理完了"] = ["A処理完了", "B処理完了"]
+```
+
+#### カスタムreducer
+
+このプロジェクトでは、履歴を**直近15件に制限**しています：
+
+```python
+# app/agents/state.py
+
 def merge_history(current: List, new: List) -> List:
     """会話履歴をマージし、直近15件に制限"""
     merged = (current or []) + (new or [])
     return merged[-15:]  # 直近15件のみ
 
 class ChatState(TypedDict):
-    history: Annotated[List[Dict], merge_history]
+    history: Annotated[List[Dict], merge_history]  # カスタムreducer
 ```
 
 ---
 
-### Pythonモジュール構成（相対インポート）
+## Part 4: Pythonファイル間のやり取りを理解する
+
+LangGraphの前に、Pythonの**モジュールシステム**を理解しましょう。
+
+### 4-1. ファイル構成のおさらい
 
 ```
-app/
-├── __init__.py         # パッケージの目印
-├── config.py           # 設定
-├── agents/             # サブパッケージ
-│   ├── __init__.py
-│   ├── state.py
-│   ├── nodes.py
-│   └── workflow.py
-└── tools/
-    ├── __init__.py
-    └── bigquery.py
+広告分析AI/
+├── main.py                 # エントリーポイント
+└── app/                    # パッケージ（ディレクトリ）
+    ├── __init__.py         # パッケージの目印
+    ├── config.py           # 設定
+    ├── agents/             # サブパッケージ
+    │   ├── __init__.py
+    │   ├── state.py
+    │   ├── nodes.py
+    │   └── workflow.py
+    └── tools/              # サブパッケージ
+        ├── __init__.py
+        └── bigquery.py
 ```
+
+### 4-2. `__init__.py` の役割
+
+`__init__.py` があるディレクトリは**パッケージ**として認識されます。
+
+```python
+# app/__init__.py が存在する
+# → "app" をパッケージとしてimportできる
+
+import app  # OK
+```
+
+#### `__init__.py` で公開APIを定義
+
+```python
+# app/agents/__init__.py
+
+from .workflow import run_chatbot  # workflowからインポートして再公開
+
+# これにより、外部から簡潔にアクセスできる
+# from app.agents import run_chatbot
+```
+
+### 4-3. import の種類
+
+#### 絶対インポート
+
+```python
+# main.py から（ルートから見たパス）
+from app.agents.workflow import run_chatbot
+from app.config import get_settings
+```
+
+#### 相対インポート
+
+```python
+# app/agents/workflow.py から（自分の位置から見たパス）
+from .state import ChatState          # 同じディレクトリ
+from .nodes import router_node        # 同じディレクトリ
+from ..config import get_settings     # 1つ上のディレクトリ
+from ..tools.bigquery import execute_query  # 1つ上 → tools
+```
+
+#### 相対インポートの記号
 
 | 記号 | 意味 | 例 |
 |------|------|-----|
 | `.` | 同じディレクトリ | `from .state import ChatState` |
 | `..` | 1つ上のディレクトリ | `from ..config import get_settings` |
+| `...` | 2つ上のディレクトリ | （あまり使わない） |
+
+### 4-4. 実際のファイル間の関係を図解
+
+```
++------------------------------------------------------------------+
+|                           main.py                                |
+|  from app.agents import run_chatbot                              |
+|  from app.config import get_settings                             |
++------------------------------------------------------------------+
+          |                                    |
+          | import                             | import
+          v                                    v
++-------------------------+          +------------------------+
+| app/agents/__init__.py  |          |     app/config.py      |
+| from .workflow import   |          | class Settings         |
+|        run_chatbot      |          | def get_settings()     |
++-------------------------+          +------------------------+
+          |                                    ^
+          | import                             |
+          v                                    |
++-------------------------+                    |
+| app/agents/workflow.py  |                    |
+| from .state import      |                    |
+|        ChatState        |---+                |
+| from .nodes import      |   |                |
+|        router_node      |-+ |                |
+| def run_chatbot(...)    | | |                |
++-------------------------+ | |                |
+                            | |                |
+          +-----------------+ |                |
+          |                   |                |
+          v                   v                |
++------------------+  +------------------+     |
+| app/agents/      |  | app/agents/      |     |
+| state.py         |  | nodes.py         |     |
++------------------+  +------------------+     |
+| class ChatState  |  | from ..config    |-----+
+|   (TypedDict)    |  |   import ...     |
++------------------+  | from ..tools     |--+
+                      |   .bigquery      |  |
+                      |   import ...     |  |
+                      | def router_node  |  |
+                      +------------------+  |
+                                            |
+                                            v
+                      +------------------------+
+                      | app/tools/bigquery.py  |
+                      | def execute_query()    |
+                      | def build_agg_query()  |
+                      +------------------------+
+```
+
+### 4-5. 具体的なコードで追ってみる
+
+#### Step 1: main.py が呼ばれる
+
+```python
+# main.py
+from app.agents import run_chatbot  # ← ここから追跡
+
+@functions_framework.http
+def chat(request):
+    result = run_chatbot(message, advertiser_id, history)
+    return make_response(result)
+```
+
+#### Step 2: app/agents/__init__.py を見る
+
+```python
+# app/agents/__init__.py
+from .workflow import run_chatbot  # workflow.py から持ってきて公開
+```
+
+**なぜ `__init__.py` で再公開するのか？**
+
+```python
+# __init__.py がないと...
+from app.agents.workflow import run_chatbot  # 長い
+
+# __init__.py で再公開すると...
+from app.agents import run_chatbot  # 短い！
+```
+
+#### Step 3: app/agents/workflow.py を見る
+
+```python
+# app/agents/workflow.py
+
+from .state import ChatState  # 同じディレクトリの state.py
+from .nodes import (          # 同じディレクトリの nodes.py
+    router_node,
+    clarification_node,
+    planner_node,
+    executor_node,
+    responder_node
+)
+
+def create_chatbot_graph() -> StateGraph:
+    workflow = StateGraph(ChatState)  # state.py の ChatState を使用
+    workflow.add_node("router", router_node)  # nodes.py の関数を使用
+    ...
+
+def run_chatbot(message, advertiser_id, history):
+    graph = get_compiled_graph()
+    initial_state: ChatState = {...}  # state.py の型を使用
+    final_state = graph.invoke(initial_state)
+    return {...}
+```
+
+#### Step 4: app/agents/nodes.py を見る
+
+```python
+# app/agents/nodes.py
+
+from ..config import get_settings  # 1つ上(app/)の config.py
+from ..tools.bigquery import execute_query, build_aggregation_query  # 1つ上 → tools/
+from .state import ChatState  # 同じディレクトリの state.py
+
+def router_node(state: ChatState) -> dict:
+    settings = get_settings()  # config.py の関数を使用
+    ...
+
+def executor_node(state: ChatState) -> dict:
+    results = execute_query(sql)  # bigquery.py の関数を使用
+    ...
+```
+
+### 4-6. importエラーのよくある原因
+
+| エラー | 原因 | 解決策 |
+|--------|------|--------|
+| 循環インポート | 互いにインポートし合う | 依存関係を整理、関数内でインポート |
+| 相対インポートのミス | ドットの数が間違っている | 正しい数に修正 |
+| パッケージとして実行していない | `python file.py` で直接実行 | `python -m package.module` で実行 |
 
 ---
 
-### 実際のワークフロー例
+## Part 5: 実際のプロジェクトを読み解く
+
+### 5-1. プロジェクト全体のフロー
+
+```
++------------------------------------------------------------------+
+|                       HTTP リクエスト                             |
+|              POST /chat {message: "...", ...}                    |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                          main.py                                 |
+|  @functions_framework.http                                       |
+|  def chat(request):                                              |
+|      result = run_chatbot(message, advertiser_id, history)       |
+|      return jsonify(result)                                      |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                   app/agents/workflow.py                         |
+|  def run_chatbot(message, advertiser_id, history):               |
+|      graph = get_compiled_graph()                                |
+|      final_state = graph.invoke(initial_state)                   |
+|      return {...}                                                |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                    LangGraph ワークフロー                         |
++------------------------------------------------------------------+
+|                                                                  |
+|    +-------+     +--------+     +----------+     +-----------+   |
+|    | START | --> | Router | --> | Planner  | --> | Executor  |   |
+|    +-------+     +--------+     +----------+     +-----------+   |
+|                       |               |                |         |
+|                       | clarification | テーブル       |         |
+|                       v               | なし           |         |
+|                 +-------------+       |                |         |
+|                 |Clarification|       |                |         |
+|                 +-------------+       |                |         |
+|                       |               |                |         |
+|                       +-------+-------+----------------+         |
+|                               |                                  |
+|                               v                                  |
+|                        +-----------+                             |
+|                        | Responder |                             |
+|                        +-----------+                             |
+|                               |                                  |
+|                               v                                  |
+|                          +-------+                               |
+|                          |  END  |                               |
+|                          +-------+                               |
+|                                                                  |
++------------------------------------------------------------------+
+```
+
+### 5-2. State定義を読む
 
 ```python
+# app/agents/state.py
+
+from typing import List, Dict, Any, Optional, TypedDict, Annotated
+from operator import add
+
+# カスタムreducer
+def merge_history(current: List, new: List) -> List:
+    merged = (current or []) + (new or [])
+    return merged[-15:]
+
+class ChatState(TypedDict):
+    """全ノードで共有される状態"""
+
+    # --- 入力（最初に設定、変更されない）---
+    user_message: str      # ユーザーの質問
+    advertiser_id: str     # 広告主ID
+
+    # --- 会話履歴（Annotatedでreducerを指定）---
+    history: Annotated[List[Dict[str, str]], merge_history]
+
+    # --- 各ノードの出力 ---
+    intent: str                          # Router → 意図分類結果
+    query_plan: Optional[Dict[str, Any]] # Planner → クエリ計画
+    query_results: Optional[List[Dict]]  # Executor → クエリ結果
+    error: Optional[str]                 # エラー情報
+    response: str                        # Responder → 最終回答
+
+    # --- 将来用 ---
+    messages: Annotated[List[Dict], add]
+```
+
+#### 各フィールドがどのノードで設定されるか
+
+| フィールド | 設定するノード | 内容例 |
+|-----------|---------------|--------|
+| user_message | (初期値) | "キャンペーン別CVを..." |
+| advertiser_id | (初期値) | "ckoaouv1l4skp3uulr4g" |
+| history | (初期値→Responder) | 過去の会話リスト |
+| intent | Router | "data_query" |
+| query_plan | Planner | {tables, metrics, ...} |
+| query_results | Executor | [{campaign: A, CV: 10}] |
+| error | Executor | エラー時のメッセージ |
+| response | Responder | "CVは以下の通りです..." |
+
+### 5-3. 各Nodeを読む
+
+#### Router Node（意図分類）
+
+```python
+# app/agents/nodes.py
+
+ROUTER_PROMPT = """ユーザーのメッセージを分析し、意図に分類してください：
+- data_query: データ取得が必要な質問
+- comparison: 2つの期間を比較
+- insight: 深い分析を求める
+- general: 一般知識（データ不要）
+- clarification: 曖昧で確認が必要
+...
+"""
+
+def router_node(state: ChatState) -> Dict[str, Any]:
+    """ユーザーの意図を分類"""
+
+    # 会話履歴がある場合は文脈も含める
+    history = state.get("history", [])
+    context_message = state["user_message"]
+
+    if history:
+        # 直近の会話を整形してコンテキストに含める
+        recent_context = [...]
+        context_message = f"【会話履歴】\n{...}\n【現在のメッセージ】\n{state['user_message']}"
+
+    # LLMで分類
+    prompt = ROUTER_PROMPT.format(message=context_message)
+    response = call_vertex_ai(prompt, temperature=0.1)
+    result = parse_json_response(response)
+
+    # intentだけを返す（部分更新）
+    return {"intent": result.get("intent", "general")}
+```
+
+**ポイント**:
+- LLMを使って自然言語で意図を分類
+- 会話履歴も考慮して文脈を理解
+- `temperature=0.1` で安定した分類
+
+#### Planner Node（クエリ計画）
+
+```python
+# app/agents/nodes.py
+
+PLANNER_PROMPT_TEMPLATE = """
+【利用可能なテーブル】
+- campaign: キャンペーンレベルのデータ
+- adgroup: 広告グループレベルのデータ
+- keyword: キーワードレベルのデータ
+
+【カラム】
+date, campaign_name, Imp, Clicks, Cost, CV, ...
+
+質問: {message}
+意図: {intent}
+
+JSON形式で回答:
+{{
+  "tables_needed": ["campaign"],
+  "metrics": ["Imp", "Clicks", "Cost", "CV"],
+  "dimensions": ["campaign_name"],
+  "date_range": {{"start": "...", "end": "..."}}
+}}
+"""
+
+def planner_node(state: ChatState) -> Dict[str, Any]:
+    """クエリ計画を作成"""
+
+    # 一般的な質問はスキップ
+    if state["intent"] == "general":
+        return {"query_plan": {"needs_external_knowledge": True, "tables_needed": []}}
+
+    # 日付コンテキストを生成
+    date_ctx = get_date_context()  # today, yesterday, this_month_start等
+
+    # LLMでクエリ計画を生成
+    prompt = PLANNER_PROMPT_TEMPLATE.format(
+        message=state["user_message"],
+        intent=state["intent"],
+        **date_ctx
+    )
+    response = call_vertex_ai(prompt, temperature=0.1)
+    result = parse_json_response(response)
+
+    return {"query_plan": result}
+```
+
+**ポイント**:
+- LLMにテーブル構造を教え、適切なクエリ計画を生成させる
+- 日付表現（「先月」「今月」等）を具体的な日付に変換
+
+#### Executor Node（クエリ実行）
+
+```python
+# app/agents/nodes.py
+
+def executor_node(state: ChatState) -> Dict[str, Any]:
+    """BigQueryでクエリを実行"""
+
+    plan = state.get("query_plan")
+
+    # プランがない or テーブル不要なら何もしない
+    if not plan or not plan.get("tables_needed"):
+        return {"query_results": None}
+
+    advertiser_id = state["advertiser_id"]
+
+    try:
+        # クエリを構築・実行
+        for table_type in plan["tables_needed"]:
+            sql = build_aggregation_query(
+                advertiser_id=advertiser_id,
+                table_type=table_type,
+                metrics=plan.get("metrics", []),
+                dimensions=plan.get("dimensions", []),
+                date_range=plan.get("date_range"),
+            )
+            print(f"Executing: {sql[:200]}...")
+            results = execute_query(sql)
+
+        return {"query_results": results}
+
+    except Exception as e:
+        return {"query_results": None, "error": f"データ取得失敗: {str(e)}"}
+```
+
+**ポイント**:
+- Plannerの計画に基づいてSQLを動的に構築
+- BigQueryで実行して結果を取得
+- エラー時はerrorフィールドに記録
+
+#### Responder Node（回答生成）
+
+```python
+# app/agents/nodes.py
+
+RESPONDER_PROMPT = """あなたは広告運用のシニアコンサルタントです。
+データに基づいて具体的なアクションを提案してください。
+
+質問: {message}
+意図: {intent}
+データ: {data}
+外部情報: {external_info}
+
+以下の構成で回答:
+1. データサマリー
+2. 原因分析
+3. 具体的アクション提案
+"""
+
+def responder_node(state: ChatState) -> Dict[str, Any]:
+    """最終回答を生成"""
+
+    # 既にresponseがあれば（clarificationから）そのまま返す
+    if state.get("response"):
+        return {"history": [...]}
+
+    # エラーがあればエラーメッセージを返す
+    if state.get("error"):
+        return {"response": f"申し訳ありません。{state['error']}", "history": [...]}
+
+    # 回答生成
+    prompt = RESPONDER_PROMPT.format(
+        message=state["user_message"],
+        intent=state["intent"],
+        data=str(state.get("query_results")),
+        external_info=get_external_context(...),  # 季節性等の外部情報
+    )
+    response = call_vertex_ai(prompt, temperature=0.4)
+
+    # 回答と履歴を返す
+    return {
+        "response": response,
+        "history": [
+            {"role": "user", "content": state["user_message"]},
+            {"role": "assistant", "content": response[:500]}
+        ]
+    }
+```
+
+**ポイント**:
+- データを元に「コンサルタント」として回答
+- 季節性等の外部要因も考慮
+- 会話履歴を更新（Annotated + reducerで自動マージ）
+
+### 5-4. Workflowを読む
+
+```python
+# app/agents/workflow.py
+
 from langgraph.graph import StateGraph, START, END
 from .state import ChatState
-from .nodes import router_node, planner_node, executor_node, responder_node
+from .nodes import router_node, clarification_node, planner_node, executor_node, responder_node
 
 def create_chatbot_graph() -> StateGraph:
+    """LangGraphワークフローを構築"""
+
     workflow = StateGraph(ChatState)
 
-    # ノードを追加
+    # === ノードを追加 ===
     workflow.add_node("router", router_node)
+    workflow.add_node("clarification", clarification_node)
     workflow.add_node("planner", planner_node)
     workflow.add_node("executor", executor_node)
     workflow.add_node("responder", responder_node)
 
-    # エッジを追加
+    # === エッジを追加 ===
+
+    # START → Router
     workflow.add_edge(START, "router")
 
-    # Router → Planner（条件分岐）
+    # Router → Clarification or Planner（条件分岐）
     def route_after_router(state: ChatState) -> str:
         if state.get("intent") == "clarification":
-            return "responder"
+            return "clarification"
         return "planner"
 
     workflow.add_conditional_edges(
         "router",
         route_after_router,
-        {"responder": "responder", "planner": "planner"}
+        {"clarification": "clarification", "planner": "planner"}
     )
 
-    # Planner → Executor or Responder
+    # Clarification → Responder
+    workflow.add_edge("clarification", "responder")
+
+    # Planner → Executor or Responder（条件分岐）
     def should_execute(state: ChatState) -> str:
         plan = state.get("query_plan")
         if plan and plan.get("tables_needed"):
@@ -2435,61 +3148,420 @@ def create_chatbot_graph() -> StateGraph:
         {"executor": "executor", "responder": "responder"}
     )
 
+    # Executor → Responder
     workflow.add_edge("executor", "responder")
+
+    # Responder → END
     workflow.add_edge("responder", END)
 
     return workflow
 
-# コンパイル済みグラフをキャッシュ（シングルトン）
+
+# コンパイル済みグラフをキャッシュ
 _graph = None
 
 def get_compiled_graph():
+    """コンパイル済みグラフを取得（シングルトン）"""
     global _graph
     if _graph is None:
         workflow = create_chatbot_graph()
         _graph = workflow.compile()
     return _graph
+
+
+def run_chatbot(message: str, advertiser_id: str, history: List = None) -> Dict:
+    """チャットボットを実行"""
+    graph = get_compiled_graph()
+
+    initial_state: ChatState = {
+        "user_message": message,
+        "advertiser_id": advertiser_id,
+        "history": history or [],
+        "intent": "",
+        "query_plan": None,
+        "query_results": None,
+        "error": None,
+        "response": "",
+        "messages": [],
+    }
+
+    final_state = graph.invoke(initial_state)
+
+    return {
+        "ok": True,
+        "response": final_state.get("response", ""),
+        "intent": final_state.get("intent", ""),
+        "data": final_state.get("query_results"),
+        "history": final_state.get("history", []),
+    }
+```
+
+### 5-5. 全体のデータフローまとめ
+
+```
++------------------------------------------------------------------+
+|                        初期 State                                 |
++------------------------------------------------------------------+
+|  user_message: "キャンペーン別のCV数を教えて"                      |
+|  advertiser_id: "xxx..."                                         |
+|  history: []                                                     |
+|  intent: ""  (空)                                                |
+|  query_plan: null                                                |
+|  query_results: null                                             |
+|  response: ""  (空)                                              |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                       Router Node                                |
++------------------------------------------------------------------+
+|  入力: user_message                                              |
+|  処理: LLMで意図を分類                                           |
+|  出力: {intent: "data_query"}                                    |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                       Planner Node                               |
++------------------------------------------------------------------+
+|  入力: user_message, intent                                      |
+|  処理: LLMでクエリ計画を生成                                     |
+|  出力: {query_plan: {tables: [...], metrics: [...], ...}}        |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                       Executor Node                              |
++------------------------------------------------------------------+
+|  入力: query_plan, advertiser_id                                 |
+|  処理: BigQueryでSQL実行                                         |
+|  出力: {query_results: [{campaign: "A", CV: 150}, ...]}          |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                       Responder Node                             |
++------------------------------------------------------------------+
+|  入力: user_message, intent, query_results                       |
+|  処理: LLMで回答を生成                                           |
+|  出力: {response: "...", history: [...]}                         |
++------------------------------------------------------------------+
+                              |
+                              v
++------------------------------------------------------------------+
+|                        最終 State                                 |
++------------------------------------------------------------------+
+|  user_message: "キャンペーン別のCV数を教えて"                      |
+|  intent: "data_query"                                            |
+|  query_plan: {tables: [...], metrics: [...], ...}                |
+|  query_results: [{campaign: "A", CV: 150}, ...]                  |
+|  response: "キャンペーン別のCV数は以下の通りです..."               |
+|  history: [{role: "user", ...}, {role: "assistant", ...}]        |
++------------------------------------------------------------------+
 ```
 
 ---
 
-### よく使うパターン
+### 付録: よく使うパターン
 
-**エラーハンドリング**:
+#### パターン1: エラーハンドリング
+
 ```python
 def some_node(state: ChatState) -> dict:
     try:
+        # 処理
         result = do_something()
         return {"result": result}
     except Exception as e:
         return {"error": str(e)}
 ```
 
-**条件によってスキップ**:
+#### パターン2: 条件によってスキップ
+
 ```python
 def executor_node(state: ChatState) -> dict:
+    # 条件を満たさなければ何もしない
     if not state.get("query_plan"):
         return {}  # 空のdictを返す = 更新なし
-    # 処理を実行...
+
+    # 処理を実行
+    ...
 ```
 
-**前のノードの結果を利用**:
+#### パターン3: 前のノードの結果を利用
+
 ```python
 def responder_node(state: ChatState) -> dict:
+    # 前のノードが設定した値を参照
     intent = state["intent"]           # Routerが設定
     data = state.get("query_results")  # Executorが設定
-    # それらを使って処理...
+
+    # それらを使って処理
+    ...
 ```
 
 ---
 
-### LangChainエコシステムまとめ
+## Part 6: 実際の使い方（広告分析AI）
 
-| ツール | 役割 | 例え |
-|--------|------|------|
-| LangChain | 部品（LLM、プロンプト、ツール等） | レゴブロック |
-| LangGraph | 部品を組み立てるフレームワーク | 設計図 |
-| LangSmith | 動作を監視・デバッグするツール | 検査機器 |
+このセクションでは、広告分析AIとしての実際の使用方法を解説します。
+
+### 6-1. セットアップ
+
+#### 必要な環境変数（.env）
+
+```bash
+# BigQuery（広告データ）
+GCP_PROJECT_ID=your-project-id
+BIGQUERY_DATASET=your_dataset_name
+
+# Vertex AI（LLM）
+VERTEX_PROJECT_ID=your-vertex-project  # 空の場合はGCP_PROJECT_IDを使用
+VERTEX_LOCATION=us-central1
+VERTEX_MODEL=gemini-2.0-flash-001
+
+# API認証
+API_KEY=your-api-key
+```
+
+#### ローカルで実行する方法
+
+**方法1: VSCodeで直接実行（推奨）**
+
+1. VSCodeで `test_chatbot.ipynb` を開く
+2. 右上の「カーネルを選択」で `venv` の Python を選ぶ
+3. セルを順番に実行（Shift + Enter）
+
+**方法2: ターミナルから実行**
+
+```bash
+# 1. プロジェクトディレクトリに移動
+cd /path/to/広告分析AI
+
+# 2. 仮想環境を有効化
+source venv/bin/activate
+
+# 3. プロンプトが変わったことを確認
+#    (venv) $ のように表示される
+
+# 4. Jupyter Notebookを起動
+jupyter notebook
+```
+
+#### 仮想環境とは？
+
+```
++------------------------------------------------------------------+
+|  あなたのPC                                                       |
++------------------------------------------------------------------+
+|                                                                  |
+|  システムのPython（グローバル）                                    |
+|    - いろんなプロジェクトで共有                                    |
+|    - パッケージのバージョン競合が起きやすい                        |
+|                                                                  |
+|  +------------------------------------------------------------+  |
+|  | 広告分析AI/venv/（仮想環境）                                |  |
+|  +------------------------------------------------------------+  |
+|  |  - このプロジェクト専用のPython                             |  |
+|  |  - requirements.txt のパッケージだけインストール            |  |
+|  |  - 他のプロジェクトに影響しない                             |  |
+|  +------------------------------------------------------------+  |
+|                                                                  |
++------------------------------------------------------------------+
+```
+
+| コマンド | 意味 |
+|----------|------|
+| `source venv/bin/activate` | 仮想環境を有効化 |
+| `deactivate` | 仮想環境を無効化 |
+| `which python` | 今どのPythonを使っているか確認 |
+
+### 6-2. 質問の種類と回答例
+
+#### データ取得（data_query）
+
+```python
+chat("キャンペーン別のCV数を教えて")
+chat("直近1ヶ月で広告グループ別のCTRが高いものを3つ教えて")
+chat("キーワード別のコストを教えて")
+```
+
+**回答例**:
+```
+キャンペーン別のCV数は以下の通りです：
+
+| キャンペーン名 | CV数 |
+|---------------|------|
+| ブランド検索   | 230  |
+| 一般検索      | 150  |
+| リマーケティング| 85  |
+
+【分析】
+ブランド検索キャンペーンが最もCV数が多く...
+```
+
+#### 期間比較（comparison）
+
+```python
+chat("先月と今月のCVを比較して")
+chat("前週比でCTRの変化を教えて")
+```
+
+**回答例**:
+```
+先月と今月のCV比較：
+
+| 期間  | CV数 | 前月比 |
+|-------|------|--------|
+| 先月  | 420  | -      |
+| 今月  | 465  | +10.7% |
+
+【原因分析】
+今月はCVが10.7%増加しています。主な要因として...
+```
+
+#### 深い分析（insight）
+
+```python
+chat("CTRが高い広告グループとその理由を教えて")
+chat("CPAを下げるにはどうすればいい？")
+```
+
+#### 曖昧な質問（clarification）
+
+```python
+chat("調子はどう？")
+```
+
+**回答例**:
+```
+どの指標で評価しますか？
+例えば、CVR（成約率）、CPA（獲得単価）、CV数（成約数）など。
+```
+
+### 6-3. 会話の継続
+
+会話履歴は自動的に保持されます（直近15件）。
+
+```python
+chat("キャンペーン別のCVを教えて")
+chat("その中でCPAが低いのは？")
+chat("そのキャンペーンの予算を増やすべき？")
+
+# 会話をリセットしたい場合
+chat("新しい質問", reset=True)
+# または
+reset_chat()
+```
+
+### 6-4. デバッグモード
+
+```python
+chat("キャンペーン別のCVを教えて", show_debug=True)
+```
+
+**出力例**:
+```
+📝 質問: キャンペーン別のCVを教えて
+📚 会話履歴: 0件
+⏳ 処理中...
+
+🏷️ Intent: data_query
+------------------------------------------------------------
+[Markdown形式の回答]
+
+📚 更新後の会話履歴: 2件
+
+📊 取得データ（先頭5件）:
+  {'campaign_name': 'ブランド検索', 'CV': 230}
+  {'campaign_name': '一般検索', 'CV': 150}
+  ...
+
+📜 会話履歴:
+  👤 キャンペーン別のCVを教えて...
+  🤖 キャンペーン別のCV数は以下の通りです...
+```
+
+### 6-5. 利用可能な指標とディメンション
+
+#### 指標（メトリクス）
+
+| 指標 | 説明 | 計算式 |
+|------|------|--------|
+| Imp | インプレッション数 | - |
+| Clicks | クリック数 | - |
+| Cost | 広告費用 | - |
+| CV | コンバージョン数 | - |
+| CTR | クリック率 | Clicks / Imp * 100 |
+| CVR | コンバージョン率 | CV / Clicks * 100 |
+| CPC | クリック単価 | Cost / Clicks |
+| CPA | 獲得単価 | Cost / CV |
+| ROAS | 広告費用対効果 | Value / Cost * 100 |
+
+#### ディメンション（粒度）
+
+| 粒度 | テーブル | 例 |
+|------|----------|-----|
+| キャンペーン別 | campaign | 「キャンペーン別のCVを教えて」 |
+| 広告グループ別 | adgroup | 「広告グループ別のCTRを教えて」 |
+| キーワード別 | keyword | 「キーワード別のコストを教えて」 |
+| 媒体別 | campaign | 「媒体別のCPAを教えて」 |
+| デバイス別 | campaign | 「デバイス別のCVRを教えて」 |
+
+#### 期間指定
+
+| 表現 | 解釈 |
+|------|------|
+| 今月 | 今月1日〜今日 |
+| 先月 | 先月1日〜先月末日 |
+| 今週 | 今週月曜〜今日 |
+| 先週 | 先週月曜〜先週日曜 |
+| 直近1ヶ月 | 過去30日間 |
+| 直近 / 最近 | 全期間（明示されない場合） |
+
+### 6-6. よくある質問例
+
+#### パフォーマンス分析
+
+```python
+chat("全体のパフォーマンスを教えて")
+chat("CPAが高いキャンペーンは？")
+chat("CVRが低下している原因は？")
+```
+
+#### 予算・入札
+
+```python
+chat("予算を増やすべきキャンペーンは？")
+chat("入札を調整すべきキーワードは？")
+```
+
+#### 比較分析
+
+```python
+chat("先月と今月でCVRを比較して")
+chat("Google検索とYahoo!検索の効果を比較")
+chat("PCとモバイルの違いを教えて")
+```
+
+#### 改善提案
+
+```python
+chat("コストを下げるにはどうすればいい？")
+chat("CVを増やすための施策を教えて")
+chat("このキャンペーンをどう改善すればいい？")
+```
+
+---
+
+### 次のステップ
+
+1. `test_chatbot.ipynb` で実際に動かしてみる
+2. `nodes.py` のプロンプトを変更して挙動の変化を確認
+3. 新しいノードを追加してみる（例: 結果をキャッシュするノード）
+4. `workflow.py` でフローを変更してみる
+
+Happy Learning!
 
 </div>
 </div>
