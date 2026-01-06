@@ -1884,7 +1884,7 @@ QAテストは来週月曜から3日間で150件実施予定。
                 <!-- 右側: スティッキーサイドバー -->
                 <div class="tutorial-sidebar">
                     <div class="tutorial-sidebar-title">📍 現在の位置</div>
-                    <svg viewBox="0 0 280 420" class="sidebar-architecture-svg">
+                    <svg viewBox="0 0 280 680" class="sidebar-architecture-svg">
                         <defs>
                             <marker id="sidebarArr" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
                                 <polygon points="0 0, 8 3, 0 6" fill="#667eea"/>
@@ -1900,68 +1900,80 @@ QAテストは来週月曜から3日間で150件実施予定。
 
                         <!-- Step 1: 環境準備 -->
                         <g id="sidebar-step1" class="sidebar-step" data-step="1">
-                            <rect x="90" y="10" width="100" height="35" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
-                            <text x="140" y="32" text-anchor="middle" fill="#86efac" font-size="10">環境準備</text>
+                            <rect x="80" y="10" width="120" height="35" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="32" text-anchor="middle" fill="#86efac" font-size="11">📁 環境準備</text>
                         </g>
 
                         <line x1="140" y1="45" x2="140" y2="60" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
 
                         <!-- Step 2: MeetingState -->
                         <g id="sidebar-step2" class="sidebar-step" data-step="2">
-                            <rect x="65" y="65" width="150" height="45" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
-                            <text x="140" y="85" text-anchor="middle" fill="#86efac" font-size="10">MeetingState</text>
-                            <text x="140" y="100" text-anchor="middle" fill="#4ade80" font-size="8">(raw_text, summary, ...)</text>
+                            <rect x="65" y="65" width="150" height="50" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="85" text-anchor="middle" fill="#86efac" font-size="11">📦 MeetingState</text>
+                            <text x="140" y="102" text-anchor="middle" fill="#4ade80" font-size="8">(raw_text, summary, ...)</text>
                         </g>
 
-                        <line x1="140" y1="110" x2="140" y2="125" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+                        <line x1="140" y1="115" x2="140" y2="130" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
 
-                        <!-- Step 3: Nodes（議事録用） -->
+                        <!-- Step 3: Nodes（縦に直列配置） -->
                         <g id="sidebar-step3" class="sidebar-step" data-step="3">
-                            <rect x="25" y="130" width="70" height="40" rx="6" fill="#1a2634" stroke="#667eea" stroke-width="2"/>
-                            <text x="60" y="147" text-anchor="middle" fill="#667eea" font-size="8">summarize</text>
-                            <text x="60" y="160" text-anchor="middle" fill="#667eea" font-size="8">_node</text>
+                            <!-- タイトル -->
+                            <text x="140" y="145" text-anchor="middle" fill="#86efac" font-size="10">⚙️ Nodes（処理関数）</text>
 
-                            <rect x="105" y="130" width="70" height="40" rx="6" fill="#1a2634" stroke="#06b6d4" stroke-width="2"/>
-                            <text x="140" y="147" text-anchor="middle" fill="#06b6d4" font-size="8">check</text>
-                            <text x="140" y="160" text-anchor="middle" fill="#06b6d4" font-size="8">_length</text>
+                            <!-- summarize_node -->
+                            <rect x="75" y="155" width="130" height="35" rx="6" fill="#1a2634" stroke="#667eea" stroke-width="2"/>
+                            <text x="140" y="177" text-anchor="middle" fill="#667eea" font-size="10">summarize_node</text>
 
-                            <rect x="185" y="130" width="70" height="40" rx="6" fill="#1a2634" stroke="#22c55e" stroke-width="2"/>
-                            <text x="220" y="147" text-anchor="middle" fill="#22c55e" font-size="8">extract</text>
-                            <text x="220" y="160" text-anchor="middle" fill="#22c55e" font-size="8">_topics</text>
+                            <line x1="140" y1="190" x2="140" y2="205" stroke="#667eea" stroke-width="1.5" marker-end="url(#sidebarArr)"/>
 
-                            <rect x="25" y="175" width="70" height="40" rx="6" fill="#1a2634" stroke="#f97316" stroke-width="2"/>
-                            <text x="60" y="192" text-anchor="middle" fill="#f97316" font-size="8">extract</text>
-                            <text x="60" y="205" text-anchor="middle" fill="#f97316" font-size="8">_actions</text>
+                            <!-- check_length_node -->
+                            <rect x="75" y="210" width="130" height="35" rx="6" fill="#1a2634" stroke="#06b6d4" stroke-width="2"/>
+                            <text x="140" y="232" text-anchor="middle" fill="#06b6d4" font-size="10">check_length_node</text>
 
-                            <rect x="105" y="175" width="70" height="40" rx="6" fill="#1a2634" stroke="#ec4899" stroke-width="2"/>
-                            <text x="140" y="192" text-anchor="middle" fill="#ec4899" font-size="8">format</text>
-                            <text x="140" y="205" text-anchor="middle" fill="#ec4899" font-size="8">_doc</text>
+                            <line x1="140" y1="245" x2="140" y2="260" stroke="#667eea" stroke-width="1.5" marker-end="url(#sidebarArr)"/>
+
+                            <!-- extract_topics_node -->
+                            <rect x="75" y="265" width="130" height="35" rx="6" fill="#1a2634" stroke="#22c55e" stroke-width="2"/>
+                            <text x="140" y="287" text-anchor="middle" fill="#22c55e" font-size="10">extract_topics_node</text>
+
+                            <line x1="140" y1="300" x2="140" y2="315" stroke="#667eea" stroke-width="1.5" marker-end="url(#sidebarArr)"/>
+
+                            <!-- extract_actions_node -->
+                            <rect x="75" y="320" width="130" height="35" rx="6" fill="#1a2634" stroke="#f97316" stroke-width="2"/>
+                            <text x="140" y="342" text-anchor="middle" fill="#f97316" font-size="10">extract_actions_node</text>
+
+                            <line x1="140" y1="355" x2="140" y2="370" stroke="#667eea" stroke-width="1.5" marker-end="url(#sidebarArr)"/>
+
+                            <!-- format_doc_node -->
+                            <rect x="75" y="375" width="130" height="35" rx="6" fill="#1a2634" stroke="#ec4899" stroke-width="2"/>
+                            <text x="140" y="397" text-anchor="middle" fill="#ec4899" font-size="10">format_doc_node</text>
                         </g>
 
-                        <line x1="140" y1="220" x2="140" y2="240" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+                        <line x1="140" y1="410" x2="140" y2="430" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
 
                         <!-- Step 4: 条件分岐 -->
                         <g id="sidebar-step4" class="sidebar-step" data-step="4">
-                            <polygon points="140,245 175,275 140,305 105,275" fill="#1a2634" stroke="#8b5cf6" stroke-width="2"/>
-                            <text x="140" y="272" text-anchor="middle" fill="#8b5cf6" font-size="9">is_long?</text>
-                            <text x="140" y="285" text-anchor="middle" fill="#8b5cf6" font-size="8">分岐</text>
+                            <text x="140" y="445" text-anchor="middle" fill="#86efac" font-size="10">🔀 条件分岐</text>
+                            <polygon points="140,455 180,490 140,525 100,490" fill="#1a2634" stroke="#8b5cf6" stroke-width="2"/>
+                            <text x="140" y="488" text-anchor="middle" fill="#8b5cf6" font-size="10">is_long?</text>
+                            <text x="140" y="503" text-anchor="middle" fill="#8b5cf6" font-size="8">True/False</text>
                         </g>
 
-                        <line x1="140" y1="305" x2="140" y2="320" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+                        <line x1="140" y1="525" x2="140" y2="545" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
 
                         <!-- Step 5: グラフ組立 -->
                         <g id="sidebar-step5" class="sidebar-step" data-step="5">
-                            <rect x="55" y="325" width="170" height="40" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
-                            <text x="140" y="342" text-anchor="middle" fill="#86efac" font-size="9">add_node / add_edge</text>
-                            <text x="140" y="357" text-anchor="middle" fill="#4ade80" font-size="8">→ compile()</text>
+                            <rect x="50" y="550" width="180" height="50" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="570" text-anchor="middle" fill="#86efac" font-size="10">🔧 グラフ組み立て</text>
+                            <text x="140" y="588" text-anchor="middle" fill="#4ade80" font-size="9">add_node → add_edge → compile()</text>
                         </g>
 
-                        <line x1="140" y1="365" x2="140" y2="380" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
+                        <line x1="140" y1="600" x2="140" y2="620" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
 
                         <!-- Step 6: 実行 -->
                         <g id="sidebar-step6" class="sidebar-step" data-step="6">
-                            <rect x="75" y="385" width="130" height="30" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
-                            <text x="140" y="405" text-anchor="middle" fill="#86efac" font-size="10">▶ graph.invoke()</text>
+                            <rect x="70" y="625" width="140" height="40" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="650" text-anchor="middle" fill="#86efac" font-size="11">▶ graph.invoke()</text>
                         </g>
                     </svg>
                     <div class="current-step-label" id="sidebarStepLabel">Step 1: 環境準備</div>
