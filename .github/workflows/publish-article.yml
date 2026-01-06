@@ -35,9 +35,78 @@ jobs:
         run: |
           mkdir -p _site
           mkdir -p _site/langchain
+          mkdir -p _site/langgraph
 
-          # LangGraphガイドをトップページに
-          cp index.html _site/index.html
+          # トップページ（ナビゲーション）
+          cat > _site/index.html << 'INDEXHTML'
+          <!DOCTYPE html>
+          <html lang="ja">
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>AI Agent 学習ガイド</title>
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+            <style>
+              * { margin: 0; padding: 0; box-sizing: border-box; }
+              body {
+                font-family: 'Noto Sans JP', sans-serif;
+                background: linear-gradient(135deg, #0f1419 0%, #1a2634 100%);
+                min-height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 2rem;
+              }
+              .container { max-width: 800px; width: 100%; }
+              h1 {
+                text-align: center;
+                font-size: 2.5rem;
+                margin-bottom: 3rem;
+                background: linear-gradient(135deg, #22c55e, #10b981);
+                -webkit-background-clip: text;
+                -webkit-text-fill-color: transparent;
+              }
+              .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+              .card {
+                background: #1a2634;
+                border: 2px solid #22543d;
+                border-radius: 16px;
+                padding: 2rem;
+                text-decoration: none;
+                transition: all 0.3s ease;
+              }
+              .card:hover {
+                border-color: #22c55e;
+                transform: translateY(-5px);
+                box-shadow: 0 10px 40px rgba(34, 197, 94, 0.2);
+              }
+              .card-icon { font-size: 3rem; margin-bottom: 1rem; }
+              .card-title { font-size: 1.5rem; color: #f0fdf4; margin-bottom: 0.5rem; }
+              .card-desc { color: #86efac; font-size: 0.95rem; line-height: 1.6; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>AI Agent 学習ガイド</h1>
+              <div class="cards">
+                <a href="langchain/" class="card">
+                  <div class="card-icon">🦜</div>
+                  <div class="card-title">LangChain チートシート</div>
+                  <div class="card-desc">LLM統一API、プロンプトテンプレート、チェーン、RAG、ツールなど</div>
+                </a>
+                <a href="langgraph/" class="card">
+                  <div class="card-icon">🔗</div>
+                  <div class="card-title">LangGraph 完全学習ガイド</div>
+                  <div class="card-desc">State・Node・Edge、条件分岐、reducer、実践ワークフロー構築</div>
+                </a>
+              </div>
+            </div>
+          </body>
+          </html>
+          INDEXHTML
+
+          # LangGraphガイドを /langgraph/ に
+          cp index.html _site/langgraph/index.html
 
           # LangChainチートシートを /langchain/ に
           sudo apt-get update && sudo apt-get install -y pandoc

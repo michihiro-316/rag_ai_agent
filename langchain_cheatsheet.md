@@ -54,7 +54,7 @@
   <button class="tab-button" onclick="openTab(event, 'tools')">ツール</button>
   <button class="tab-button" onclick="openTab(event, 'practice')">実践</button>
   <button class="tab-button" onclick="openTab(event, 'reference')">補足</button>
-  <button class="tab-button" onclick="openTab(event, 'langgraph')">LangGraph</button>
+  <a href="../langgraph/" class="tab-button" style="text-decoration: none;">LangGraph →</a>
 </div>
 
 <!-- ==================== 基礎タブ ==================== -->
