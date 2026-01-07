@@ -22,3 +22,6 @@ __pycache__/
 
 # Claude Code
 .claude/
+
+# 広告分析AIプロジェクト（別リポジトリ管理）
+広告分析AI/
