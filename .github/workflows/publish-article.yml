@@ -5,8 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'index.html'
-      - 'langchain_cheatsheet.md'
+      - 'articles/**'
       - '.github/workflows/publish-article.yml'
   workflow_dispatch:
 
@@ -106,7 +105,7 @@ jobs:
           INDEXHTML
 
           # LangGraphガイドを /langgraph/ に
-          cp index.html _site/langgraph/index.html
+          cp articles/langgraph_guide.html _site/langgraph/index.html
 
           # LangChainチートシートを /langchain/ に
           sudo apt-get update && sudo apt-get install -y pandoc
@@ -147,7 +146,7 @@ jobs:
             <article class="markdown-body">
           HTMLHEADER
 
-          pandoc langchain_cheatsheet.md -f markdown -t html >> _site/langchain/index.html
+          pandoc articles/langchain_cheatsheet.md -f markdown -t html >> _site/langchain/index.html
 
           cat >> _site/langchain/index.html << 'HTMLFOOTER'
             </article>
