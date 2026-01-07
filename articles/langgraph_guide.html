@@ -746,6 +746,7 @@
                 <button class="nav-tab" data-section="state">State管理</button>
                 <button class="nav-tab" data-section="project">実践</button>
                 <button class="nav-tab" data-section="security">セキュリティ</button>
+                <button class="nav-tab" data-section="design">設計相談</button>
             </nav>
         </div>
     </header>
@@ -1334,6 +1335,137 @@ workflow.add_conditional_edges(
                     </div>
                 </div>
             </div>
+
+            <!-- 構造化出力 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">📦</div>
+                    <h3 class="card-title">構造化出力（with_structured_output）</h3>
+                </div>
+                <p>LLMの出力を<strong>Pydanticモデルに直接マッピング</strong>する最新の推奨パターンです。<br>
+                文字列パースが不要になり、型安全性が向上します。</p>
+
+                <div style="background: rgba(59, 130, 246, 0.1); border-left: 3px solid var(--accent-blue); padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                    <p style="margin: 0; color: var(--accent-blue); font-weight: 600;">💡 従来 vs 構造化出力</p>
+                    <table style="width: 100%; margin-top: 0.5rem; border-collapse: collapse; font-size: 0.9rem;">
+                        <tr>
+                            <th style="padding: 0.5rem; background: rgba(59, 130, 246, 0.2); border: 1px solid var(--border-color); text-align: left;">従来の方法</th>
+                            <th style="padding: 0.5rem; background: rgba(59, 130, 246, 0.2); border: 1px solid var(--border-color); text-align: left;">構造化出力</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem; border: 1px solid var(--border-color); color: var(--text-secondary);">LLMに「JSON形式で出力して」と指示</td>
+                            <td style="padding: 0.5rem; border: 1px solid var(--border-color); color: var(--text-secondary);">Pydanticモデルを渡すだけ</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem; border: 1px solid var(--border-color); color: var(--text-secondary);">json.loads()でパース必要</td>
+                            <td style="padding: 0.5rem; border: 1px solid var(--border-color); color: var(--text-secondary);">自動でオブジェクト化</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.5rem; border: 1px solid var(--border-color); color: var(--text-secondary);">パースエラーのリスク</td>
+                            <td style="padding: 0.5rem; border: 1px solid var(--border-color); color: var(--text-secondary);">型安全＆バリデーション付き</td>
+                        </tr>
+                    </table>
+                </div>
+
+                <div class="code-block">
+                    <div class="code-header">Python - 構造化出力の基本パターン</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> typing <span class="kw">import</span> List
+<span class="kw">from</span> langchain_google_genai <span class="kw">import</span> ChatGoogleGenerativeAI
+
+<span class="cm"># 1. 出力スキーマを定義</span>
+<span class="kw">class</span> <span class="cl">MeetingTopics</span>(BaseModel):
+    <span class="st">"""会議の議題抽出結果"""</span>
+    topics: List[<span class="cl">str</span>] = Field(description=<span class="st">"抽出された議題のリスト"</span>)
+    main_topic: <span class="cl">str</span> = Field(description=<span class="st">"最も重要な議題"</span>)
+    priority: <span class="cl">int</span> = Field(description=<span class="st">"優先度（1-5）"</span>, ge=<span class="cl">1</span>, le=<span class="cl">5</span>)
+
+<span class="cm"># 2. LLMに構造化出力を設定</span>
+llm = ChatGoogleGenerativeAI(model=<span class="st">"gemini-1.5-flash"</span>)
+structured_llm = llm.with_structured_output(MeetingTopics)
+
+<span class="cm"># 3. 呼び出し - 直接Pydanticオブジェクトが返る！</span>
+result = structured_llm.invoke(<span class="st">"以下の会議要約から議題を抽出: ..."</span>)
+
+<span class="cm"># resultはMeetingTopics型</span>
+<span class="kw">print</span>(result.topics)      <span class="cm"># ['予算検討', 'スケジュール確認']</span>
+<span class="kw">print</span>(result.main_topic)  <span class="cm"># '予算検討'</span>
+<span class="kw">print</span>(result.priority)    <span class="cm"># 3</span>
+
+<span class="cm"># JSONに変換も簡単</span>
+<span class="kw">print</span>(result.model_dump_json(indent=<span class="cl">2</span>))
+<span class="cm"># {</span>
+<span class="cm">#   "topics": ["予算検討", "スケジュール確認"],</span>
+<span class="cm">#   "main_topic": "予算検討",</span>
+<span class="cm">#   "priority": 3</span>
+<span class="cm"># }</span></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <h4 style="margin: 1.5rem 0 1rem; color: var(--accent-purple);">LangGraphのNodeで使う</h4>
+                <div class="code-block">
+                    <div class="code-header">Python - Nodeでの構造化出力活用</div>
+                    <div class="code-body">
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span></div>
+                        <div class="code-content">
+<pre><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+<span class="kw">from</span> typing <span class="kw">import</span> List
+
+<span class="cm"># 出力スキーマ</span>
+<span class="kw">class</span> <span class="cl">ActionItems</span>(BaseModel):
+    <span class="st">"""アクションアイテムの抽出結果"""</span>
+    items: List[<span class="cl">dict</span>] = Field(
+        description=<span class="st">"アクションアイテムのリスト"</span>,
+        examples=[[{<span class="st">"who"</span>: <span class="st">"田中"</span>, <span class="st">"what"</span>: <span class="st">"資料作成"</span>, <span class="st">"deadline"</span>: <span class="st">"金曜"</span>}]]
+    )
+
+<span class="cm"># 構造化出力を使うNode</span>
+<span class="kw">def</span> <span class="fn">extract_actions_node</span>(state: MeetingState) -> <span class="cl">dict</span>:
+    <span class="st">"""アクションアイテムを構造化抽出"""</span>
+
+    structured_llm = llm.with_structured_output(ActionItems)
+
+    prompt = ChatPromptTemplate.from_messages([
+        (<span class="st">"system"</span>, <span class="st">"""会議要約からアクションアイテムを抽出。
+各アイテムは「誰が」「何を」「いつまでに」を含める。"""</span>),
+        (<span class="st">"human"</span>, <span class="st">"{summary}"</span>)
+    ])
+
+    chain = prompt | structured_llm
+    result = chain.invoke({<span class="st">"summary"</span>: state[<span class="st">"summary"</span>]})
+
+    <span class="cm"># resultはActionItems型！パース不要</span>
+    <span class="kw">return</span> {
+        <span class="st">"actions"</span>: result.items,
+        <span class="st">"logs"</span>: [<span class="st">f"[actions] {len(result.items)}件抽出"</span>]
+    }</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(34, 197, 94, 0.1); border-left: 3px solid var(--accent-green); padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                    <p style="margin: 0 0 0.5rem; color: var(--accent-green); font-weight: 600;">✅ 構造化出力のメリット</p>
+                    <ul style="margin: 0 0 0 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li><strong>型安全</strong>: IDEの補完が効く、typoを防げる</li>
+                        <li><strong>バリデーション</strong>: Fieldで制約を定義（ge, le, max_length等）</li>
+                        <li><strong>ドキュメント</strong>: descriptionがスキーマに含まれLLMの精度向上</li>
+                        <li><strong>コード削減</strong>: json.loads()やエラーハンドリングが不要</li>
+                    </ul>
+                </div>
+
+                <div style="background: rgba(249, 115, 22, 0.1); border-left: 3px solid var(--accent-orange); padding: 1rem; margin: 1rem 0; border-radius: 4px;">
+                    <p style="margin: 0 0 0.5rem; color: var(--accent-orange); font-weight: 600;">⚠️ 注意点</p>
+                    <ul style="margin: 0 0 0 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li><strong>対応モデル</strong>: Gemini 1.5, GPT-4, Claude 3など最新モデルが必要</li>
+                        <li><strong>ストリーミング</strong>: 構造化出力時はストリーミング不可の場合あり</li>
+                        <li><strong>複雑なスキーマ</strong>: ネストが深いと精度が下がることがある</li>
+                    </ul>
+                </div>
+            </div>
         </section>
 
         <!-- 実践セクション -->
@@ -1825,6 +1957,77 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
                         <li>実務では<code>error_message</code>や<code>retry_count</code>も入れておくとエラーハンドリングしやすい</li>
                     </ul>
                 </div>
+
+                <!-- TypedDict vs BaseModel -->
+                <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid var(--accent-purple); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
+                    <div style="color: var(--accent-purple); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">📚 State定義の2つの方法：TypedDict vs BaseModel</div>
+
+                    <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                        LangGraphでは <code>TypedDict</code>（上記の例）と <code>BaseModel</code>（Pydantic）の両方でStateを定義できます。<br>
+                        用途に応じて使い分けましょう。
+                    </p>
+
+                    <table style="width: 100%; margin: 1rem 0; border-collapse: collapse;">
+                        <tr>
+                            <th style="padding: 0.75rem; background: rgba(139, 92, 246, 0.2); border: 1px solid var(--border-color); text-align: left;">方式</th>
+                            <th style="padding: 0.75rem; background: rgba(139, 92, 246, 0.2); border: 1px solid var(--border-color); text-align: left;">メリット</th>
+                            <th style="padding: 0.75rem; background: rgba(139, 92, 246, 0.2); border: 1px solid var(--border-color); text-align: left;">デメリット</th>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>TypedDict</code></td>
+                            <td style="padding: 0.75rem; border: 1px solid var(--border-color); color: var(--text-secondary);">シンプル、軽量、公式ドキュメントで多用</td>
+                            <td style="padding: 0.75rem; border: 1px solid var(--border-color); color: var(--text-secondary);">バリデーションなし</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 0.75rem; border: 1px solid var(--border-color);"><code>BaseModel</code></td>
+                            <td style="padding: 0.75rem; border: 1px solid var(--border-color); color: var(--text-secondary);">Field()で説明・デフォルト値・バリデーション可能</td>
+                            <td style="padding: 0.75rem; border: 1px solid var(--border-color); color: var(--text-secondary);">やや冗長</td>
+                        </tr>
+                    </table>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
+                        <!-- TypedDict版 -->
+                        <div style="background: #0f1419; border-radius: 8px; padding: 1rem; border: 2px solid var(--accent-green);">
+                            <div style="color: var(--accent-green); font-weight: 600; margin-bottom: 0.5rem;">TypedDict版（シンプル）</div>
+                            <pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; overflow-x: auto;"><span class="kw">from</span> typing <span class="kw">import</span> TypedDict
+
+<span class="kw">class</span> <span class="cl">MeetingState</span>(TypedDict):
+    raw_text: <span class="cl">str</span>
+    summary: <span class="cl">str</span>
+    is_long: <span class="cl">bool</span></pre>
+                        </div>
+
+                        <!-- BaseModel版 -->
+                        <div style="background: #0f1419; border-radius: 8px; padding: 1rem; border: 2px solid var(--accent-purple);">
+                            <div style="color: var(--accent-purple); font-weight: 600; margin-bottom: 0.5rem;">BaseModel版（Pydantic）</div>
+                            <pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; overflow-x: auto;"><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
+
+<span class="kw">class</span> <span class="cl">MeetingState</span>(BaseModel):
+    raw_text: <span class="cl">str</span> = Field(
+        default=<span class="st">""</span>,
+        description=<span class="st">"会議の生テキスト"</span>
+    )
+    summary: <span class="cl">str</span> = Field(
+        default=<span class="st">""</span>,
+        description=<span class="st">"要約結果"</span>
+    )
+    is_long: <span class="cl">bool</span> = Field(
+        default=<span class="cl">False</span>,
+        description=<span class="st">"長い会議フラグ"</span>
+    )</pre>
+                        </div>
+                    </div>
+
+                    <div style="background: #0f1419; border-radius: 8px; padding: 1rem; margin-top: 1rem; border-left: 3px solid var(--accent-orange);">
+                        <div style="color: var(--accent-orange); font-weight: 600; margin-bottom: 0.5rem;">💡 どちらを選ぶ？</div>
+                        <ul style="margin: 0 0 0 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                            <li><strong>学習・プロトタイプ</strong> → TypedDict（シンプルで始めやすい）</li>
+                            <li><strong>本番・チーム開発</strong> → BaseModel（descriptionでドキュメント化、バリデーションで堅牢）</li>
+                            <li><strong>Annotated[..., add]</strong> はどちらでも使用可能</li>
+                        </ul>
+                    </div>
+                </div>
+
             </div>
 
             <!-- ステップ3 -->
@@ -1942,6 +2145,13 @@ llm = ChatVertexAI(
                 <h4 id="substep-3-3" style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-3. 議題抽出ノード / アクション抽出ノード</h4>
                 <p style="margin-bottom: 1rem; color: var(--text-secondary);">同じパターンで複数のNodeを作ります。抽出結果はリストで返します。</p>
 
+                <div style="background: rgba(52, 211, 153, 0.1); border-left: 3px solid var(--accent-green); padding: 1rem; margin-bottom: 1rem; border-radius: 4px;">
+                    <p style="margin: 0 0 0.5rem; color: var(--accent-green); font-weight: 600;">💡 補足: 本番環境ではJSON出力が推奨</p>
+                    <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                        今回は学習用にシンプルな「改行区切り」を使用していますが、最新のGeminiでは<code style="background: rgba(255,255,255,0.1); padding: 0.1rem 0.3rem; border-radius: 3px;">response_mime_type="application/json"</code>でJSON出力を強制したり、<code style="background: rgba(255,255,255,0.1); padding: 0.1rem 0.3rem; border-radius: 3px;">with_structured_output()</code>でPydanticモデルに直接マッピングする方法が推奨されます。これにより型安全性とパース処理の省略が可能です。
+                    </p>
+                </div>
+
                 <div class="code-block">
                     <div class="code-header">Python - nodes.py（その3: 抽出系）</div>
                     <div class="code-body">
@@ -1953,7 +2163,7 @@ llm = ChatVertexAI(
     要約から主要な議題を抽出（リスト形式）
 
     ポイント: LLMの出力を「改行区切り」にしてsplit()で分割
-    → JSON形式より確実に動作する
+    ※今回は学習用にシンプルな実装を採用
     """</span>
 
     prompt = ChatPromptTemplate.from_messages([
@@ -3320,6 +3530,500 @@ logger = logging.getLogger(__name__)
                 </div>
             </div>
         </section>
+
+        <!-- 設計相談セクション -->
+        <section class="section" id="design">
+            <div class="section-header">
+                <div class="section-number">8</div>
+                <h2 class="section-title">設計相談ガイド</h2>
+                <p class="section-subtitle">AIと一緒にLangGraphアプリを設計する</p>
+            </div>
+
+            <!-- イントロ -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon purple">🤝</div>
+                    <h3 class="card-title">なぜ設計相談が必要？</h3>
+                </div>
+                <p>LangGraphの<strong>構文</strong>を学んでも、実際のプロジェクトでは：</p>
+                <ul style="margin: 1rem 0 1rem 1.5rem; color: var(--text-secondary);">
+                    <li>「どこから手をつければいい？」</li>
+                    <li>「Nodeの分け方がわからない」</li>
+                    <li>「Stateに何を入れるべき？」</li>
+                </ul>
+                <p>という壁にぶつかります。<br>
+                <strong>いきなりコードを書くのではなく、まず設計を整理する</strong>ことが成功の鍵です。</p>
+
+                <div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(59, 130, 246, 0.2)); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem;">
+                    <p style="margin: 0; text-align: center; font-size: 1.1rem;">
+                        💡 このセクションでは<strong>Claude</strong>と対話しながら<br>
+                        ステップバイステップで設計を進めるためのテンプレートを提供します
+                    </p>
+                </div>
+            </div>
+
+            <!-- 設計の流れ -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon green">🗺️</div>
+                    <h3 class="card-title">設計の5ステップ</h3>
+                </div>
+
+                <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(34, 197, 94, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-green);">
+                        <div style="background: var(--accent-green); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">ゴールを明確にする</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">「何を入力して、何を出力したいか」を言語化</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-emerald);">
+                        <div style="background: var(--accent-emerald); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">処理を日本語で書き出す</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">コードではなく「やること」を箇条書きに</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-blue);">
+                        <div style="background: var(--accent-blue); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">Nodeに分解する</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">「1つの処理 = 1つのNode」を意識して分割</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(139, 92, 246, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-purple);">
+                        <div style="background: var(--accent-purple); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">Stateを設計する</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">Node間で受け渡すデータを洗い出す</div>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(249, 115, 22, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-orange);">
+                        <div style="background: var(--accent-orange); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">5</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 0.25rem;">Edgeと分岐を決める</div>
+                            <div style="color: var(--text-secondary); font-size: 0.9rem;">フローの順序と条件分岐を整理</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- プロンプトテンプレート -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">📋</div>
+                    <h3 class="card-title">Claudeへの相談テンプレート</h3>
+                </div>
+                <p>以下のテンプレートをコピーして、Claudeに送ってください。<br>
+                対話しながら設計を進められます。</p>
+
+                <div class="code-block" style="margin-top: 1.5rem;">
+                    <div class="code-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>プロンプトテンプレート（コピーして使う）</span>
+                        <button onclick="copyPrompt()" style="background: var(--accent-green); color: #0f1419; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">📋 コピー</button>
+                    </div>
+                    <div class="code-body" style="background: #0d1117;">
+                        <div class="code-content">
+<pre id="design-prompt" style="white-space: pre-wrap; color: var(--text-secondary); padding: 1rem;">
+# LangGraph設計相談
+
+## 作りたいもの
+（例：会議の議事録を自動で要約・整理するツール）
+
+
+## 入力
+- 形式：（例：テキスト、音声ファイル、API経由など）
+- 内容：（例：会議の文字起こしテキスト）
+
+## 出力
+- 形式：（例：JSON、Markdown、画面表示など）
+- 内容：（例：要約、議題リスト、アクションアイテム）
+
+## 処理の流れ（ざっくり）
+1. （例：テキストを受け取る）
+2. （例：要約する）
+3. （例：議題を抽出する）
+4. （例：結果を整形する）
+
+## 条件分岐があれば
+- （例：テキストが長い場合は詳細分析、短い場合は簡易処理）
+
+## 不明点・相談したいこと
+- （例：Nodeの分け方が適切かわからない）
+- （例：エラーハンドリングをどこでやるべき？）
+
+---
+上記をもとに、LangGraphの設計を一緒に考えてください。
+State、Node、Edgeの構成を提案してもらえると助かります。
+</pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(34, 197, 94, 0.1); border-left: 3px solid var(--accent-green); padding: 1rem; margin-top: 1rem; border-radius: 4px;">
+                    <p style="margin: 0; color: var(--accent-green); font-weight: 600;">💡 使い方のコツ</p>
+                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary); font-size: 0.9rem;">
+                        <li><strong>全部埋めなくてOK</strong>: わからない部分は空欄のまま送って相談</li>
+                        <li><strong>具体例を書く</strong>: 抽象的より具体的な方が良いアドバイスが得られる</li>
+                        <li><strong>追加質問OK</strong>: 対話しながら詰めていく</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- 対話例 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon blue">💬</div>
+                    <h3 class="card-title">対話の例</h3>
+                </div>
+                <p>実際にどんな対話になるかの例です。</p>
+
+                <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 1rem;">
+                    <!-- ユーザー発言 -->
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div style="background: var(--accent-blue); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">👤</div>
+                        <div style="background: rgba(59, 130, 246, 0.15); padding: 1rem; border-radius: 12px; border-top-left-radius: 4px; flex: 1;">
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                                カスタマーサポートのチャットボットを作りたい。<br>
+                                ユーザーの質問を分類して、FAQで答えられるものはFAQから返答、<br>
+                                それ以外は人間のオペレーターに転送したい。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- AI発言 -->
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div style="background: var(--accent-purple); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🤖</div>
+                        <div style="background: rgba(139, 92, 246, 0.15); padding: 1rem; border-radius: 12px; border-top-left-radius: 4px; flex: 1;">
+                            <p style="margin: 0 0 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                良いですね！いくつか確認させてください：
+                            </p>
+                            <ol style="margin: 0 0 0 1.25rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                <li>質問の分類は何種類くらい想定していますか？</li>
+                                <li>FAQデータはどこに保存されていますか？（DB、ファイル、API？）</li>
+                                <li>「人間に転送」は具体的にどうしますか？（Slack通知、メール？）</li>
+                            </ol>
+                        </div>
+                    </div>
+
+                    <!-- ユーザー発言 -->
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div style="background: var(--accent-blue); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">👤</div>
+                        <div style="background: rgba(59, 130, 246, 0.15); padding: 1rem; border-radius: 12px; border-top-left-radius: 4px; flex: 1;">
+                            <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                                分類は「FAQ対応可能」「要オペレーター」「不明」の3つ。<br>
+                                FAQはJSONファイル。転送はとりあえずログ出力でOK。
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- AI発言 -->
+                    <div style="display: flex; gap: 1rem; align-items: flex-start;">
+                        <div style="background: var(--accent-purple); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">🤖</div>
+                        <div style="background: rgba(139, 92, 246, 0.15); padding: 1rem; border-radius: 12px; border-top-left-radius: 4px; flex: 1;">
+                            <p style="margin: 0 0 0.5rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                では以下の構成を提案します：
+                            </p>
+                            <p style="margin: 0.5rem 0; color: var(--text-primary); font-weight: 600; font-size: 0.85rem;">【Node構成】</p>
+                            <ul style="margin: 0 0 0.5rem 1rem; color: var(--text-secondary); font-size: 0.85rem;">
+                                <li><code>classify_node</code> - 質問を3分類</li>
+                                <li><code>faq_search_node</code> - FAQから回答検索</li>
+                                <li><code>generate_response_node</code> - 回答生成</li>
+                                <li><code>escalate_node</code> - オペレーター転送（ログ）</li>
+                            </ul>
+                            <p style="margin: 0.5rem 0; color: var(--text-primary); font-weight: 600; font-size: 0.85rem;">【State】</p>
+                            <ul style="margin: 0 0 0 1rem; color: var(--text-secondary); font-size: 0.85rem;">
+                                <li><code>question: str</code></li>
+                                <li><code>category: str</code></li>
+                                <li><code>faq_answer: str | None</code></li>
+                                <li><code>response: str</code></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(139, 92, 246, 0.1); border-left: 3px solid var(--accent-purple); padding: 1rem; margin-top: 1.5rem; border-radius: 4px;">
+                    <p style="margin: 0; color: var(--accent-purple); font-weight: 600;">🎯 ポイント</p>
+                    <p style="margin: 0.5rem 0 0; color: var(--text-secondary); font-size: 0.9rem;">
+                        このように<strong>対話を重ねることで</strong>、曖昧だった要件が具体化し、<br>
+                        適切なNode/State/Edgeの設計に落とし込めます。
+                    </p>
+                </div>
+            </div>
+
+            <!-- 設計チェックリスト -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon emerald">✅</div>
+                    <h3 class="card-title">設計チェックリスト</h3>
+                </div>
+                <p>コードを書き始める前に確認しましょう。</p>
+
+                <div style="margin-top: 1.5rem; display: grid; gap: 0.75rem;">
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" style="width: 20px; height: 20px; accent-color: var(--accent-emerald);">
+                        <span style="color: var(--text-secondary);">入力と出力が明確になっている</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" style="width: 20px; height: 20px; accent-color: var(--accent-emerald);">
+                        <span style="color: var(--text-secondary);">各Nodeの責務が1つに絞られている</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" style="width: 20px; height: 20px; accent-color: var(--accent-emerald);">
+                        <span style="color: var(--text-secondary);">Stateにすべての中間データが含まれている</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" style="width: 20px; height: 20px; accent-color: var(--accent-emerald);">
+                        <span style="color: var(--text-secondary);">条件分岐のパターンが洗い出せている</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" style="width: 20px; height: 20px; accent-color: var(--accent-emerald);">
+                        <span style="color: var(--text-secondary);">エラー時の挙動を考慮している</span>
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem; background: rgba(16, 185, 129, 0.1); border-radius: 8px; cursor: pointer;">
+                        <input type="checkbox" style="width: 20px; height: 20px; accent-color: var(--accent-emerald);">
+                        <span style="color: var(--text-secondary);">処理フローを図で描ける（頭の中でもOK）</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 困ったときのヒント -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon pink">💡</div>
+                    <h3 class="card-title">困ったときのヒント</h3>
+                </div>
+
+                <div style="display: grid; gap: 1rem; margin-top: 1rem;">
+                    <div style="background: #0f1419; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
+                        <p style="margin: 0 0 0.5rem; color: var(--accent-cyan); font-weight: 600;">「Nodeの分け方がわからない」</p>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                            → <strong>動詞で考える</strong>。「要約する」「分類する」「検索する」など、<br>
+                            　 1つの動詞 = 1つのNodeが基本。
+                        </p>
+                    </div>
+
+                    <div style="background: #0f1419; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
+                        <p style="margin: 0 0 0.5rem; color: var(--accent-cyan); font-weight: 600;">「Stateに何を入れるべき？」</p>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                            → <strong>後のNodeが必要とするもの</strong>をすべて入れる。<br>
+                            　 「このNodeの結果を、次のNodeで使うか？」で判断。
+                        </p>
+                    </div>
+
+                    <div style="background: #0f1419; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
+                        <p style="margin: 0 0 0.5rem; color: var(--accent-cyan); font-weight: 600;">「条件分岐が複雑になりそう」</p>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                            → まず<strong>シンプルな直線フロー</strong>で動くものを作る。<br>
+                            　 その後、分岐を1つずつ追加していく。
+                        </p>
+                    </div>
+
+                    <div style="background: #0f1419; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
+                        <p style="margin: 0 0 0.5rem; color: var(--accent-cyan); font-weight: 600;">「LLMを使う箇所が多すぎる」</p>
+                        <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
+                            → 本当にLLMが必要か確認。単純なルールベースで<br>
+                            　 できる処理は通常の関数で実装（コスト削減）。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 生成AIコードの注意点 -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">⚠️</div>
+                    <h3 class="card-title">生成AIのコード、ここに気をつけて！</h3>
+                </div>
+                <p>Claude含む生成AIが書くコードには<strong>よくある問題パターン</strong>があります。<br>
+                これを知っておくと「おかしいな？」と気づいて相談できます。</p>
+
+                <div style="margin-top: 1.5rem; display: grid; gap: 1.5rem;">
+
+                    <!-- 問題1: 古いAPI -->
+                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
+                        <div style="background: rgba(249, 115, 22, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
+                            <span style="color: var(--accent-orange); font-weight: 700;">🔴 古いAPI・非推奨の書き方</span>
+                        </div>
+                        <div style="padding: 1rem;">
+                            <p style="margin: 0 0 0.75rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                LangChainは進化が速く、半年前の書き方が既に古いことも。
+                            </p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <div style="background: rgba(239, 68, 68, 0.1); padding: 0.75rem; border-radius: 6px; border-left: 3px solid #ef4444;">
+                                    <div style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">❌ 古い</div>
+                                    <code style="font-size: 0.8rem; color: var(--text-secondary);">llm.predict(text)</code><br>
+                                    <code style="font-size: 0.8rem; color: var(--text-secondary);">LLMChain(llm, prompt)</code>
+                                </div>
+                                <div style="background: rgba(34, 197, 94, 0.1); padding: 0.75rem; border-radius: 6px; border-left: 3px solid #22c55e;">
+                                    <div style="color: #22c55e; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">✅ 最新</div>
+                                    <code style="font-size: 0.8rem; color: var(--text-secondary);">llm.invoke(text)</code><br>
+                                    <code style="font-size: 0.8rem; color: var(--text-secondary);">prompt | llm</code>
+                                </div>
+                            </div>
+                            <p style="margin: 0.75rem 0 0; color: var(--accent-cyan); font-size: 0.85rem;">
+                                👉 <strong>見かけたら聞こう</strong>：「この書き方、最新？」
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 問題2: 過剰なtry-except -->
+                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
+                        <div style="background: rgba(249, 115, 22, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
+                            <span style="color: var(--accent-orange); font-weight: 700;">🔴 過剰なtry-except</span>
+                        </div>
+                        <div style="padding: 1rem;">
+                            <p style="margin: 0 0 0.75rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                AIは「念のため」でエラーハンドリングを入れがち。本当に必要か確認を。
+                            </p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <div style="background: rgba(239, 68, 68, 0.1); padding: 0.75rem; border-radius: 6px; border-left: 3px solid #ef4444;">
+                                    <div style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">❌ 過剰</div>
+<pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">try:
+    result = llm.invoke(x)
+except Exception as e:
+    logger.error(e)
+    return None</pre>
+                                </div>
+                                <div style="background: rgba(34, 197, 94, 0.1); padding: 0.75rem; border-radius: 6px; border-left: 3px solid #22c55e;">
+                                    <div style="color: #22c55e; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">✅ シンプル</div>
+<pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">result = llm.invoke(x)
+<span style="color: #6b7280;"># エラーは呼び出し元で</span>
+<span style="color: #6b7280;"># まとめてハンドリング</span></pre>
+                                </div>
+                            </div>
+                            <p style="margin: 0.75rem 0 0; color: var(--accent-cyan); font-size: 0.85rem;">
+                                👉 <strong>見かけたら聞こう</strong>：「このtry-except、必要？」
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 問題3: 不要なクラス化 -->
+                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
+                        <div style="background: rgba(249, 115, 22, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
+                            <span style="color: var(--accent-orange); font-weight: 700;">🔴 不要なクラス化・抽象化</span>
+                        </div>
+                        <div style="padding: 1rem;">
+                            <p style="margin: 0 0 0.75rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                「将来の拡張性のため」で複雑にしがち。YAGNI原則を忘れずに。
+                            </p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <div style="background: rgba(239, 68, 68, 0.1); padding: 0.75rem; border-radius: 6px; border-left: 3px solid #ef4444;">
+                                    <div style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">❌ 過剰</div>
+<pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">class SummarizerService:
+    def __init__(self, llm):
+        self.llm = llm
+    def summarize(self, text):
+        return self.llm.invoke(text)</pre>
+                                </div>
+                                <div style="background: rgba(34, 197, 94, 0.1); padding: 0.75rem; border-radius: 6px; border-left: 3px solid #22c55e;">
+                                    <div style="color: #22c55e; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">✅ シンプル</div>
+<pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">def summarize(text):
+    return llm.invoke(text)
+
+<span style="color: #6b7280;"># 関数で十分！</span></pre>
+                                </div>
+                            </div>
+                            <p style="margin: 0.75rem 0 0; color: var(--accent-cyan); font-size: 0.85rem;">
+                                👉 <strong>見かけたら聞こう</strong>：「クラスにする意味ある？関数で良くない？」
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 問題4: 冗長なコメント -->
+                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
+                        <div style="background: rgba(249, 115, 22, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
+                            <span style="color: var(--accent-orange); font-weight: 700;">🔴 冗長なコメント・docstring</span>
+                        </div>
+                        <div style="padding: 1rem;">
+                            <p style="margin: 0 0 0.75rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                コードを見れば分かることを長々と説明しがち。
+                            </p>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem;">
+                                <div style="background: rgba(239, 68, 68, 0.1); padding: 0.75rem; border-radius: 6px; border-left: 3px solid #ef4444;">
+                                    <div style="color: #ef4444; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">❌ 冗長</div>
+<pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;"><span style="color: #6b7280;"># カウンターを1増やす</span>
+counter += 1
+<span style="color: #6b7280;"># 結果をリストに追加</span>
+results.append(x)</pre>
+                                </div>
+                                <div style="background: rgba(34, 197, 94, 0.1); padding: 0.75rem; border-radius: 6px; border-left: 3px solid #22c55e;">
+                                    <div style="color: #22c55e; font-size: 0.75rem; font-weight: 600; margin-bottom: 0.25rem;">✅ 必要なときだけ</div>
+<pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0;">counter += 1
+results.append(x)
+<span style="color: #6b7280;"># 15件に制限（メモリ対策）</span>
+results = results[-15:]</pre>
+                                </div>
+                            </div>
+                            <p style="margin: 0.75rem 0 0; color: var(--accent-cyan); font-size: 0.85rem;">
+                                👉 <strong>見かけたら聞こう</strong>：「このコメント、本当に必要？」
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- 問題5: LangGraph特有 -->
+                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-purple);">
+                        <div style="background: rgba(139, 92, 246, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
+                            <span style="color: var(--accent-purple); font-weight: 700;">🟣 LangGraph特有の注意点</span>
+                        </div>
+                        <div style="padding: 1rem;">
+                            <ul style="margin: 0; padding-left: 1.25rem; color: var(--text-secondary); font-size: 0.9rem;">
+                                <li style="margin-bottom: 0.5rem;">
+                                    <strong>Stateの直接変更</strong>: <code>state["key"] = value</code> はNG。必ず <code>return {"key": value}</code> で返す
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    <strong>グローバル変数の使用</strong>: Node内でグローバル変数を使うと予期せぬ挙動に
+                                </li>
+                                <li style="margin-bottom: 0.5rem;">
+                                    <strong>reducer忘れ</strong>: リストに追加したいのに毎回上書きされる → <code>Annotated[List, add]</code> が必要
+                                </li>
+                                <li>
+                                    <strong>END忘れ</strong>: 終了条件で <code>END</code> を返さないと無限ループに
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Claudeへの質問例 -->
+                <div style="background: linear-gradient(135deg, rgba(6, 182, 212, 0.15), rgba(59, 130, 246, 0.15)); border-radius: 12px; padding: 1.5rem; margin-top: 1.5rem; border: 1px solid var(--accent-cyan);">
+                    <p style="margin: 0 0 1rem; color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">💬 こんな風にClaudeに聞いてみよう</p>
+                    <div style="display: grid; gap: 0.5rem;">
+                        <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; font-size: 0.9rem; color: var(--text-secondary);">
+                            「このコード、もっとシンプルに書ける？」
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; font-size: 0.9rem; color: var(--text-secondary);">
+                            「LangChain/LangGraphの最新の書き方に直して」
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; font-size: 0.9rem; color: var(--text-secondary);">
+                            「この処理、LangGraphでやる意味ある？普通の関数で良い？」
+                        </div>
+                        <div style="background: rgba(255,255,255,0.05); padding: 0.75rem; border-radius: 6px; font-size: 0.9rem; color: var(--text-secondary);">
+                            「コードレビューして、改善点を教えて」
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 締め -->
+            <div class="highlight-box success">
+                <div class="highlight-title">🎓 設計相談のまとめ</div>
+                <p style="margin-bottom: 0.5rem;"><strong>いきなりコードを書かない</strong>。これがLangGraph開発成功の秘訣です。</p>
+                <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
+                    <li>テンプレートを使ってClaudeに相談</li>
+                    <li>対話しながら要件を具体化</li>
+                    <li>チェックリストで確認してからコーディング</li>
+                    <li>困ったらいつでも追加で相談OK</li>
+                </ul>
+                <p style="margin: 1rem 0 0; color: var(--accent-green); font-weight: 600;">
+                    さあ、上のテンプレートをコピーして、あなたのプロジェクトを相談してみましょう！
+                </p>
+            </div>
+        </section>
     </main>
 
     <script>
@@ -3756,6 +4460,24 @@ logger = logging.getLogger(__name__)
                 }
             });
         });
+
+        // 設計相談テンプレートのコピー機能
+        function copyPrompt() {
+            const promptText = document.getElementById('design-prompt').textContent;
+            navigator.clipboard.writeText(promptText.trim()).then(() => {
+                const btn = event.target;
+                const originalText = btn.textContent;
+                btn.textContent = '✓ コピー完了！';
+                btn.style.background = '#10b981';
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.background = 'var(--accent-green)';
+                }, 2000);
+            }).catch(err => {
+                console.error('コピーに失敗しました:', err);
+                alert('コピーに失敗しました。手動でコピーしてください。');
+            });
+        }
     </script>
 </body>
 </html>
