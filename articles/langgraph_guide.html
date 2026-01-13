@@ -1,4 +1,5 @@
 
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -3412,39 +3413,94 @@ console.log(result.final_doc);  <span class="cm">// 整形された議事録</sp
             <div class="section-header">
                 <div class="section-number">7</div>
                 <h2 class="section-title">Cloud Run Functions へデプロイ</h2>
-                <p class="section-subtitle">Jupyter → 本番API への移行（GUIで操作）</p>
+                <p class="section-subtitle">実践で作った議事録AIを本番APIにする</p>
             </div>
 
-            <!-- 全体の流れ -->
+            <!-- イントロ：実践との連携 -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon green">🎯</div>
-                    <h3 class="card-title">全体の流れ</h3>
+                    <h3 class="card-title">このセクションでやること</h3>
                 </div>
-                <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px;">
-                    <div style="background: var(--bg-card); border: 2px solid #f97316; border-radius: 8px; padding: 0.75rem 1rem; text-align: center;">
-                        <div style="font-size: 1.5rem;">📓</div>
-                        <div style="font-size: 0.8rem; font-weight: 600;">Jupyter</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">動作確認済み</div>
+                <div class="card-body">
+                    <p><strong>実践チュートリアル（タブ6）で作った「議事録要約AI」</strong>をクラウドにアップして、<br>
+                    誰でもアクセスできるAPIにします。</p>
+
+                    <div style="display: flex; align-items: center; justify-content: center; gap: 0.5rem; flex-wrap: wrap; padding: 1.5rem; background: rgba(0,0,0,0.2); border-radius: 12px; margin: 1rem 0;">
+                        <div style="background: var(--bg-card); border: 2px solid #22c55e; border-radius: 8px; padding: 0.75rem 1rem; text-align: center;">
+                            <div style="font-size: 1.5rem;">✅</div>
+                            <div style="font-size: 0.8rem; font-weight: 600;">実践で完成</div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">議事録AI</div>
+                        </div>
+                        <div style="color: var(--accent-cyan); font-size: 1.5rem;">→</div>
+                        <div style="background: var(--bg-card); border: 2px solid var(--accent-cyan); border-radius: 8px; padding: 0.75rem 1rem; text-align: center;">
+                            <div style="font-size: 1.5rem;">📁</div>
+                            <div style="font-size: 0.8rem; font-weight: 600;">+config.py</div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">設定を追加</div>
+                        </div>
+                        <div style="color: var(--accent-cyan); font-size: 1.5rem;">→</div>
+                        <div style="background: var(--bg-card); border: 2px solid var(--accent-blue); border-radius: 8px; padding: 0.75rem 1rem; text-align: center;">
+                            <div style="font-size: 1.5rem;">🔧</div>
+                            <div style="font-size: 0.8rem; font-weight: 600;">main.py改造</div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">API化</div>
+                        </div>
+                        <div style="color: var(--accent-cyan); font-size: 1.5rem;">→</div>
+                        <div style="background: var(--bg-card); border: 2px solid var(--accent-green); border-radius: 8px; padding: 0.75rem 1rem; text-align: center;">
+                            <div style="font-size: 1.5rem;">☁️</div>
+                            <div style="font-size: 0.8rem; font-weight: 600;">デプロイ</div>
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">本番API完成</div>
+                        </div>
                     </div>
-                    <div style="color: var(--accent-cyan); font-size: 1.5rem;">→</div>
-                    <div style="background: var(--bg-card); border: 2px solid var(--accent-cyan); border-radius: 8px; padding: 0.75rem 1rem; text-align: center;">
-                        <div style="font-size: 1.5rem;">📁</div>
-                        <div style="font-size: 0.8rem; font-weight: 600;">ファイル分割</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">機能ごとに整理</div>
+
+                    <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 1rem; border-radius: 8px;">
+                        <p style="margin: 0; color: #22c55e; font-weight: 700;">💡 上から順番にコピペすれば動きます</p>
+                        <p style="margin: 0.5rem 0 0 0; color: #d1d5db;">
+                            実践セクションで作った <code>state.py</code>、<code>nodes.py</code>、<code>routing.py</code> は<strong>そのまま使います</strong>。<br>
+                            追加するのは <code>config.py</code> と、<code>main.py</code> の改造だけです。
+                        </p>
                     </div>
-                    <div style="color: var(--accent-cyan); font-size: 1.5rem;">→</div>
-                    <div style="background: var(--bg-card); border: 2px solid var(--accent-blue); border-radius: 8px; padding: 0.75rem 1rem; text-align: center;">
-                        <div style="font-size: 1.5rem;">⚡</div>
-                        <div style="font-size: 0.8rem; font-weight: 600;">main.py</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">エントリーポイント</div>
+                </div>
+            </div>
+
+            <!-- 通信の基礎知識（たとえ話で簡潔に） -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon orange">📞</div>
+                    <h3 class="card-title">30秒でわかる通信の基礎（たとえ話）</h3>
+                </div>
+                <div class="card-body">
+                    <p>専門用語が出てくるので、先に「たとえ話」で理解しておきましょう。</p>
+
+                    <div style="display: grid; gap: 1rem; margin: 1rem 0;">
+                        <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                            <p style="margin: 0; color: #60a5fa; font-weight: 700;">🌐 CORS = 「誰からの電話を受けるか」</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                                会社の電話に誰でも出られたら困る → 「この番号からだけ受ける」と設定する
+                            </p>
+                        </div>
+                        <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #22c55e;">
+                            <p style="margin: 0; color: #22c55e; font-weight: 700;">🔑 APIキー = 「合言葉」</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                                合言葉を知っている人だけが入れる → お客さんごとに別の合言葉を発行
+                            </p>
+                        </div>
+                        <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #f97316;">
+                            <p style="margin: 0; color: #fb923c; font-weight: 700;">📝 JWT = 「本人確認の会員証」</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                                会員証に名前が書いてある → サーバーが「この人は誰か」を確認できる
+                            </p>
+                        </div>
+                        <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #8b5cf6;">
+                            <p style="margin: 0; color: #a78bfa; font-weight: 700;">✒️ 署名 = 「偽造できない実印」</p>
+                            <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                                会員証に実印を押す → 偽の会員証を作っても実印がないのでバレる
+                            </p>
+                        </div>
                     </div>
-                    <div style="color: var(--accent-cyan); font-size: 1.5rem;">→</div>
-                    <div style="background: var(--bg-card); border: 2px solid var(--accent-green); border-radius: 8px; padding: 0.75rem 1rem; text-align: center;">
-                        <div style="font-size: 1.5rem;">☁️</div>
-                        <div style="font-size: 0.8rem; font-weight: 600;">Cloud Run</div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">Functions</div>
-                    </div>
+
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
+                        ※ 詳しい仕組みは後で説明します。まずは「こういうものがある」と覚えてください。
+                    </p>
                 </div>
             </div>
 
@@ -3452,28 +3508,31 @@ console.log(result.final_doc);  <span class="cm">// 整形された議事録</sp
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon blue">📁</div>
-                    <h3 class="card-title">Step 1: フォルダ構成</h3>
+                    <h3 class="card-title">Step 1: フォルダ構成（実践セクションから引き継ぎ）</h3>
                 </div>
-                <p style="color: var(--text-secondary); margin-bottom: 1rem;">Cloud Run Functionsに必要な最小構成</p>
-                <div class="code-block">
-                    <div class="code-header">フォルダ構成</div>
-                    <div class="code-body">
-                        <div class="code-content">
-<pre style="color: var(--text-primary);">my-langgraph-api/
-├── <span style="color: var(--accent-blue);">main.py</span>              <span class="cm"># エントリーポイント（必須）</span>
-├── <span style="color: var(--accent-orange);">requirements.txt</span>     <span class="cm"># 依存パッケージ（必須）</span>
+                <div class="card-body">
+                    <p>実践で作ったファイル + デプロイ用の設定ファイルを追加します。</p>
+                    <div class="code-block">
+                        <div class="code-header">フォルダ構成</div>
+                        <div class="code-body">
+                            <div class="code-content">
+<pre style="color: var(--text-primary);">meeting_summarizer/
 │
-├── <span style="color: var(--text-muted);">config.py</span>            <span class="cm"># 設定・環境変数</span>
-├── <span style="color: var(--text-muted);">state.py</span>             <span class="cm"># State定義</span>
-├── <span style="color: var(--text-muted);">nodes.py</span>             <span class="cm"># Node（頂点）の関数</span>
-└── <span style="color: var(--text-muted);">graph.py</span>             <span class="cm"># グラフ構築</span></pre>
+│  <span style="color: #22c55e;">── 実践セクションで作成済み ──</span>
+├── <span style="color: #22c55e;">state.py</span>             <span class="cm"># State定義（そのまま使う）</span>
+├── <span style="color: #22c55e;">nodes.py</span>             <span class="cm"># Node関数（そのまま使う）</span>
+├── <span style="color: #22c55e;">routing.py</span>           <span class="cm"># ルーティング（そのまま使う）</span>
+│
+│  <span style="color: #f97316;">── このセクションで追加 ──</span>
+├── <span style="color: #f97316;">config.py</span>            <span class="cm"># 🆕 設定・環境変数・認証</span>
+├── <span style="color: #f97316;">main.py</span>              <span class="cm"># 🔧 API用に改造</span>
+├── <span style="color: #f97316;">requirements.txt</span>     <span class="cm"># 🔧 ライブラリ追加</span>
+│
+│  <span style="color: #8b5cf6;">── 認証方式に応じて追加 ──</span>
+└── <span style="color: #8b5cf6;">auth.py</span>              <span class="cm"># Firebase認証を使う場合のみ</span></pre>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="highlight-box success">
-                    <div class="highlight-title">💡 ポイント</div>
-                    <p style="font-size: 0.9rem;"><strong>main.py</strong> と <strong>requirements.txt</strong> は必須。<br>
-                    関数名は自由だが、<code>main.py</code> 内にエントリーポイント関数を定義する。</p>
                 </div>
             </div>
 
@@ -3481,101 +3540,86 @@ console.log(result.final_doc);  <span class="cm">// 整形された議事録</sp
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon cyan">📄</div>
-                    <h3 class="card-title">Step 2: 各ファイルの作成</h3>
+                    <h3 class="card-title">Step 2: 各ファイルをコピペ（上から順番に）</h3>
                 </div>
+                <div class="card-body">
+                    <p>以下のファイルを<strong>上から順番にコピペ</strong>してください。</p>
 
-                <h4 style="margin: 1rem 0 0.5rem; color: var(--accent-orange);">requirements.txt</h4>
-                <div class="code-block">
-                    <div class="code-header">requirements.txt</div>
-                    <div class="code-body">
-                        <div class="code-content">
-<pre>functions-framework==3.*
-langgraph>=0.2.0
-langchain-google-vertexai>=1.0.0
-google-cloud-aiplatform>=1.38.0</pre>
+                    <h4 style="margin: 1rem 0 0.5rem; color: var(--accent-orange);">① requirements.txt（ライブラリ追加）</h4>
+                    <div class="code-block">
+                        <div class="code-header">requirements.txt - Cloud Run用に追加</div>
+                        <div class="code-body">
+                            <div class="code-content">
+<pre><span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+<span class="cm"># Cloud Run Functions に必要なライブラリ</span>
+<span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
+functions-framework==3.*          <span class="cm"># Cloud Run Functions用</span>
+langgraph>=0.2.0                  <span class="cm"># 実践で使用</span>
+langchain-google-vertexai>=1.0.0  <span class="cm"># Gemini API</span>
+google-cloud-aiplatform>=1.38.0   <span class="cm"># Vertex AI</span></pre>
+                            </div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <h4 style="margin: 1.5rem 0 0.5rem; color: var(--accent-orange);">config.py（★★★ 重要：環境変数で管理）</h4>
-                <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                    <p style="margin: 0; color: #22c55e; font-weight: 700;">💡 このファイルの役割</p>
-                    <p style="margin: 0.5rem 0 0 0; color: #d1d5db;">
-                        <strong>環境変数を1箇所で管理</strong>します。ドメイン制限、CORS設定などを<br>
-                        コードを変更せずCloud Consoleの環境変数で切り替えられます。
-                    </p>
-                </div>
+                    <h4 style="margin: 1.5rem 0 0.5rem; color: var(--accent-orange);">② config.py（🆕 新規作成）</h4>
+                    <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
+                        <p style="margin: 0; color: #22c55e; font-weight: 700;">💡 このファイルの役割</p>
+                        <p style="margin: 0.5rem 0 0 0; color: #d1d5db;">
+                            設定を1箇所にまとめる「司令塔」<br>
+                            → <strong>コードを変えずに</strong>Cloud Consoleで設定変更できる
+                        </p>
+                    </div>
                 <div class="code-block">
-                    <div class="code-header">config.py - 環境変数管理（ai-chat-docsと同じ構成）</div>
+                    <div class="code-header">config.py - APIキー認証 + 環境変数管理</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span><span>57</span><span>58</span><span>59</span><span>60</span><span>61</span><span>62</span><span>63</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span></div>
                         <div class="code-content">
 <pre><span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
 <span class="cm"># config.py - 環境変数管理</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># ★★★ このファイルはコードを変更せず、</span>
-<span class="cm">#     Cloud Consoleの環境変数で設定を切り替える ★★★</span>
+<span class="cm"># ★★★ Cloud Consoleの環境変数で設定を切り替える ★★★</span>
+<span class="cm">#</span>
+<span class="cm"># 【たとえ話】</span>
+<span class="cm"># このファイルは「受付マニュアル」のようなもの</span>
+<span class="cm"># → 「合言葉はこれ」「この番号からだけ電話を受けて」など</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
 
 <span class="kw">import</span> os
 
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># セクション1: GCP基本設定</span>
+<span class="cm"># GCP基本設定</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
 PROJECT_ID = os.getenv(<span class="st">"PROJECT_ID"</span>)
 LOCATION = os.getenv(<span class="st">"LOCATION"</span>, <span class="st">"asia-northeast1"</span>)
-MODEL_NAME = os.getenv(<span class="st">"MODEL_NAME"</span>, <span class="st">"gemini-1.5-flash"</span>)
 
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># セクション2: アクセス制限（★★★ 重要 ★★★）</span>
+<span class="cm"># APIキー認証（合言葉方式）★★★ 重要 ★★★</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># 許可するメールアドレス（カンマ区切り）</span>
-<span class="cm"># 例: "user1@example.com,user2@example.com"</span>
-ALLOWED_EMAILS = os.getenv(<span class="st">"ALLOWED_EMAILS"</span>, <span class="st">""</span>).split(<span class="st">","</span>)
-ALLOWED_EMAILS = [e.strip() <span class="kw">for</span> e <span class="kw">in</span> ALLOWED_EMAILS <span class="kw">if</span> e.strip()]
-
-<span class="cm"># 許可するドメイン（カンマ区切り）</span>
-<span class="cm"># 例: "example.com,company.co.jp"</span>
-ALLOWED_DOMAINS = os.getenv(<span class="st">"ALLOWED_DOMAINS"</span>, <span class="st">""</span>).split(<span class="st">","</span>)
-ALLOWED_DOMAINS = [d.strip() <span class="kw">for</span> d <span class="kw">in</span> ALLOWED_DOMAINS <span class="kw">if</span> d.strip()]
+<span class="cm"># 許可するAPIキーをカンマ区切りで設定</span>
+<span class="cm"># 例: "key-abc123,key-xyz789"（お客さんごとに発行）</span>
+API_KEYS = os.getenv(<span class="st">"API_KEYS"</span>, <span class="st">""</span>).split(<span class="st">","</span>)
+API_KEYS = [k.strip() <span class="kw">for</span> k <span class="kw">in</span> API_KEYS <span class="kw">if</span> k.strip()]
 
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># セクション3: CORS設定</span>
+<span class="cm"># CORS設定（誰からの電話を受けるか）</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># 許可するオリジン（カンマ区切り）</span>
-<span class="cm"># 開発時: "*"（全許可）</span>
-<span class="cm"># 本番時: "https://your-app.web.app,https://your-domain.com"</span>
+<span class="cm"># 開発時: "*"（誰でもOK）</span>
+<span class="cm"># 本番時: "https://your-app.web.app"（特定サイトのみ）</span>
 CORS_ORIGINS = os.getenv(<span class="st">"CORS_ORIGINS"</span>, <span class="st">"*"</span>).split(<span class="st">","</span>)
 CORS_ORIGINS = [o.strip() <span class="kw">for</span> o <span class="kw">in</span> CORS_ORIGINS <span class="kw">if</span> o.strip()]
 
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># セクション4: LLM設定</span>
+<span class="cm"># 認証チェック関数（合言葉が合ってるか確認）</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-MAX_TOKENS = <span class="bi">int</span>(os.getenv(<span class="st">"MAX_TOKENS"</span>, <span class="st">"2048"</span>))
-TEMPERATURE = <span class="bi">float</span>(os.getenv(<span class="st">"TEMPERATURE"</span>, <span class="st">"0.7"</span>))
-
-<span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># バリデーション（起動時チェック）</span>
-<span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="kw">if not</span> PROJECT_ID:
-    <span class="kw">raise</span> <span class="bi">ValueError</span>(<span class="st">"★★★ PROJECT_ID が設定されていません ★★★"</span>)
-
-<span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># ヘルパー関数</span>
-<span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="kw">def</span> <span class="fn">is_allowed_user</span>(email: <span class="cl">str</span>) -> <span class="cl">bool</span>:
-    <span class="st">"""メールアドレスがアクセス許可されているか確認"""</span>
-    <span class="cm"># 制限なしの場合は全員許可</span>
-    <span class="kw">if not</span> ALLOWED_EMAILS <span class="kw">and not</span> ALLOWED_DOMAINS:
+<span class="kw">def</span> <span class="fn">is_allowed_user</span>(api_key: <span class="cl">str</span>) -> <span class="cl">bool</span>:
+    <span class="st">"""APIキーが許可リストにあるか確認"""</span>
+    <span class="cm"># APIキーが未設定なら全員許可（開発用）</span>
+    <span class="kw">if not</span> API_KEYS:
         <span class="kw">return</span> <span class="kw">True</span>
-    <span class="cm"># メールアドレスで許可</span>
-    <span class="kw">if</span> email <span class="kw">in</span> ALLOWED_EMAILS:
-        <span class="kw">return</span> <span class="kw">True</span>
-    <span class="cm"># ドメインで許可</span>
-    domain = email.split(<span class="st">"@"</span>)[<span class="cl">-1</span>] <span class="kw">if</span> <span class="st">"@"</span> <span class="kw">in</span> email <span class="kw">else</span> <span class="st">""</span>
-    <span class="kw">if</span> domain <span class="kw">in</span> ALLOWED_DOMAINS:
-        <span class="kw">return</span> <span class="kw">True</span>
-    <span class="kw">return</span> <span class="kw">False</span></pre>
+    <span class="cm"># 合言葉が合ってるかチェック</span>
+    <span class="kw">return</span> api_key <span class="kw">in</span> API_KEYS</pre>
                         </div>
                     </div>
                 </div>
@@ -3586,196 +3630,79 @@ TEMPERATURE = <span class="bi">float</span>(os.getenv(<span class="st">"TEMPERAT
                         <tr style="background: rgba(0,0,0,0.2);">
                             <th style="padding: 8px; text-align: left; border: 1px solid #374151;">環境変数名</th>
                             <th style="padding: 8px; text-align: left; border: 1px solid #374151;">設定例</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #374151;">説明</th>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;"><code>PROJECT_ID</code></td>
                             <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">my-gcp-project</td>
+                            <td style="padding: 8px; border: 1px solid #374151; color: #6b7280;">GCPプロジェクトID</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;"><code>ALLOWED_DOMAINS</code></td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">company.co.jp,example.com</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;"><code>ALLOWED_EMAILS</code></td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">admin@gmail.com,manager@gmail.com</td>
+                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;"><code>API_KEYS</code></td>
+                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">key-abc123,key-xyz789</td>
+                            <td style="padding: 8px; border: 1px solid #374151; color: #6b7280;">許可する合言葉（カンマ区切り）</td>
                         </tr>
                         <tr>
                             <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;"><code>CORS_ORIGINS</code></td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">https://myapp.web.app（本番時）</td>
+                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">*（開発）/ https://myapp.web.app（本番）</td>
+                            <td style="padding: 8px; border: 1px solid #374151; color: #6b7280;">許可する呼び出し元</td>
                         </tr>
                     </table>
                 </div>
 
-                <h4 style="margin: 1.5rem 0 0.5rem; color: var(--accent-orange);">state.py（充実版）</h4>
-                <div class="code-block">
-                    <div class="code-header">state.py - 様々なStateパターン</div>
-                    <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span><span>57</span><span>58</span><span>59</span><span>60</span></div>
-                        <div class="code-content">
-<pre><span class="cm"># ==========================================</span>
-<span class="cm"># State定義のパターン集</span>
-<span class="cm"># ==========================================</span>
-
-<span class="kw">from</span> typing <span class="kw">import</span> TypedDict, Annotated, Literal, Optional
-<span class="kw">from</span> operator <span class="kw">import</span> add
-
-<span class="cm"># ==========================================</span>
-<span class="cm"># パターン1: シンプルなチャットState</span>
-<span class="cm"># ==========================================</span>
-<span class="kw">class</span> <span class="cl">SimpleChatState</span>(TypedDict):
-    <span class="st">"""最小限のチャットState"""</span>
-    user_input: <span class="cl">str</span>           <span class="cm"># ユーザーの入力</span>
-    response: <span class="cl">str</span>             <span class="cm"># AIの回答</span>
-
-<span class="cm"># ==========================================</span>
-<span class="cm"># パターン2: 会話履歴を保持するState</span>
-<span class="cm"># ==========================================</span>
-<span class="kw">class</span> <span class="cl">ConversationState</span>(TypedDict):
-    <span class="st">"""会話履歴を自動マージするState"""</span>
-    user_input: <span class="cl">str</span>
-    <span class="cm"># Annotated + add で履歴が自動的に追加される</span>
-    messages: Annotated[<span class="bi">list</span>[<span class="bi">dict</span>], add]
-    response: <span class="cl">str</span>
-
-<span class="cm"># ==========================================</span>
-<span class="cm"># パターン3: 分岐判定を含むState</span>
-<span class="cm"># ==========================================</span>
-<span class="kw">class</span> <span class="cl">RouterState</span>(TypedDict):
-    <span class="st">"""条件分岐用のState"""</span>
-    user_input: <span class="cl">str</span>
-    intent: Literal[<span class="st">"question"</span>, <span class="st">"command"</span>, <span class="st">"chitchat"</span>]  <span class="cm"># 分岐先</span>
-    response: <span class="cl">str</span>
-
-<span class="cm"># ==========================================</span>
-<span class="cm"># パターン4: RAG用State</span>
-<span class="cm"># ==========================================</span>
-<span class="kw">class</span> <span class="cl">RAGState</span>(TypedDict):
-    <span class="st">"""RAGアプリケーション用State"""</span>
-    query: <span class="cl">str</span>                             <span class="cm"># 検索クエリ</span>
-    retrieved_docs: <span class="bi">list</span>[<span class="bi">dict</span>]              <span class="cm"># 検索結果</span>
-    context: <span class="cl">str</span>                            <span class="cm"># LLMに渡すコンテキスト</span>
-    answer: <span class="cl">str</span>                             <span class="cm"># 最終回答</span>
-    sources: <span class="bi">list</span>[<span class="cl">str</span>]                      <span class="cm"># 参照元</span>
-
-<span class="cm"># ==========================================</span>
-<span class="cm"># パターン5: エージェント用State（ツール実行あり）</span>
-<span class="cm"># ==========================================</span>
-<span class="kw">class</span> <span class="cl">AgentState</span>(TypedDict):
-    <span class="st">"""ツール実行を伴うエージェント用State"""</span>
-    user_input: <span class="cl">str</span>
-    messages: Annotated[<span class="bi">list</span>[<span class="bi">dict</span>], add]    <span class="cm"># 会話履歴</span>
-    tool_calls: <span class="bi">list</span>[<span class="bi">dict</span>]                  <span class="cm"># 実行するツール</span>
-    tool_results: Annotated[<span class="bi">list</span>[<span class="bi">dict</span>], add]<span class="cm"># ツール実行結果</span>
-    final_response: <span class="cl">str</span>                     <span class="cm"># 最終回答</span>
-    iteration_count: <span class="cl">int</span>                    <span class="cm"># ループ回数（無限ループ防止）</span>
-    max_iterations: <span class="cl">int</span>                     <span class="cm"># 最大ループ回数</span></pre>
-                        </div>
+                    <h4 style="margin: 1.5rem 0 0.5rem; color: #22c55e;">③ state.py、nodes.py、routing.py（✅ 実践で作成済み）</h4>
+                    <div style="background: rgba(34, 197, 94, 0.1); border: 2px solid #22c55e; border-radius: 8px; padding: 1rem; margin-bottom: 1rem;">
+                        <p style="margin: 0; color: #22c55e; font-weight: 700;">✅ そのまま使えます！</p>
+                        <p style="margin: 0.5rem 0 0 0; color: #d1d5db;">
+                            実践チュートリアル（タブ6）で作成した<strong>3つのファイルはそのまま使用</strong>します。<br>
+                            コピーして同じフォルダに配置してください。
+                        </p>
+                        <ul style="margin: 0.5rem 0 0 1rem; color: #9ca3af; font-size: 0.9rem;">
+                            <li><code>state.py</code> - MeetingStateの定義</li>
+                            <li><code>nodes.py</code> - summarize_node, extract_topics_node など</li>
+                            <li><code>routing.py</code> - route_by_length</li>
+                        </ul>
                     </div>
-                </div>
 
-                <h4 style="margin: 1.5rem 0 0.5rem; color: var(--accent-orange);">nodes.py</h4>
-                <div class="code-block">
-                    <div class="code-header">nodes.py</div>
-                    <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span></div>
-                        <div class="code-content">
-<pre><span class="kw">from</span> langchain_google_vertexai <span class="kw">import</span> ChatVertexAI
-<span class="kw">from</span> state <span class="kw">import</span> ConversationState
-<span class="kw">from</span> config <span class="kw">import</span> MODEL_NAME, PROJECT_ID, LOCATION
-
-<span class="cm"># LLMの初期化</span>
-llm = ChatVertexAI(
-    model=MODEL_NAME,
-    project=PROJECT_ID,
-    location=LOCATION
-)
-
-<span class="kw">def</span> <span class="fn">process_node</span>(state: <span class="cl">ConversationState</span>) -> <span class="bi">dict</span>:
-    <span class="st">"""ユーザー入力を処理"""</span>
-    user_input = state[<span class="st">"user_input"</span>]
-    <span class="kw">return</span> {<span class="st">"messages"</span>: [{<span class="st">"role"</span>: <span class="st">"user"</span>, <span class="st">"content"</span>: user_input}]}
-
-<span class="kw">def</span> <span class="fn">generate_node</span>(state: <span class="cl">ConversationState</span>) -> <span class="bi">dict</span>:
-    <span class="st">"""LLMで回答を生成"""</span>
-    messages = state[<span class="st">"messages"</span>]
-    response = llm.invoke(messages)
-    <span class="kw">return</span> {
-        <span class="st">"response"</span>: response.content,
-        <span class="st">"messages"</span>: [{<span class="st">"role"</span>: <span class="st">"assistant"</span>, <span class="st">"content"</span>: response.content}]
-    }</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <h4 style="margin: 1.5rem 0 0.5rem; color: var(--accent-orange);">graph.py</h4>
-                <div class="code-block">
-                    <div class="code-header">graph.py</div>
-                    <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span></div>
-                        <div class="code-content">
-<pre><span class="kw">from</span> langgraph.graph <span class="kw">import</span> StateGraph, START, END
-<span class="kw">from</span> state <span class="kw">import</span> ConversationState
-<span class="kw">from</span> nodes <span class="kw">import</span> process_node, generate_node
-
-<span class="kw">def</span> <span class="fn">create_graph</span>():
-    <span class="st">"""LangGraphを構築"""</span>
-    workflow = StateGraph(<span class="cl">ConversationState</span>)
-
-    <span class="cm"># 頂点を追加</span>
-    workflow.add_node(<span class="st">"process"</span>, process_node)
-    workflow.add_node(<span class="st">"generate"</span>, generate_node)
-
-    <span class="cm"># 辺を追加</span>
-    workflow.add_edge(START, <span class="st">"process"</span>)
-    workflow.add_edge(<span class="st">"process"</span>, <span class="st">"generate"</span>)
-    workflow.add_edge(<span class="st">"generate"</span>, END)
-
-    <span class="kw">return</span> workflow.compile()</pre>
-                        </div>
-                    </div>
-                </div>
-
-                <h4 style="margin: 1.5rem 0 0.5rem; color: var(--accent-blue);">main.py（★★★ エントリーポイント）</h4>
+                    <h4 style="margin: 1.5rem 0 0.5rem; color: var(--accent-blue);">④ main.py（🔧 API用に改造）</h4>
                 <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 8px; margin-bottom: 1rem;">
-                    <p style="margin: 0; color: #60a5fa; font-weight: 700;">💡 このファイルの役割</p>
+                    <p style="margin: 0; color: #60a5fa; font-weight: 700;">💡 このファイルの役割（たとえ話）</p>
                     <p style="margin: 0.5rem 0 0 0; color: #d1d5db;">
-                        HTTPリクエストを受け取り、<strong>認証チェック → グラフ実行 → レスポンス</strong>の流れを処理します。<br>
-                        ai-chat-docsと同じ構成で、エンドポイント追加も簡単です。
+                        実践で作った「議事録AI」を「受付窓口」として公開します。<br>
+                        → CORS確認（電話番号）→ APIキー確認（合言葉）→ グラフ実行
                     </p>
                 </div>
                 <div class="code-block">
-                    <div class="code-header">main.py - Cloud Run Functions用（ai-chat-docsと同じ構成）</div>
+                    <div class="code-header">main.py - 議事録要約AI用（実践セクションのグラフを使用）</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span><span>57</span><span>58</span><span>59</span><span>60</span><span>61</span><span>62</span><span>63</span><span>64</span><span>65</span><span>66</span><span>67</span><span>68</span><span>69</span><span>70</span><span>71</span><span>72</span><span>73</span><span>74</span><span>75</span><span>76</span><span>77</span><span>78</span><span>79</span><span>80</span><span>81</span><span>82</span><span>83</span><span>84</span><span>85</span><span>86</span><span>87</span><span>88</span><span>89</span><span>90</span><span>91</span><span>92</span><span>93</span><span>94</span><span>95</span><span>96</span><span>97</span><span>98</span><span>99</span><span>100</span><span>101</span><span>102</span><span>103</span><span>104</span><span>105</span><span>106</span><span>107</span><span>108</span><span>109</span><span>110</span><span>111</span><span>112</span><span>113</span><span>114</span><span>115</span><span>116</span><span>117</span><span>118</span><span>119</span><span>120</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span><span>57</span><span>58</span><span>59</span><span>60</span><span>61</span><span>62</span><span>63</span><span>64</span><span>65</span><span>66</span><span>67</span><span>68</span><span>69</span><span>70</span><span>71</span><span>72</span><span>73</span><span>74</span><span>75</span><span>76</span><span>77</span><span>78</span><span>79</span><span>80</span><span>81</span><span>82</span><span>83</span><span>84</span><span>85</span><span>86</span><span>87</span><span>88</span><span>89</span><span>90</span><span>91</span><span>92</span><span>93</span><span>94</span><span>95</span><span>96</span><span>97</span><span>98</span><span>99</span><span>100</span></div>
                         <div class="code-content">
 <pre><span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># main.py - Cloud Run Functions エントリーポイント</span>
+<span class="cm"># main.py - 議事録要約AI（Cloud Run Functions版）</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># ★★★ 処理の流れ ★★★</span>
+<span class="cm"># ★★★ 実践セクションで作ったグラフをAPI化 ★★★</span>
 <span class="cm">#</span>
-<span class="cm">#   リクエスト</span>
+<span class="cm">#   会議テキスト（raw_text）</span>
 <span class="cm">#       ↓</span>
 <span class="cm">#   ┌─────────────────┐</span>
-<span class="cm">#   │ 1. CORS処理      │ ← プリフライト対応</span>
+<span class="cm">#   │ 1. CORS処理      │ ← 誰からの電話を受けるか</span>
 <span class="cm">#   └─────────────────┘</span>
 <span class="cm">#       ↓</span>
 <span class="cm">#   ┌─────────────────┐</span>
-<span class="cm">#   │ 2. 認証チェック   │ ← ドメイン/メール制限</span>
+<span class="cm">#   │ 2. 認証チェック   │ ← 合言葉は合ってる？</span>
 <span class="cm">#   └─────────────────┘</span>
 <span class="cm">#       ↓</span>
 <span class="cm">#   ┌─────────────────┐</span>
-<span class="cm">#   │ 3. グラフ実行    │ ← LangGraph処理</span>
+<span class="cm">#   │ 3. グラフ実行    │ ← 実践で作ったやつ！</span>
 <span class="cm">#   └─────────────────┘</span>
 <span class="cm">#       ↓</span>
-<span class="cm">#   レスポンス</span>
+<span class="cm">#   議事録（final_doc）</span>
 <span class="cm">#</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
 
 <span class="kw">import</span> functions_framework
-<span class="kw">import</span> json
-<span class="kw">import</span> base64
 <span class="kw">from</span> flask <span class="kw">import</span> jsonify
-<span class="kw">from</span> graph <span class="kw">import</span> create_graph
+<span class="kw">from</span> graph <span class="kw">import</span> create_graph  <span class="cm"># 実践で作ったグラフ</span>
 <span class="kw">from</span> config <span class="kw">import</span> CORS_ORIGINS, is_allowed_user
 
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
@@ -3784,33 +3711,15 @@ llm = ChatVertexAI(
 graph = create_graph()
 
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># ヘルパー関数</span>
+<span class="cm"># CORS設定（誰からの電話を受けるか）</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
 <span class="kw">def</span> <span class="fn">get_cors_headers</span>():
-    <span class="st">"""CORS用ヘッダーを返す"""</span>
     origin = CORS_ORIGINS[<span class="cl">0</span>] <span class="kw">if</span> CORS_ORIGINS <span class="kw">else</span> <span class="st">"*"</span>
     <span class="kw">return</span> {
         <span class="st">"Access-Control-Allow-Origin"</span>: origin,
-        <span class="st">"Access-Control-Allow-Methods"</span>: <span class="st">"GET, POST, OPTIONS"</span>,
-        <span class="st">"Access-Control-Allow-Headers"</span>: <span class="st">"Content-Type, Authorization"</span>,
+        <span class="st">"Access-Control-Allow-Methods"</span>: <span class="st">"POST, OPTIONS"</span>,
+        <span class="st">"Access-Control-Allow-Headers"</span>: <span class="st">"Content-Type, X-API-Key"</span>,
     }
-
-<span class="kw">def</span> <span class="fn">get_user_email</span>(request) -> <span class="cl">str</span>:
-    <span class="st">"""Authorizationヘッダーからメールアドレスを取得"""</span>
-    auth_header = request.headers.get(<span class="st">"Authorization"</span>, <span class="st">""</span>)
-    <span class="kw">if not</span> auth_header.startswith(<span class="st">"Bearer "</span>):
-        <span class="kw">return</span> <span class="st">""</span>
-    <span class="kw">try</span>:
-        token = auth_header.split(<span class="st">" "</span>)[<span class="cl">1</span>]
-        <span class="cm"># JWTのペイロード部分（2番目のセグメント）をデコード</span>
-        payload = token.split(<span class="st">"."</span>)[<span class="cl">1</span>]
-        <span class="cm"># Base64パディング調整</span>
-        payload += <span class="st">"="</span> * (<span class="cl">4</span> - <span class="bi">len</span>(payload) % <span class="cl">4</span>)
-        decoded = base64.urlsafe_b64decode(payload)
-        data = json.loads(decoded)
-        <span class="kw">return</span> data.get(<span class="st">"email"</span>, <span class="st">""</span>)
-    <span class="kw">except</span>:
-        <span class="kw">return</span> <span class="st">""</span>
 
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
 <span class="cm"># エントリーポイント（★★★ 削除禁止 ★★★）</span>
@@ -3820,49 +3729,45 @@ graph = create_graph()
     <span class="st">"""Cloud Run Functions のエントリーポイント"""</span>
     headers = get_cors_headers()
 
-    <span class="cm"># ━━━ 1. CORSプリフライト対応 ━━━</span>
+    <span class="cm"># ━━━ 1. CORSプリフライト ━━━</span>
+    <span class="cm"># ブラウザが「この電話番号に電話していい？」と確認してくる</span>
     <span class="kw">if</span> request.method == <span class="st">"OPTIONS"</span>:
         <span class="kw">return</span> (<span class="st">""</span>, <span class="cl">204</span>, headers)
 
-    <span class="cm"># ━━━ 2. 認証チェック ━━━</span>
-    email = get_user_email(request)
-    <span class="kw">if not</span> is_allowed_user(email):
-        <span class="kw">return</span> (jsonify({<span class="st">"error"</span>: <span class="st">"アクセス権がありません"</span>}), <span class="cl">403</span>, headers)
+    <span class="cm"># ━━━ 2. 認証チェック（合言葉の確認） ━━━</span>
+    api_key = request.headers.get(<span class="st">"X-API-Key"</span>, <span class="st">""</span>)
+    <span class="kw">if not</span> is_allowed_user(api_key):
+        <span class="kw">return</span> (jsonify({<span class="st">"error"</span>: <span class="st">"APIキーが無効です"</span>}), <span class="cl">403</span>, headers)
 
-    <span class="cm"># ━━━ 3. エンドポイントのルーティング ━━━</span>
-    path = request.path
+    <span class="cm"># ━━━ 3. 議事録要約を実行 ━━━</span>
+    <span class="kw">return</span> handle_summarize(request, headers)
 
-    <span class="cm"># /api/chat - チャットAPI</span>
-    <span class="kw">if</span> path == <span class="st">"/api/chat"</span> <span class="kw">or</span> path == <span class="st">"/"</span>:
-        <span class="kw">return</span> handle_chat(request, headers)
-
-    <span class="cm"># /api/health - ヘルスチェック</span>
-    <span class="kw">if</span> path == <span class="st">"/api/health"</span>:
-        <span class="kw">return</span> (jsonify({<span class="st">"status"</span>: <span class="st">"ok"</span>}), <span class="cl">200</span>, headers)
-
-    <span class="cm"># ━━━ 新しいAPIを追加する場所 ━━━</span>
-    <span class="cm"># if path == "/api/new-endpoint":</span>
-    <span class="cm">#     return handle_new_endpoint(request, headers)</span>
-
-    <span class="kw">return</span> (jsonify({<span class="st">"error"</span>: <span class="st">"Not Found"</span>}), <span class="cl">404</span>, headers)
 
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="cm"># チャットAPI</span>
+<span class="cm"># 議事録要約API（実践セクションのグラフを呼び出す）</span>
 <span class="cm"># ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</span>
-<span class="kw">def</span> <span class="fn">handle_chat</span>(request, headers):
-    <span class="st">"""チャットAPIの処理"""</span>
+<span class="kw">def</span> <span class="fn">handle_summarize</span>(request, headers):
     <span class="kw">try</span>:
+        <span class="cm"># リクエストから会議テキストを取得</span>
         request_json = request.get_json(silent=<span class="kw">True</span>)
-        user_message = request_json.get(<span class="st">"message"</span>, <span class="st">""</span>) <span class="kw">if</span> request_json <span class="kw">else</span> <span class="st">""</span>
+        meeting_text = request_json.get(<span class="st">"meeting_text"</span>, <span class="st">""</span>) <span class="kw">if</span> request_json <span class="kw">else</span> <span class="st">""</span>
 
-        <span class="cm"># グラフを実行</span>
+        <span class="kw">if not</span> meeting_text:
+            <span class="kw">return</span> (jsonify({<span class="st">"error"</span>: <span class="st">"meeting_textが必要です"</span>}), <span class="cl">400</span>, headers)
+
+        <span class="cm"># ★★★ 実践で作ったグラフを実行 ★★★</span>
+        <span class="cm"># MeetingStateのraw_textに会議テキストを渡す</span>
         result = graph.invoke({
-            <span class="st">"user_input"</span>: user_message,
-            <span class="st">"messages"</span>: [],
-            <span class="st">"response"</span>: <span class="st">""</span>
+            <span class="st">"raw_text"</span>: meeting_text  <span class="cm"># ← 実践で定義したState</span>
         })
 
-        <span class="kw">return</span> (jsonify({<span class="st">"response"</span>: result[<span class="st">"response"</span>]}), <span class="cl">200</span>, headers)
+        <span class="cm"># 結果を返す（final_docが整形された議事録）</span>
+        <span class="kw">return</span> (jsonify({
+            <span class="st">"summary"</span>: result.get(<span class="st">"summary"</span>, <span class="st">""</span>),
+            <span class="st">"topics"</span>: result.get(<span class="st">"topics"</span>, []),
+            <span class="st">"action_items"</span>: result.get(<span class="st">"action_items"</span>, []),
+            <span class="st">"final_doc"</span>: result.get(<span class="st">"final_doc"</span>, <span class="st">""</span>)
+        }), <span class="cl">200</span>, headers)
 
     <span class="kw">except</span> <span class="bi">Exception</span> <span class="kw">as</span> e:
         <span class="kw">return</span> (jsonify({<span class="st">"error"</span>: <span class="bi">str</span>(e)}), <span class="cl">500</span>, headers)</pre>
@@ -3871,12 +3776,12 @@ graph = create_graph()
                 </div>
 
                 <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
-                    <p style="margin: 0 0 0.5rem; color: #22c55e; font-weight: 600;">✅ ポイント（ai-chat-docsと同じ）</p>
+                    <p style="margin: 0 0 0.5rem; color: #22c55e; font-weight: 600;">✅ ポイント（実践セクションと連動）</p>
                     <ul style="margin: 0 0 0 1rem; color: #9ca3af; font-size: 0.9rem;">
-                        <li><strong>処理の流れを図解</strong>: コメントで流れを明示</li>
-                        <li><strong>削除禁止</strong>: 重要な箇所を明記</li>
-                        <li><strong>拡張ポイント</strong>: 新APIを追加する場所をコメントで示す</li>
-                        <li><strong>認証チェック</strong>: config.pyの設定を使用</li>
+                        <li><strong>実践で作ったグラフをそのまま使用</strong>: graph.pyのcreate_graph()を呼び出し</li>
+                        <li><strong>MeetingStateを使用</strong>: raw_textを入力、final_docを出力</li>
+                        <li><strong>たとえ話コメント</strong>: CORS=電話、認証=合言葉</li>
+                        <li><strong>APIキー認証</strong>: X-API-Keyヘッダーで認証</li>
                     </ul>
                 </div>
             </div>
@@ -3910,7 +3815,7 @@ graph = create_graph()
                             <div class="step-title">基本設定を入力</div>
                             <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
                                 <li><strong>環境</strong>: 第2世代（Cloud Run ベース）</li>
-                                <li><strong>関数名</strong>: my-langgraph-chat</li>
+                                <li><strong>関数名</strong>: meeting-summarizer（議事録要約AI）</li>
                                 <li><strong>リージョン</strong>: asia-northeast1（東京）</li>
                                 <li><strong>トリガー</strong>: HTTPS</li>
                             </ul>
@@ -4048,13 +3953,27 @@ graph = create_graph()
                 </div>
 
                 <div class="highlight-box success">
-                    <div class="highlight-title">🎉 成功レスポンス例</div>
+                    <div class="highlight-title">🎉 成功レスポンス例（議事録要約AI）</div>
                     <div class="code-block" style="margin-top: 0.5rem;">
-                        <div class="code-header">JSON</div>
+                        <div class="code-header">リクエスト（curlコマンド）</div>
+                        <div class="code-body">
+                            <div class="code-content">
+<pre>curl -X POST https://your-function-url \
+  -H "Content-Type: application/json" \
+  -H "X-API-Key: your-api-key" \
+  -d '{"meeting_text": "本日の会議では..."}'</pre>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="code-block" style="margin-top: 0.5rem;">
+                        <div class="code-header">レスポンス（JSON）</div>
                         <div class="code-body">
                             <div class="code-content">
 <pre>{
-    <span class="st">"response"</span>: <span class="st">"こんにちは！何かお手伝いできることはありますか？"</span>
+    <span class="st">"summary"</span>: <span class="st">"新機能の開発方針と期限について議論..."</span>,
+    <span class="st">"topics"</span>: [<span class="st">"新機能開発"</span>, <span class="st">"スケジュール調整"</span>],
+    <span class="st">"action_items"</span>: [<span class="st">"田中: 設計書作成（1/20まで）"</span>],
+    <span class="st">"final_doc"</span>: <span class="st">"# 議事録\\n\\n## 要約\\n..."</span>
 }</pre>
                             </div>
                         </div>
