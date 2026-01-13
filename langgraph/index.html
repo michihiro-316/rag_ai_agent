@@ -2034,100 +2034,47 @@ llm = ChatVertexAI(
                     </p>
                 </div>
 
-                <!-- ファイル構成ガイド -->
+                <!-- Colabでの進め方 -->
                 <div class="highlight-box" style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border-left-color: var(--accent-purple); margin-top: 2rem;">
-                    <div class="highlight-title" style="color: var(--accent-purple);">🏗️ AIエンジニアのプロジェクト構成（重要！）</div>
-                    <p style="margin-bottom: 1rem;">初心者は全部を1ファイルに書きがちですが、<strong>プロは役割ごとにファイルを分けます</strong>。<br>
-                    理由: 保守性、再利用性、チーム開発のしやすさが格段に上がるからです。</p>
+                    <div class="highlight-title" style="color: var(--accent-purple);">📓 Colabでの進め方</div>
+                    <p style="margin: 0;">このチュートリアルは<strong>1つのノートブック内でセルを分けて</strong>進めます。<br>
+                    Step 2〜6のコードを順番にセルに貼り付けて実行するだけでOK！</p>
                 </div>
 
-                <div class="code-block">
-                    <div class="code-header">📂 推奨プロジェクト構成</div>
-                    <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span></div>
-                        <div class="code-content">
-<pre>meeting_summarizer/          <span class="cm"># プロジェクトルート</span>
-├── <span class="fn">main.py</span>                  <span class="cm"># エントリーポイント（実行するファイル）</span>
-│                            <span class="cm"># → グラフの組み立てと実行</span>
-│
-├── <span class="fn">state.py</span>                 <span class="cm"># State定義</span>
-│                            <span class="cm"># → MeetingStateクラスを定義</span>
-│
-├── <span class="fn">nodes.py</span>                 <span class="cm"># Node関数群</span>
-│                            <span class="cm"># → summarize_node, check_length_node など</span>
-│
-├── <span class="fn">routing.py</span>               <span class="cm"># ルーティング関数</span>
-│                            <span class="cm"># → route_by_length など条件分岐ロジック</span>
-│
-├── <span class="fn">requirements.txt</span>         <span class="cm"># 依存ライブラリ一覧</span>
-│                            <span class="cm"># → pip install -r requirements.txt で一括インストール</span>
-│
-├── <span class="fn">sample_input.txt</span>         <span class="cm"># テスト用の会議テキスト</span>
-│                            <span class="cm"># → 開発中のテストに使用</span>
-│
-└── output/                  <span class="cm"># 出力ディレクトリ</span>
-    └── <span class="fn">meeting_notes.md</span>    <span class="cm"># 生成された議事録</span>
-                             <span class="cm"># → git ignoreに追加（生成物なので）</span>
-</pre>
+                <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; margin: 1rem 0;">
+                    <div style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.75rem;">📋 これから作るセル構成</div>
+                    <div style="display: grid; gap: 0.5rem; font-size: 0.9rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #9ca3af;">
+                            <span style="background: #22c55e; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">完了</span>
+                            <span>セル1-2: 環境準備 & LLM設定</span>
                         </div>
-                    </div>
-                </div>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
-                    <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem;">
-                        <div style="color: var(--accent-green); font-weight: 700; margin-bottom: 0.5rem;">✅ なぜ分けるの？</div>
-                        <ul style="margin: 0; padding-left: 1.2rem; color: var(--text-secondary); font-size: 0.9rem;">
-                            <li><strong>state.py</strong>を変えれば型定義だけ変更</li>
-                            <li><strong>nodes.py</strong>は処理ロジックだけに集中</li>
-                            <li>バグが起きても<strong>影響範囲が限定</strong>される</li>
-                            <li>他プロジェクトに<strong>ノードを再利用</strong>できる</li>
-                        </ul>
-                    </div>
-                    <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem;">
-                        <div style="color: var(--accent-orange); font-weight: 700; margin-bottom: 0.5rem;">❌ 1ファイルだとどうなる？</div>
-                        <ul style="margin: 0; padding-left: 1.2rem; color: var(--text-secondary); font-size: 0.9rem;">
-                            <li>500行超えると<strong>迷子になる</strong></li>
-                            <li>State変更 → 全体を確認する羽目に</li>
-                            <li>チーム開発で<strong>コンフリクト地獄</strong></li>
-                            <li>テストが書きにくい</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="code-block">
-                    <div class="code-header">Terminal - ファイル作成コマンド</div>
-                    <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span></div>
-                        <div class="code-content">
-<pre><span class="cm"># ============================================</span>
-<span class="cm"># プロジェクト構成を作成</span>
-<span class="cm"># ============================================</span>
-cd meeting_summarizer
-
-<span class="cm"># 空のPythonファイルを作成</span>
-touch state.py nodes.py routing.py main.py
-
-<span class="cm"># 出力ディレクトリを作成</span>
-mkdir -p output
-
-<span class="cm"># requirements.txtを作成</span>
-echo <span class="st">"langgraph>=0.2.0"</span> > requirements.txt
-echo <span class="st">"langchain-google-vertexai>=2.0.0"</span> >> requirements.txt
-
-<span class="cm"># 構成確認</span>
-ls -la</pre>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary);">
+                            <span style="background: var(--border-color); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Step 2</span>
+                            <span>セル3: State定義（MeetingState）</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary);">
+                            <span style="background: var(--border-color); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Step 3</span>
+                            <span>セル4: Node関数（summarize_node等）</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary);">
+                            <span style="background: var(--border-color); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Step 4</span>
+                            <span>セル5: ルーティング関数（route_by_length）</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary);">
+                            <span style="background: var(--border-color); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Step 5</span>
+                            <span>セル6: グラフ組み立て</span>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary);">
+                            <span style="background: var(--border-color); color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">Step 6</span>
+                            <span>セル7: 実行テスト</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="highlight-box success">
-                    <div class="highlight-title">💡 AIエンジニアからのアドバイス</div>
-                    <p style="margin: 0;">このチュートリアルでは各ステップで<strong>どのファイルを編集するか</strong>を明示します。<br>
-                    Step 2 → <code style="background: #0d1117; padding: 0.2rem 0.5rem; border-radius: 4px;">state.py</code>、
-                    Step 3 → <code style="background: #0d1117; padding: 0.2rem 0.5rem; border-radius: 4px;">nodes.py</code>、
-                    Step 4 → <code style="background: #0d1117; padding: 0.2rem 0.5rem; border-radius: 4px;">routing.py</code>、
-                    Step 5-6 → <code style="background: #0d1117; padding: 0.2rem 0.5rem; border-radius: 4px;">main.py</code><br>
-                    <strong>最終的にはこの4ファイルでAIエージェントが完成します！</strong></p>
+                    <div class="highlight-title">💡 本番デプロイ時のファイル分割</div>
+                    <p style="margin: 0;">Colabで動作確認した後、Cloud Runにデプロイする際は<strong>ファイルを分割</strong>します。<br>
+                    詳しくは「デプロイ」タブを参照してください。</p>
                 </div>
             </div>
 
@@ -2229,7 +2176,7 @@ ls -la</pre>
                 </div>
 
                 <div class="code-block">
-                    <div class="code-header">Python - state.py（このファイルを作成）</div>
+                    <div class="code-header">Python (Colab) - セル3: State定義</div>
                     <div class="code-body">
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span></div>
                         <div class="code-content">
@@ -2423,7 +2370,7 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
                 <p style="margin-bottom: 1rem; color: var(--text-secondary);">会議テキストを300文字程度に要約します。LLMを使う典型的なパターンです。</p>
 
                 <div class="code-block">
-                    <div class="code-header">Python - nodes.py（その1: 要約）</div>
+                    <div class="code-header">Python (Colab) - セル4: Node関数（その1: 要約）</div>
                     <div class="code-body">
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span></div>
                         <div class="code-content">
@@ -2489,7 +2436,7 @@ llm = ChatVertexAI(
                 <p style="margin-bottom: 1rem; color: var(--text-secondary);">LLMを使わない処理もNodeにできます。条件分岐に使うフラグを設定します。</p>
 
                 <div class="code-block">
-                    <div class="code-header">Python - nodes.py（その2: 長さチェック）</div>
+                    <div class="code-header">Python (Colab) - セル4に追加: 長さチェック</div>
                     <div class="code-body">
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span></div>
                         <div class="code-content">
@@ -2528,7 +2475,7 @@ llm = ChatVertexAI(
                 </div>
 
                 <div class="code-block">
-                    <div class="code-header">Python - nodes.py（その3: 抽出系）</div>
+                    <div class="code-header">Python (Colab) - セル4に追加: 抽出系</div>
                     <div class="code-body">
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span></div>
                         <div class="code-content">
@@ -2596,7 +2543,7 @@ llm = ChatVertexAI(
                 <p style="margin-bottom: 1rem; color: var(--text-secondary);">最後に、すべての情報をMarkdown形式に整形します。</p>
 
                 <div class="code-block">
-                    <div class="code-header">Python - nodes.py（その4: 整形）</div>
+                    <div class="code-header">Python (Colab) - セル4に追加: 整形</div>
                     <div class="code-body">
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span></div>
                         <div class="code-content">
@@ -2666,7 +2613,7 @@ llm = ChatVertexAI(
                 </div>
 
                 <div class="code-block">
-                    <div class="code-header">Python - routing.py（条件分岐関数）</div>
+                    <div class="code-header">Python (Colab) - セル5: ルーティング関数</div>
                     <div class="code-body">
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span></div>
                         <div class="code-content">
@@ -2768,7 +2715,7 @@ Stateの値を見て「次にどのNodeに進むか」を返します。
                 </div>
 
                 <div class="code-block">
-                    <div class="code-header">Python - main.py（グラフ組み立て）</div>
+                    <div class="code-header">Python (Colab) - セル6: グラフ組み立て</div>
                     <div class="code-body">
                         <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span><span>57</span><span>58</span><span>59</span><span>60</span><span>61</span><span>62</span><span>63</span><span>64</span><span>65</span><span>66</span><span>67</span><span>68</span><span>69</span><span>70</span><span>71</span><span>72</span><span>73</span><span>74</span><span>75</span></div>
                         <div class="code-content">
@@ -2923,18 +2870,15 @@ Stateの値を見て「次にどのNodeに進むか」を返します。
                     </div>
 
                     <div class="code-block">
-                        <div class="code-header">Python - main.py（実行部分を追加）</div>
+                        <div class="code-header">Python (Colab) - セル7: 実行テスト</div>
                         <div class="code-body">
                             <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span></div>
                             <div class="code-content">
-<pre><span class="cm"># main.pyの末尾に追加</span>
-
-<span class="kw">if</span> __name__ == <span class="st">"__main__"</span>:
-    <span class="cm"># ============================================</span>
-    <span class="cm"># サンプル会議テキスト（長いバージョン）</span>
-    <span class="cm"># 実際にはZoomの文字起こしや議事メモを入れる</span>
-    <span class="cm"># ============================================</span>
-    sample_meeting = <span class="st">"""
+<pre><span class="cm"># ============================================</span>
+<span class="cm"># サンプル会議テキスト（長いバージョン）</span>
+<span class="cm"># 実際にはZoomの文字起こしや議事メモを入れる</span>
+<span class="cm"># ============================================</span>
+sample_meeting = <span class="st">"""
     【プロジェクト進捗会議】2024年1月15日
 
     田中: 今週の進捗を報告します。フロントエンドのUI改修は80%完了。
@@ -2953,48 +2897,31 @@ Stateの値を見て「次にどのNodeに進むか」を返します。
 
     鈴木: 承認します。経理に連絡しておきます。
 
-    次回の会議は来週月曜10時から。
-    """</span>
+次回の会議は来週月曜10時から。
+"""</span>
 
-    <span class="cm"># ============================================</span>
-    <span class="cm"># グラフを作成して実行</span>
-    <span class="cm"># ============================================</span>
-    graph = create_meeting_graph()
+<span class="cm"># ============================================</span>
+<span class="cm"># グラフを作成して実行</span>
+<span class="cm"># ============================================</span>
+graph = create_meeting_graph()
 
-    <span class="cm"># invoke()で実行（入力はdictで渡す）</span>
-    result = graph.invoke({
-        <span class="st">"raw_text"</span>: sample_meeting,  <span class="cm"># 必須: 会議テキスト</span>
-        <span class="st">"logs"</span>: []                    <span class="cm"># 必須: 空リストで初期化</span>
-    })
+<span class="cm"># invoke()で実行（入力はdictで渡す）</span>
+result = graph.invoke({
+    <span class="st">"raw_text"</span>: sample_meeting,  <span class="cm"># 必須: 会議テキスト</span>
+    <span class="st">"logs"</span>: []                    <span class="cm"># 必須: 空リストで初期化</span>
+})
 
-    <span class="cm"># ============================================</span>
-    <span class="cm"># 結果を表示</span>
-    <span class="cm"># ============================================</span>
-    <span class="bi">print</span>(<span class="st">"="</span> * <span class="cl">50</span>)
-    <span class="bi">print</span>(<span class="st">"【生成された議事録】"</span>)
-    <span class="bi">print</span>(<span class="st">"="</span> * <span class="cl">50</span>)
-    <span class="bi">print</span>(result[<span class="st">"final_doc"</span>])
+<span class="cm"># ============================================</span>
+<span class="cm"># 結果を表示</span>
+<span class="cm"># ============================================</span>
+<span class="bi">print</span>(<span class="st">"="</span> * <span class="cl">50</span>)
+<span class="bi">print</span>(<span class="st">"【生成された議事録】"</span>)
+<span class="bi">print</span>(<span class="st">"="</span> * <span class="cl">50</span>)
+<span class="bi">print</span>(result[<span class="st">"final_doc"</span>])
 
-    <span class="bi">print</span>(<span class="st">"\n【処理ログ】"</span>)
-    <span class="kw">for</span> log <span class="kw">in</span> result[<span class="st">"logs"</span>]:
-        <span class="bi">print</span>(<span class="st">f"  {log}"</span>)
-
-    <span class="cm"># ファイルに保存したい場合</span>
-    <span class="kw">with</span> <span class="bi">open</span>(<span class="st">"output/meeting_notes.md"</span>, <span class="st">"w"</span>) <span class="kw">as</span> f:
-        f.write(result[<span class="st">"final_doc"</span>])
-    <span class="bi">print</span>(<span class="st">"\n✅ output/meeting_notes.md に保存しました"</span>)</pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="code-block">
-                        <div class="code-header">Terminal - 実行コマンド</div>
-                        <div class="code-body">
-                            <div class="line-nums"><span>1</span><span>2</span><span>3</span></div>
-                            <div class="code-content">
-<pre><span class="cm"># プロジェクトディレクトリで実行</span>
-cd meeting_summarizer
-python main.py</pre>
+<span class="bi">print</span>(<span class="st">"\n【処理ログ】"</span>)
+<span class="kw">for</span> log <span class="kw">in</span> result[<span class="st">"logs"</span>]:
+    <span class="bi">print</span>(<span class="st">f"  {log}"</span>)</pre>
                             </div>
                         </div>
                     </div>
