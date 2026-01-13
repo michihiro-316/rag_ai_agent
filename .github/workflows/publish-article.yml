@@ -6,6 +6,7 @@ on:
       - master
     paths:
       - 'articles/**'
+      - 'langgraph/**'
       - '.github/workflows/publish-article.yml'
   workflow_dispatch:
 
@@ -105,7 +106,12 @@ jobs:
           INDEXHTML
 
           # LangGraphガイドを /langgraph/ に
-          cp articles/langgraph_guide.html _site/langgraph/index.html
+          # langgraph/index.html を優先、なければ articles/ から
+          if [ -f langgraph/index.html ]; then
+            cp langgraph/index.html _site/langgraph/index.html
+          else
+            cp articles/langgraph_guide.html _site/langgraph/index.html
+          fi
 
           # LangChainチートシートを /langchain/ に
           sudo apt-get update && sudo apt-get install -y pandoc
