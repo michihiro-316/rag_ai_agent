@@ -1906,18 +1906,10 @@ result = structured_llm.invoke(<span class="st">"今日の会議では予算と�
                 <div class="card-header">
                     <div class="card-icon green">📁</div>
                     <h3 class="card-title">Step 1: 環境準備</h3>
-                    <span class="tag green" style="margin-left: auto;">所要時間: 5分</span>
                 </div>
-                <p>「<strong>議事録要約AI</strong>」を作ります。会議のテキストを入力すると、要約・議題・アクションアイテムを自動抽出してくれるツールです。</p>
-
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
-                    <div class="highlight-title" style="color: var(--accent-cyan);">🎯 このチュートリアルで作るもの</div>
-                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
-                        <li><strong>入力</strong>: 会議のテキスト（Zoomの文字起こし、手書きメモなど）</li>
-                        <li><strong>処理</strong>: 要約生成 → 長さ判定 → 議題抽出 → アクションアイテム抽出</li>
-                        <li><strong>出力</strong>: 構造化された議事録（Markdown形式）</li>
-                    </ul>
-                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    「<strong>議事録要約AI</strong>」を作ります。会議テキスト → 要約・議題・アクションを自動抽出します。
+                </p>
 
                 <!-- Google Colab推奨 -->
                 <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid #f97316; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
@@ -2083,97 +2075,11 @@ llm = ChatVertexAI(
                 <div class="card-header">
                     <div class="card-icon emerald">📦</div>
                     <h3 class="card-title">Step 2: Stateを定義する</h3>
-                    <span class="tag emerald" style="margin-left: auto;">最重要</span>
                 </div>
 
-                <!-- 会社に例えた説明 -->
-                <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid var(--accent-purple); border-radius: 12px; padding: 1.5rem; margin: 1rem 0;">
-                    <div style="color: var(--accent-purple); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">🏢 LangGraphを「会社」に例えると...</div>
-
-                    <div style="display: grid; gap: 1rem;">
-                        <!-- StateGraph = 会社 -->
-                        <div style="background: #0f1419; border-radius: 12px; padding: 1.25rem; border: 2px solid var(--accent-green);">
-                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.5rem;">🏢</span>
-                                <span style="color: var(--accent-green); font-weight: 700; font-size: 1.1rem;">StateGraph = 会社そのもの</span>
-                            </div>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;">
-                                「議事録要約株式会社」という<strong>会社全体</strong>のイメージ。<br>
-                                社員（Node）がいて、業務フロー（Edge）があって、書類（State）が回覧される。
-                            </p>
-                        </div>
-
-                        <!-- State = 回覧ファイル -->
-                        <div style="background: #0f1419; border-radius: 12px; padding: 1.25rem; border: 2px solid var(--accent-cyan);">
-                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.5rem;">📋</span>
-                                <span style="color: var(--accent-cyan); font-weight: 700; font-size: 1.1rem;">State = 回覧ファイル（クリップボード）</span>
-                            </div>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;">
-                                社員の間を回る<strong>クリップボード</strong>。<br>
-                                最初は「元の会議テキスト」だけ。各社員が自分の担当欄に記入して次に回す。<br>
-                                最後には「要約」「議題」「アクション」全部が埋まった完成版になる。
-                            </p>
-                        </div>
-
-                        <!-- Node = 社員 -->
-                        <div style="background: #0f1419; border-radius: 12px; padding: 1.25rem; border: 2px solid var(--accent-orange);">
-                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.5rem;">👤</span>
-                                <span style="color: var(--accent-orange); font-weight: 700; font-size: 1.1rem;">Node = 社員（担当者）</span>
-                            </div>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;">
-                                「要約担当の田中さん」「議題抽出担当の鈴木さん」のように、<br>
-                                それぞれ<strong>専門の仕事</strong>を持つ社員。回覧ファイルを受け取り、自分の欄を埋めて次に回す。
-                            </p>
-                        </div>
-
-                        <!-- Edge = 業務フロー -->
-                        <div style="background: #0f1419; border-radius: 12px; padding: 1.25rem; border: 2px solid #8b5cf6;">
-                            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
-                                <span style="font-size: 1.5rem;">🔀</span>
-                                <span style="color: #8b5cf6; font-weight: 700; font-size: 1.1rem;">Edge = 業務フロー（回覧順序）</span>
-                            </div>
-                            <p style="color: var(--text-secondary); font-size: 0.9rem; line-height: 1.7; margin: 0;">
-                                「田中さん → 鈴木さん → 佐藤さん」という<strong>回覧ルート</strong>。<br>
-                                「会議が長い場合は詳細チームへ」のような<strong>条件分岐</strong>もここで決める。
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-green);">
-                    <div class="highlight-title" style="color: var(--accent-green);">💡 つまりStateとは？</div>
-                    <p style="font-size: 1.05rem; line-height: 1.8;">
-                        <strong>「全社員が共有する回覧ファイル」</strong>のこと。<br>
-                        最初は空欄だらけ → 各社員（Node）が順番に自分の欄を埋める → 完成！
-                    </p>
-                </div>
-
-                <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid var(--accent-green); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
-                    <div style="color: var(--accent-green); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">📋 回覧ファイル（State）の変化</div>
-                    <div style="display: grid; grid-template-columns: 1fr 60px 1fr; align-items: center; gap: 0.5rem;">
-                        <div style="background: #0f1419; border: 2px dashed var(--border-color); border-radius: 8px; padding: 1rem;">
-                            <div style="color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 0.5rem;">🚀 回覧スタート</div>
-                            <div style="font-family: monospace; font-size: 0.8rem; line-height: 1.6;">
-                                <div style="color: var(--accent-green);">会議テキスト: <span style="color: var(--accent-cyan);">✅ 記入済み</span></div>
-                                <div style="color: var(--text-muted);">要約欄: <span style="color: #666;">___（空欄）</span></div>
-                                <div style="color: var(--text-muted);">議題欄: <span style="color: #666;">___（空欄）</span></div>
-                                <div style="color: var(--text-muted);">最終議事録: <span style="color: #666;">___（空欄）</span></div>
-                            </div>
-                        </div>
-                        <div style="text-align: center; color: var(--accent-green); font-size: 1.5rem;">→</div>
-                        <div style="background: #0f1419; border: 2px solid var(--accent-green); border-radius: 8px; padding: 1rem;">
-                            <div style="color: var(--accent-green); font-size: 0.85rem; margin-bottom: 0.5rem;">✅ 回覧完了！</div>
-                            <div style="font-family: monospace; font-size: 0.8rem; line-height: 1.6;">
-                                <div style="color: var(--accent-green);">会議テキスト: <span style="color: var(--accent-cyan);">✅</span></div>
-                                <div style="color: var(--accent-green);">要約欄: <span style="color: var(--accent-cyan);">✅ 田中が記入</span></div>
-                                <div style="color: var(--accent-green);">議題欄: <span style="color: var(--accent-cyan);">✅ 鈴木が記入</span></div>
-                                <div style="color: var(--accent-green);">最終議事録: <span style="color: var(--accent-cyan);">✅ 佐藤が記入</span></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    <strong>State</strong>はグラフ全体で共有するデータの入れ物です。各Nodeがこれを読み書きします。
+                </p>
 
                 <div class="code-block">
                     <div class="code-header">Python (Colab) - セル3: State定義</div>
@@ -2357,17 +2263,13 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
                 <div class="card-header">
                     <div class="card-icon blue">⚙️</div>
                     <h3 class="card-title">Step 3: Nodeを定義する</h3>
-                    <span class="tag blue" style="margin-left: auto;">処理ロジック</span>
                 </div>
 
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
-                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 Nodeとは？</div>
-                    <p>Nodeは<strong>「Stateを受け取って、更新内容を返す関数」</strong>です。<br>
-                    議事録AIでは「要約する」「議題を抽出する」「アクションを抽出する」など、それぞれがNodeになります。</p>
-                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    <strong>Node</strong>はStateを受け取り、更新内容を返す関数です。議事録AIでは「要約」「議題抽出」「アクション抽出」の3つのNodeを作ります。
+                </p>
 
-                <h4 id="substep-3-1" style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-1. 要約ノード（summarize_node）</h4>
-                <p style="margin-bottom: 1rem; color: var(--text-secondary);">会議テキストを300文字程度に要約します。LLMを使う典型的なパターンです。</p>
+                <h4 id="substep-3-1" style="margin: 1.5rem 0 1rem; color: var(--accent-green);">3-1. 要約ノード</h4>
 
                 <div class="code-block">
                     <div class="code-header">Python (Colab) - セル4: Node関数（その1: 要約）</div>
@@ -2586,15 +2488,6 @@ llm = ChatVertexAI(
                     </div>
                 </div>
 
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
-                    <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 AIエンジニア視点</div>
-                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
-                        <li><strong>1 Node = 1責務</strong>: 要約と議題抽出を分けると、テストや差し替えが容易</li>
-                        <li><strong>LLM呼び出しは最小限に</strong>: format_doc_nodeはLLM不要 → コスト削減</li>
-                        <li><strong>print()でデバッグ</strong>: 処理の流れを追いやすくなる</li>
-                        <li><strong>state.get("key", default)</strong>: キーがない場合のエラー回避</li>
-                    </ul>
-                </div>
             </div>
 
             <!-- ステップ4 -->
@@ -2602,15 +2495,11 @@ llm = ChatVertexAI(
                 <div class="card-header">
                     <div class="card-icon purple">🔀</div>
                     <h3 class="card-title">Step 4: 条件分岐を定義する</h3>
-                    <span class="tag purple" style="margin-left: auto;">ルーティング</span>
                 </div>
 
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
-                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 なぜ条件分岐が必要？</div>
-                    <p>議事録AIでは、<strong>長い会議と短い会議で処理を変えたい</strong>です。<br>
-                    - 長い会議 → 議題抽出・アクション抽出もやる（詳細モード）<br>
-                    - 短い会議 → 要約だけで十分（簡易モード）</p>
-                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    長い会議は詳細モード（議題・アクション抽出）、短い会議は簡易モード（要約のみ）に分岐させます。
+                </p>
 
                 <div class="code-block">
                     <div class="code-header">Python (Colab) - セル5: ルーティング関数</div>
@@ -2658,15 +2547,6 @@ Stateの値を見て「次にどのNodeに進むか」を返します。
                     </div>
                 </div>
 
-                <div class="highlight-box success">
-                    <div class="highlight-title">💡 条件分岐のポイント</div>
-                    <ul style="margin: 0.5rem 0 0 1rem;">
-                        <li><strong>Stateを読むだけ</strong>: 条件分岐関数はStateを更新しない</li>
-                        <li><strong>戻り値は文字列</strong>: 次に進むNodeの名前を返す</li>
-                        <li><strong>Literal型で安全に</strong>: 返せる値を限定してタイポを防ぐ</li>
-                    </ul>
-                </div>
-
                 <div class="diagram-container" style="margin-top: 1.5rem;">
                     <div class="diagram-title">条件分岐のイメージ</div>
                     <svg viewBox="0 0 500 150" style="max-width: 500px; margin: 0 auto; display: block;">
@@ -2702,17 +2582,11 @@ Stateの値を見て「次にどのNodeに進むか」を返します。
                 <div class="card-header">
                     <div class="card-icon orange">🔗</div>
                     <h3 class="card-title">Step 5: グラフを組み立てる</h3>
-                    <span class="tag orange" style="margin-left: auto;">組み立て</span>
                 </div>
 
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-purple);">
-                    <div class="highlight-title" style="color: var(--accent-purple);">🤔 グラフ組み立ての流れ</div>
-                    <p>1. <code>StateGraph(State型)</code> でグラフ作成<br>
-                    2. <code>add_node("名前", 関数)</code> でNodeを登録<br>
-                    3. <code>add_edge("A", "B")</code> でA→Bの接続<br>
-                    4. <code>add_conditional_edges()</code> で条件分岐<br>
-                    5. <code>compile()</code> で実行可能なグラフに変換</p>
-                </div>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    Nodeを登録し、Edgeで接続して、最後に<code>compile()</code>で実行可能にします。
+                </p>
 
                 <div class="code-block">
                     <div class="code-header">Python (Colab) - セル6: グラフ組み立て</div>
@@ -2821,56 +2695,14 @@ Stateの値を見て「次にどのNodeに進むか」を返します。
                 <div class="card-header">
                     <div class="card-icon green">▶️</div>
                     <h3 class="card-title">Step 6: 実行してみる</h3>
-                    <span class="tag green" style="margin-left: auto;">完成！</span>
                 </div>
 
-                <p>いよいよ実行です！<strong>実行方法を選んでください</strong>：</p>
+                <p style="color: var(--text-secondary); margin-bottom: 1rem;">
+                    最後のセルで実行テストを行います。サンプルの会議テキストを入力として議事録を生成します。
+                </p>
 
-                <!-- 実行方法選択タブ -->
-                <div class="execution-tabs" style="display: flex; gap: 0.5rem; margin: 1.5rem 0;">
-                    <button class="exec-tab active" data-target="exec-local" onclick="switchExecTab('exec-local')" style="
-                        flex: 1;
-                        padding: 1rem;
-                        background: linear-gradient(135deg, #22c55e, #10b981);
-                        border: none;
-                        border-radius: 12px;
-                        color: #0f1419;
-                        font-weight: 700;
-                        font-size: 1rem;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                    ">
-                        💻 ローカル実行<br>
-                        <span style="font-size: 0.75rem; font-weight: 400; opacity: 0.8;">初心者向け・すぐ試せる</span>
-                    </button>
-                    <button class="exec-tab" data-target="exec-cloudrun" onclick="switchExecTab('exec-cloudrun')" style="
-                        flex: 1;
-                        padding: 1rem;
-                        background: var(--bg-card);
-                        border: 2px solid var(--border-color);
-                        border-radius: 12px;
-                        color: var(--text-secondary);
-                        font-weight: 700;
-                        font-size: 1rem;
-                        cursor: pointer;
-                        transition: all 0.3s ease;
-                    ">
-                        ☁️ Cloud Run デプロイ<br>
-                        <span style="font-size: 0.75rem; font-weight: 400; opacity: 0.8;">本番向け・API公開</span>
-                    </button>
-                </div>
-
-                <!-- ローカル実行パネル -->
-                <div id="exec-local" class="exec-panel" style="display: block;">
-                    <div class="highlight-box" style="background: #0f1419; border-left-color: var(--accent-green);">
-                        <div class="highlight-title" style="color: var(--accent-green);">💻 ローカル実行とは？</div>
-                        <p>自分のPC上でPythonスクリプトを直接実行する方法です。<br>
-                        <strong>メリット</strong>: セットアップ不要、すぐ試せる、デバッグしやすい<br>
-                        <strong>用途</strong>: 開発・テスト・個人利用</p>
-                    </div>
-
-                    <div class="code-block">
-                        <div class="code-header">Python (Colab) - セル7: 実行テスト</div>
+                <div class="code-block">
+                    <div class="code-header">Python (Colab) - セル7: 実行テスト</div>
                         <div class="code-body">
                             <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span></div>
                             <div class="code-content">
@@ -2957,300 +2789,13 @@ QAテストは来週月曜から3日間で150件実施予定。
                     </div>
                 </div>
 
-                <!-- Cloud Run デプロイパネル -->
-                <div id="exec-cloudrun" class="exec-panel" style="display: none;">
-                    <div class="highlight-box" style="background: #0f1419; border-left-color: var(--accent-cyan);">
-                        <div class="highlight-title" style="color: var(--accent-cyan);">☁️ Cloud Run デプロイとは？</div>
-                        <p>Google Cloud Run にデプロイして、<strong>HTTPSのAPIエンドポイント</strong>として公開する方法です。<br>
-                        <strong>メリット</strong>: どこからでもアクセス可能、スケール自動、チームで共有<br>
-                        <strong>用途</strong>: 本番運用・Slack連携・外部サービス連携</p>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
-                        <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; text-align: center;">
-                            <div style="font-size: 2rem;">1️⃣</div>
-                            <div style="color: var(--text-primary); font-weight: 600;">FastAPI追加</div>
-                            <div style="color: var(--text-muted); font-size: 0.85rem;">HTTPエンドポイント化</div>
-                        </div>
-                        <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; text-align: center;">
-                            <div style="font-size: 2rem;">2️⃣</div>
-                            <div style="color: var(--text-primary); font-weight: 600;">Dockerfile</div>
-                            <div style="color: var(--text-muted); font-size: 0.85rem;">コンテナ化</div>
-                        </div>
-                        <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; text-align: center;">
-                            <div style="font-size: 2rem;">3️⃣</div>
-                            <div style="color: var(--text-primary); font-weight: 600;">gcloud deploy</div>
-                            <div style="color: var(--text-muted); font-size: 0.85rem;">デプロイ実行</div>
-                        </div>
-                        <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 8px; padding: 1rem; text-align: center;">
-                            <div style="font-size: 2rem;">4️⃣</div>
-                            <div style="color: var(--text-primary); font-weight: 600;">API呼び出し</div>
-                            <div style="color: var(--text-muted); font-size: 0.85rem;">curl / fetch</div>
-                        </div>
-                    </div>
-
-                    <h4 style="color: var(--accent-green); margin: 2rem 0 1rem;">1️⃣ FastAPIでHTTPエンドポイント化</h4>
-                    <div class="code-block">
-                        <div class="code-header">Python - app.py（新規作成）</div>
-                        <div class="code-body">
-                            <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span><span>26</span><span>27</span><span>28</span><span>29</span><span>30</span><span>31</span><span>32</span><span>33</span><span>34</span><span>35</span><span>36</span><span>37</span><span>38</span><span>39</span><span>40</span><span>41</span><span>42</span><span>43</span><span>44</span><span>45</span><span>46</span><span>47</span><span>48</span><span>49</span><span>50</span><span>51</span><span>52</span><span>53</span><span>54</span><span>55</span><span>56</span><span>57</span><span>58</span></div>
-                            <div class="code-content">
-<pre><span class="st">"""
-FastAPI アプリケーション
-
-【このファイルの役割】
-LangGraphの議事録AIをHTTP APIとして公開します。
-POST /summarize にJSONを送ると議事録が返ってきます。
-"""</span>
-
-<span class="kw">from</span> fastapi <span class="kw">import</span> FastAPI, HTTPException
-<span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel
-<span class="kw">from</span> main <span class="kw">import</span> create_meeting_graph
-
-<span class="cm"># ============================================</span>
-<span class="cm"># FastAPIアプリの初期化</span>
-<span class="cm"># ============================================</span>
-app = FastAPI(
-    title=<span class="st">"議事録要約AI API"</span>,
-    description=<span class="st">"会議テキストを構造化された議事録に変換します"</span>,
-    version=<span class="st">"1.0.0"</span>
-)
-
-<span class="cm"># グラフは起動時に1回だけ作成（高速化のため）</span>
-graph = create_meeting_graph()
-
-
-<span class="cm"># ============================================</span>
-<span class="cm"># リクエスト/レスポンスの型定義</span>
-<span class="cm"># ============================================</span>
-<span class="kw">class</span> <span class="cl">SummarizeRequest</span>(BaseModel):
-    <span class="st">"""リクエストボディの型"""</span>
-    meeting_text: <span class="cl">str</span>  <span class="cm"># 会議テキスト（必須）</span>
-
-
-<span class="kw">class</span> <span class="cl">SummarizeResponse</span>(BaseModel):
-    <span class="st">"""レスポンスボディの型"""</span>
-    summary: <span class="cl">str</span>           <span class="cm"># 要約</span>
-    topics: list[<span class="cl">str</span>]      <span class="cm"># 議題リスト</span>
-    action_items: list[<span class="cl">str</span>] <span class="cm"># アクションアイテム</span>
-    final_doc: <span class="cl">str</span>         <span class="cm"># 整形された議事録</span>
-
-
-<span class="cm"># ============================================</span>
-<span class="cm"># エンドポイント定義</span>
-<span class="cm"># ============================================</span>
-<span class="fn">@app.post</span>(<span class="st">"/summarize"</span>, response_model=SummarizeResponse)
-<span class="kw">async def</span> <span class="fn">summarize_meeting</span>(request: SummarizeRequest):
-    <span class="st">"""
-    会議テキストを受け取り、議事録を生成するエンドポイント
-
-    - **meeting_text**: 会議の文字起こしやメモ
-    - **返り値**: 要約、議題、アクションアイテム、整形済み議事録
-    """</span>
-    <span class="kw">try</span>:
-        result = graph.invoke({
-            <span class="st">"raw_text"</span>: request.meeting_text,
-            <span class="st">"logs"</span>: []
-        })
-        <span class="kw">return</span> SummarizeResponse(
-            summary=result.get(<span class="st">"summary"</span>, <span class="st">""</span>),
-            topics=result.get(<span class="st">"topics"</span>, []),
-            action_items=result.get(<span class="st">"action_items"</span>, []),
-            final_doc=result.get(<span class="st">"final_doc"</span>, <span class="st">""</span>)
-        )
-    <span class="kw">except</span> Exception <span class="kw">as</span> e:
-        <span class="kw">raise</span> HTTPException(status_code=<span class="cl">500</span>, detail=<span class="cl">str</span>(e))
-
-
-<span class="cm"># ヘルスチェック用（Cloud Runが生存確認に使う）</span>
-<span class="fn">@app.get</span>(<span class="st">"/"</span>)
-<span class="kw">async def</span> <span class="fn">health_check</span>():
-    <span class="kw">return</span> {<span class="st">"status"</span>: <span class="st">"healthy"</span>, <span class="st">"service"</span>: <span class="st">"meeting-summarizer"</span>}</pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4 style="color: var(--accent-green); margin: 2rem 0 1rem;">2️⃣ Dockerfile作成</h4>
-                    <div class="code-block">
-                        <div class="code-header">Dockerfile（新規作成）</div>
-                        <div class="code-body">
-                            <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span><span>22</span><span>23</span><span>24</span><span>25</span></div>
-                            <div class="code-content">
-<pre><span class="cm"># ============================================</span>
-<span class="cm"># Python 3.11のスリムイメージを使用</span>
-<span class="cm"># ============================================</span>
-FROM python:3.11-slim
-
-<span class="cm"># 作業ディレクトリを設定</span>
-WORKDIR /app
-
-<span class="cm"># 依存関係を先にコピー（キャッシュ効率化）</span>
-COPY requirements.txt .
-
-<span class="cm"># 依存関係をインストール</span>
-RUN pip install --no-cache-dir -r requirements.txt
-RUN pip install --no-cache-dir fastapi uvicorn
-
-<span class="cm"># アプリケーションコードをコピー</span>
-COPY *.py .
-
-<span class="cm"># Cloud Runはポート8080を使用</span>
-ENV PORT=8080
-EXPOSE 8080
-
-<span class="cm"># uvicornでFastAPIを起動</span>
-<span class="cm"># --host 0.0.0.0 で外部からアクセス可能に</span>
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]</pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4 style="color: var(--accent-green); margin: 2rem 0 1rem;">3️⃣ Cloud Runにデプロイ</h4>
-                    <div class="code-block">
-                        <div class="code-header">Terminal - デプロイコマンド</div>
-                        <div class="code-body">
-                            <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span><span>17</span><span>18</span><span>19</span><span>20</span><span>21</span></div>
-                            <div class="code-content">
-<pre><span class="cm"># ============================================</span>
-<span class="cm"># Cloud Runにデプロイ（1コマンドで完了！）</span>
-<span class="cm"># ============================================</span>
-
-<span class="cm"># プロジェクトIDを設定（まだの場合）</span>
-gcloud config set project YOUR_PROJECT_ID
-
-<span class="cm"># デプロイ実行</span>
-<span class="cm"># --source . : 現在のディレクトリからビルド</span>
-<span class="cm"># --region : デプロイ先リージョン</span>
-<span class="cm"># --allow-unauthenticated : 認証なしでアクセス可能</span>
-gcloud run deploy meeting-summarizer \
-    --source . \
-    --region asia-northeast1 \
-    --allow-unauthenticated
-
-<span class="cm"># ============================================</span>
-<span class="cm"># デプロイ完了後、URLが表示される</span>
-<span class="cm"># 例: https://meeting-summarizer-xxxxx-an.a.run.app</span>
-<span class="cm"># ============================================</span></pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="highlight-box warning">
-                        <div class="highlight-title">⚠️ サービスアカウントの設定</div>
-                        <p>Cloud RunからVertex AIを使うには、サービスアカウントに<strong>Vertex AI User</strong>ロールが必要です。</p>
-                        <div class="code-block" style="margin-top: 0.5rem;">
-                            <div class="code-body">
-                                <div class="code-content">
-<pre><span class="cm"># デフォルトのCompute Engine SAに権限付与</span>
-gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
-    --member="serviceAccount:PROJECT_NUMBER-compute@developer.gserviceaccount.com" \
-    --role="roles/aiplatform.user"</pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <h4 style="color: var(--accent-green); margin: 2rem 0 1rem;">4️⃣ APIを呼び出してみる</h4>
-                    <div class="code-block">
-                        <div class="code-header">Terminal - curlで呼び出し</div>
-                        <div class="code-body">
-                            <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span></div>
-                            <div class="code-content">
-<pre><span class="cm"># デプロイ後のURLに対してPOSTリクエスト</span>
-curl -X POST <span class="st">"https://meeting-summarizer-xxxxx-an.a.run.app/summarize"</span> \
-    -H <span class="st">"Content-Type: application/json"</span> \
-    -d <span class="st">'{
-        "meeting_text": "田中: 来週の締め切りについて確認します。鈴木: 火曜日までにレビュー完了します。"
-    }'</span>
-
-<span class="cm"># レスポンス例</span>
-<span class="cm"># {"summary": "...", "topics": [...], "action_items": [...], "final_doc": "..."}</span></pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="code-block">
-                        <div class="code-header">JavaScript - fetchで呼び出し（フロントエンド連携）</div>
-                        <div class="code-body">
-                            <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span><span>16</span></div>
-                            <div class="code-content">
-<pre><span class="cm">// Webアプリから呼び出す例</span>
-<span class="kw">const</span> response = <span class="kw">await</span> fetch(
-    <span class="st">"https://meeting-summarizer-xxxxx-an.a.run.app/summarize"</span>,
-    {
-        method: <span class="st">"POST"</span>,
-        headers: { <span class="st">"Content-Type"</span>: <span class="st">"application/json"</span> },
-        body: JSON.stringify({
-            meeting_text: meetingText
-        })
-    }
-);
-
-<span class="kw">const</span> result = <span class="kw">await</span> response.json();
-console.log(result.final_doc);  <span class="cm">// 整形された議事録</span></pre>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="highlight-box success">
-                        <div class="highlight-title">📤 API レスポンス例</div>
-                        <div class="code-block" style="margin-top: 0.5rem; border-left: none;">
-                            <div class="code-body" style="background: #0d1117;">
-                                <div class="code-content">
-<pre style="color: #e6edf3;">{
-  "summary": "来週の締め切りとレビュー完了について確認した短い会議",
-  "topics": [],
-  "action_items": [],
-  "final_doc": "# 議事録\n\n## 要約\n来週の締め切りとレビュー完了について..."
-}</pre>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; margin: 1.5rem 0;">
-                        <div style="background: #0f1419; border: 1px solid var(--accent-cyan); border-radius: 12px; padding: 1.25rem;">
-                            <div style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.5rem;">💡 Cloud Runの料金</div>
-                            <ul style="margin: 0; padding-left: 1.2rem; color: var(--text-secondary); font-size: 0.9rem;">
-                                <li><strong>無料枠</strong>: 月200万リクエストまで</li>
-                                <li>CPU/メモリ使用時間のみ課金</li>
-                                <li>リクエストがなければ<strong>0円</strong></li>
-                                <li>個人開発なら実質無料で運用可能</li>
-                            </ul>
-                        </div>
-                        <div style="background: #0f1419; border: 1px solid var(--accent-purple); border-radius: 12px; padding: 1.25rem;">
-                            <div style="color: var(--accent-purple); font-weight: 700; margin-bottom: 0.5rem;">🔗 次の連携アイデア</div>
-                            <ul style="margin: 0; padding-left: 1.2rem; color: var(--text-secondary); font-size: 0.9rem;">
-                                <li><strong>Slack Bot</strong>: /summarize コマンド</li>
-                                <li><strong>Google Meet</strong>: 録画→文字起こし→API</li>
-                                <li><strong>Notion連携</strong>: 議事録を自動保存</li>
-                                <li><strong>定期実行</strong>: Cloud Schedulerで毎日</li>
-                            </ul>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- 共通のまとめ部分 -->
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan); margin-top: 2rem;">
-                    <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 さらなる拡張アイデア</div>
-                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
-                        <li><strong>Streamlitでウェブアプリ化</strong>: テキスト入力→議事録生成のUIを作る</li>
-                        <li><strong>Slackボット化</strong>: チャンネルの会話を自動で議事録化</li>
-                        <li><strong>音声入力対応</strong>: Whisper APIで文字起こし→議事録化</li>
-                        <li><strong>PDFエクスポート</strong>: markdownからPDFを生成して配布</li>
-                    </ul>
-                </div>
+                <p style="color: var(--text-secondary); margin-top: 1.5rem;">
+                    Cloud Runへのデプロイ方法は「<a href="#deploy" onclick="switchTab('deploy')" style="color: var(--accent-cyan);">デプロイ</a>」タブを参照してください。
+                </p>
 
                 <div class="highlight-box success" style="margin-top: 1.5rem;">
-                    <div class="highlight-title">🎉 おめでとうございます！</div>
-                    <p style="margin-bottom: 1rem;">LangGraphを使った<strong>議事録要約AI</strong>が完成しました！</p>
-                    <p style="color: var(--text-secondary);">学んだこと:</p>
-                    <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
-                        <li>State: Node間でデータを受け渡す箱</li>
-                        <li>Node: Stateを受け取り、更新を返す関数</li>
-                        <li>Edge: Nodeの接続（固定/条件分岐）</li>
-                        <li>グラフ: Node + Edge を組み合わせたワークフロー</li>
-                    </ul>
+                    <div class="highlight-title">完成！</div>
+                    <p style="margin: 0;">LangGraphの基本（State・Node・Edge・条件分岐）を学びました。</p>
                 </div>
             </div>
 
