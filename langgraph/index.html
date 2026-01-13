@@ -11,41 +11,39 @@
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* トップページと統一したダークテーマ */
-            --bg-dark: #0f1419;
-            --bg-card: #1a2634;
-            --bg-card-hover: #243447;
-            --accent-green: #22c55e;
+            /* Qiita風の明るいテーマ */
+            --bg-dark: #f6f6f6;
+            --bg-card: #ffffff;
+            --bg-card-hover: #f8f9fa;
+            --accent-green: #55c500;
             --accent-emerald: #10b981;
             --accent-teal: #14b8a6;
-            --accent-cyan: #06b6d4;
+            --accent-cyan: #0ea5e9;
             --accent-blue: #3b82f6;
             --accent-purple: #8b5cf6;
             --accent-orange: #f97316;
             --accent-pink: #ec4899;
-            --text-primary: #f0fdf4;
-            --text-secondary: #86efac;
-            --text-muted: #4ade80;
-            --border-color: #22543d;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --text-muted: #999999;
+            --border-color: #e0e0e0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Noto Sans JP', sans-serif;
-            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a2634 100%);
-            background-attachment: fixed;
+            background: var(--bg-dark);
             color: var(--text-primary);
             line-height: 1.8;
             min-height: 100vh;
         }
         .header {
-            background: rgba(15, 20, 25, 0.95);
-            border-bottom: 2px solid var(--border-color);
-            padding: 1.5rem 2rem;
+            background: #ffffff;
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
             position: sticky;
             top: 0;
             z-index: 100;
-            backdrop-filter: blur(20px);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
         .header-content {
             max-width: 1400px;
@@ -58,46 +56,41 @@
         }
         .logo { display: flex; align-items: center; gap: 1rem; }
         .logo-icon {
-            width: 48px; height: 48px;
-            background: linear-gradient(135deg, #22c55e, #10b981);
-            border-radius: 12px;
+            width: 40px; height: 40px;
+            background: var(--accent-green);
+            border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            font-size: 1.25rem;
         }
         .logo-text h1 {
-            font-size: 1.5rem;
-            background: linear-gradient(135deg, #22c55e, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 1.25rem;
+            color: var(--accent-green);
+            font-weight: 700;
         }
-        .logo-text span { font-size: 0.75rem; color: var(--text-secondary); letter-spacing: 0.1em; }
-        .nav-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .logo-text span { font-size: 0.7rem; color: var(--text-muted); letter-spacing: 0.1em; }
+        .nav-tabs { display: flex; gap: 0.25rem; flex-wrap: wrap; }
         .nav-tab {
-            padding: 0.75rem 1.5rem;
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            background: transparent;
+            border: none;
+            border-bottom: 2px solid transparent;
+            border-radius: 0;
             color: var(--text-secondary);
             cursor: pointer;
             font-family: inherit;
             font-size: 0.875rem;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
         .nav-tab:hover {
-            background: var(--bg-card-hover);
-            border-color: var(--accent-green);
-            color: var(--text-primary);
-            transform: translateY(-2px);
+            color: var(--accent-green);
+            border-bottom-color: var(--accent-green);
         }
         .nav-tab.active {
-            background: linear-gradient(135deg, #22c55e, #10b981);
-            border-color: transparent;
-            color: #0f1419;
+            background: transparent;
+            color: var(--accent-green);
             font-weight: 700;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
-            transform: translateY(-2px);
+            border-bottom: 2px solid var(--accent-green);
         }
         .main { max-width: 1400px; margin: 0 auto; padding: 2rem; }
         .section { display: none; animation: fadeIn 0.4s ease; }
@@ -105,33 +98,28 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         .section-header { margin-bottom: 3rem; text-align: center; }
         .section-number {
-            display: inline-block; width: 60px; height: 60px;
-            background: linear-gradient(135deg, #22c55e, #10b981);
-            border-radius: 50%; line-height: 60px;
-            font-size: 1.5rem; font-weight: 900; margin-bottom: 1rem;
-            color: #0f1419;
-            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.4);
+            display: inline-block; width: 48px; height: 48px;
+            background: var(--accent-green);
+            border-radius: 50%; line-height: 48px;
+            font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem;
+            color: #ffffff;
         }
         .section-title {
-            font-size: 2.5rem; font-weight: 900; margin-bottom: 0.5rem;
-            background: linear-gradient(135deg, #22c55e, #10b981);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            font-size: 2rem; font-weight: 700; margin-bottom: 0.5rem;
+            color: var(--text-primary);
         }
-        .section-subtitle { color: var(--text-secondary); font-size: 1.125rem; }
+        .section-subtitle { color: var(--text-secondary); font-size: 1rem; }
         .card {
             background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
-            margin-bottom: 2rem;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            transition: all 0.3s ease;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s ease;
         }
         .card:hover {
-            transform: translateY(-5px);
-            border-color: var(--accent-green);
-            box-shadow: 0 20px 60px rgba(34, 197, 94, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         }
         .card-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.5rem; }
         .card-icon {
@@ -192,19 +180,19 @@
         .cl { color: #79c0ff; }
         .bi { color: #ffa657; }
         .diagram-container {
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 2rem;
-            margin: 2rem 0;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin: 1.5rem 0;
             overflow-x: auto;
         }
         .diagram-title {
             text-align: center;
-            font-size: 1.125rem;
+            font-size: 1rem;
             font-weight: 600;
-            color: var(--accent-green);
-            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
         }
         .svg-diagram { width: 100%; max-width: 900px; margin: 0 auto; display: block; }
 
@@ -269,15 +257,15 @@
         .tag.purple { background: rgba(139, 92, 246, 0.2); color: var(--accent-purple); }
         .tag.orange { background: rgba(249, 115, 22, 0.2); color: var(--accent-orange); }
         .highlight-box {
-            background: #1a2634;
-            border: 2px solid var(--border-color);
+            background: #f8f9fa;
+            border: 1px solid var(--border-color);
             border-left: 4px solid var(--accent-green);
-            border-radius: 0 12px 12px 0;
-            padding: 1.5rem;
-            margin: 1.5rem 0;
+            border-radius: 0 8px 8px 0;
+            padding: 1.25rem;
+            margin: 1rem 0;
         }
-        .highlight-box.warning { border-left-color: var(--accent-orange); background: #2a1f1a; }
-        .highlight-box.success { border-left-color: var(--accent-green); background: #1a2a1f; }
+        .highlight-box.warning { border-left-color: var(--accent-orange); background: #fff8f5; }
+        .highlight-box.success { border-left-color: var(--accent-green); background: #f5fff8; }
         .highlight-title { font-weight: 700; color: var(--accent-green); margin-bottom: 0.5rem; }
         table { width: 100%; border-collapse: collapse; font-size: 0.9rem; margin: 1rem 0; }
         th, td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--border-color); }
@@ -298,7 +286,7 @@
             border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
             font-weight: 700; flex-shrink: 0;
-            color: #0f1419;
+            color: #ffffff;
             box-shadow: 0 4px 10px rgba(34, 197, 94, 0.4);
         }
         .step-title { font-size: 1.125rem; font-weight: 600; margin-bottom: 0.5rem; color: var(--text-primary); }
@@ -316,18 +304,19 @@
         .tutorial-sidebar {
             position: sticky;
             top: 100px;
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 16px;
-            padding: 1.5rem;
+            background: #ffffff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 1rem;
             max-height: calc(100vh - 120px);
             overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
         .tutorial-sidebar-title {
-            color: var(--accent-green);
+            color: #22c55e;
             font-weight: 700;
             margin-bottom: 1rem;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             text-align: center;
         }
         .tutorial-sidebar svg {
@@ -389,15 +378,15 @@
         }
         /* Step 3 専用スタイル（デフォルト） */
         .step3-rect {
-            fill: #1a2634;
+            fill: #f8f9fa;
             stroke: #667eea;
             stroke-width: 2;
         }
         .step3-text {
-            fill: #86efac;
+            fill: #333333;
         }
         .step3-title {
-            fill: #86efac;
+            fill: #333333;
         }
         .step3-line {
             stroke: #667eea;
@@ -830,22 +819,22 @@ result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今
                         <!-- State（クリップボード）- 中央に大きく -->
                         <rect x="110" y="50" width="140" height="80" rx="12" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="3"/>
                         <text x="180" y="80" text-anchor="middle" fill="#10b981" font-size="14" font-weight="700">State（状態）</text>
-                        <text x="180" y="100" text-anchor="middle" fill="#86efac" font-size="11">データを持ち運ぶ箱</text>
-                        <text x="180" y="118" text-anchor="middle" fill="#86efac" font-size="10">{ message, result, ... }</text>
+                        <text x="180" y="100" text-anchor="middle" fill="#333333" font-size="11">データを持ち運ぶ箱</text>
+                        <text x="180" y="118" text-anchor="middle" fill="#333333" font-size="10">{ message, result, ... }</text>
 
                         <!-- Node A -->
                         <circle cx="80" cy="220" r="40" fill="#667eea" fill-opacity="0.2" stroke="#667eea" stroke-width="3"/>
-                        <text x="80" y="215" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">Node A</text>
+                        <text x="80" y="215" text-anchor="middle" fill="#333333" font-size="11" font-weight="600">Node A</text>
                         <text x="80" y="232" text-anchor="middle" fill="#a5b4fc" font-size="9">要約する</text>
 
                         <!-- Node B -->
                         <circle cx="180" cy="300" r="40" fill="#f97316" fill-opacity="0.2" stroke="#f97316" stroke-width="3"/>
-                        <text x="180" y="295" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">Node B</text>
+                        <text x="180" y="295" text-anchor="middle" fill="#333333" font-size="11" font-weight="600">Node B</text>
                         <text x="180" y="312" text-anchor="middle" fill="#fdba74" font-size="9">分類する</text>
 
                         <!-- Node C -->
                         <circle cx="280" cy="220" r="40" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899" stroke-width="3"/>
-                        <text x="280" y="215" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">Node C</text>
+                        <text x="280" y="215" text-anchor="middle" fill="#333333" font-size="11" font-weight="600">Node C</text>
                         <text x="280" y="232" text-anchor="middle" fill="#f9a8d4" font-size="9">整形する</text>
 
                         <!-- Edge（矢印）-->
@@ -884,8 +873,8 @@ result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今
                         <text x="495" y="267" fill="#6b7280" font-size="12">= Node間の接続（次にどこへ行くか）</text>
 
                         <!-- まとめ -->
-                        <rect x="420" y="305" width="340" height="35" rx="6" fill="#0f1419" stroke="#22c55e" stroke-width="1"/>
-                        <text x="590" y="327" text-anchor="middle" fill="#86efac" font-size="11">Stateを持って、Edgeに沿って、Nodeを順番に実行</text>
+                        <rect x="420" y="305" width="340" height="35" rx="6" fill="#f8f9fa" stroke="#22c55e" stroke-width="1"/>
+                        <text x="590" y="327" text-anchor="middle" fill="#333333" font-size="11">Stateを持って、Edgeに沿って、Nodeを順番に実行</text>
                     </svg>
                 </div>
             </div>
@@ -980,30 +969,30 @@ result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今
                         <!-- 左：通常の辺 -->
                         <text x="150" y="25" text-anchor="middle" fill="#22c55e" font-size="14" font-weight="700">通常の辺（add_edge）</text>
                         <circle cx="80" cy="90" r="30" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="2"/>
-                        <text x="80" y="95" text-anchor="middle" fill="#f0fdf4" font-size="12">A</text>
+                        <text x="80" y="95" text-anchor="middle" fill="#333333" font-size="12">A</text>
                         <line x1="115" y1="90" x2="175" y2="90" stroke="#22c55e" stroke-width="3" marker-end="url(#arr2)"/>
                         <circle cx="220" cy="90" r="30" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="2"/>
-                        <text x="220" y="95" text-anchor="middle" fill="#f0fdf4" font-size="12">B</text>
-                        <text x="150" y="150" text-anchor="middle" fill="#86efac" font-size="12">常に A → B へ</text>
+                        <text x="220" y="95" text-anchor="middle" fill="#333333" font-size="12">B</text>
+                        <text x="150" y="150" text-anchor="middle" fill="#333333" font-size="12">常に A → B へ</text>
                         <!-- 区切り -->
                         <line x1="350" y1="20" x2="350" y2="170" stroke="#30363d" stroke-width="2" stroke-dasharray="5,5"/>
                         <!-- 右：条件分岐 -->
                         <text x="580" y="25" text-anchor="middle" fill="#8b5cf6" font-size="14" font-weight="700">条件分岐の辺（add_conditional_edges）</text>
                         <circle cx="420" cy="90" r="30" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
-                        <text x="420" y="95" text-anchor="middle" fill="#f0fdf4" font-size="12">A</text>
+                        <text x="420" y="95" text-anchor="middle" fill="#333333" font-size="12">A</text>
                         <line x1="455" y1="75" x2="530" y2="50" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr3)"/>
                         <line x1="455" y1="90" x2="530" y2="90" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr3)"/>
                         <line x1="455" y1="105" x2="530" y2="130" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr3)"/>
                         <circle cx="565" cy="45" r="22" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="2"/>
-                        <text x="565" y="50" text-anchor="middle" fill="#f0fdf4" font-size="11">B</text>
+                        <text x="565" y="50" text-anchor="middle" fill="#333333" font-size="11">B</text>
                         <circle cx="565" cy="90" r="22" fill="#06b6d4" fill-opacity="0.3" stroke="#06b6d4" stroke-width="2"/>
-                        <text x="565" y="95" text-anchor="middle" fill="#f0fdf4" font-size="11">C</text>
+                        <text x="565" y="95" text-anchor="middle" fill="#333333" font-size="11">C</text>
                         <circle cx="565" cy="135" r="22" fill="#f97316" fill-opacity="0.3" stroke="#f97316" stroke-width="2"/>
-                        <text x="565" y="140" text-anchor="middle" fill="#f0fdf4" font-size="11">D</text>
+                        <text x="565" y="140" text-anchor="middle" fill="#333333" font-size="11">D</text>
                         <text x="680" y="50" fill="#10b981" font-size="10">条件1</text>
                         <text x="680" y="95" fill="#06b6d4" font-size="10">条件2</text>
                         <text x="680" y="140" fill="#f97316" font-size="10">その他</text>
-                        <text x="580" y="170" text-anchor="middle" fill="#86efac" font-size="12">条件で行き先が変わる</text>
+                        <text x="580" y="170" text-anchor="middle" fill="#333333" font-size="12">条件で行き先が変わる</text>
                     </svg>
                 </div>
                 <table>
@@ -1110,36 +1099,36 @@ graph = workflow.compile()  <span class="cm"># 🚀 会社を稼働開始！</sp
                         </thead>
                         <tbody>
                             <tr>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><strong>関数（def）</strong></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px; color: #22c55e;">snake_case</code><br>小文字 + アンダースコア</td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">process_node</code>, <code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">get_user_input</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><strong>関数（def）</strong></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px; color: #22c55e;">snake_case</code><br>小文字 + アンダースコア</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">process_node</code>, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">get_user_input</code></td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><strong>クラス（class）</strong></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px; color: #f59e0b;">PascalCase</code><br>各単語の先頭を大文字</td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">SimpleState</code>, <code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">UserProfile</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><strong>クラス（class）</strong></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px; color: #f59e0b;">PascalCase</code><br>各単語の先頭を大文字</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">SimpleState</code>, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">UserProfile</code></td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><strong>変数</strong></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px; color: #22c55e;">snake_case</code><br>関数と同じ</td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">user_input</code>, <code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">workflow</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><strong>変数</strong></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px; color: #22c55e;">snake_case</code><br>関数と同じ</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">user_input</code>, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">workflow</code></td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><strong>定数</strong></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px; color: #ec4899;">UPPER_SNAKE_CASE</code><br>全て大文字 + アンダースコア</td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">MAX_RETRIES</code>, <code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">API_KEY</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><strong>定数</strong></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px; color: #ec4899;">UPPER_SNAKE_CASE</code><br>全て大文字 + アンダースコア</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">MAX_RETRIES</code>, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">API_KEY</code></td>
                             </tr>
                             <tr>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><strong>プライベート</strong></td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px; color: #8b5cf6;">_prefix</code><br>先頭にアンダースコア1つ</td>
-                                <td style="padding: 10px; border-bottom: 1px solid #374151;"><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">_internal_func</code>, <code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">_private_var</code></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><strong>プライベート</strong></td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px; color: #8b5cf6;">_prefix</code><br>先頭にアンダースコア1つ</td>
+                                <td style="padding: 10px; border-bottom: 1px solid #e0e0e0;"><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">_internal_func</code>, <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">_private_var</code></td>
                             </tr>
                         </tbody>
                     </table>
 
                     <div class="info-box" style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 16px; border-radius: 8px;">
                         <p style="margin: 0; color: #d1d5db;"><strong>💡 覚え方のコツ：</strong></p>
-                        <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #9ca3af;">
+                        <ul style="margin: 8px 0 0 0; padding-left: 20px; color: #666666;">
                             <li><strong>関数・変数</strong>は「動詞っぽい」→ <code>snake_case</code>（小文字でつなぐ）</li>
                             <li><strong>クラス</strong>は「名詞っぽい」→ <code>PascalCase</code>（頭文字大文字）</li>
                             <li><strong>定数</strong>は「変わらない＝強調」→ <code>UPPER_CASE</code>（全部大文字）</li>
@@ -1228,9 +1217,9 @@ graph = workflow.compile()  <span class="cm"># 🚀 会社を稼働開始！</sp
                     </g>
                 </svg>
                 <div style="text-align: center; margin-top: 1rem;">
-                    <button id="flowPrevBtn" style="padding: 0.75rem 2rem; margin: 0.25rem; background: linear-gradient(135deg, #22c55e, #10b981); color: #0f1419; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;">◀ 前へ</button>
+                    <button id="flowPrevBtn" style="padding: 0.75rem 2rem; margin: 0.25rem; background: linear-gradient(135deg, #22c55e, #10b981); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;">◀ 前へ</button>
                     <span id="flowStepIndicator" style="padding: 0.5rem 1rem; color: #22c55e; font-weight: 700;">Step 0 / 3</span>
-                    <button id="flowNextBtn" style="padding: 0.75rem 2rem; margin: 0.25rem; background: linear-gradient(135deg, #22c55e, #10b981); color: #0f1419; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;">次へ ▶</button>
+                    <button id="flowNextBtn" style="padding: 0.75rem 2rem; margin: 0.25rem; background: linear-gradient(135deg, #22c55e, #10b981); color: #ffffff; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;">次へ ▶</button>
                     <button id="flowAutoBtn" style="padding: 0.75rem 2rem; margin: 0.25rem; background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.3s ease;">▶ 自動再生</button>
                 </div>
             </div>
@@ -1310,12 +1299,12 @@ workflow.add_conditional_edges(
                     </defs>
                     <!-- START -->
                     <circle cx="350" cy="40" r="30" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="3"/>
-                    <text x="350" y="45" text-anchor="middle" fill="#f0fdf4" font-size="12">START</text>
+                    <text x="350" y="45" text-anchor="middle" fill="#333333" font-size="12">START</text>
                     <line x1="350" y1="70" x2="350" y2="100" stroke="#22c55e" stroke-width="2" marker-end="url(#arr5)"/>
                     <!-- classifier -->
                     <circle cx="350" cy="140" r="45" fill="#22c55e" fill-opacity="0.3" stroke="#22c55e" stroke-width="3"/>
-                    <text x="350" y="135" text-anchor="middle" fill="#f0fdf4" font-size="11">classifier</text>
-                    <text x="350" y="150" text-anchor="middle" fill="#f0fdf4" font-size="11">_node</text>
+                    <text x="350" y="135" text-anchor="middle" fill="#333333" font-size="11">classifier</text>
+                    <text x="350" y="150" text-anchor="middle" fill="#333333" font-size="11">_node</text>
                     <!-- 条件分岐 -->
                     <polygon points="350,195 390,230 350,265 310,230" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
                     <text x="350" y="235" text-anchor="middle" fill="#8b5cf6" font-size="10">分岐</text>
@@ -1329,20 +1318,20 @@ workflow.add_conditional_edges(
                     <text x="480" y="265" fill="#ec4899" font-size="10">"general"</text>
                     <!-- 分岐先 -->
                     <circle cx="150" cy="340" r="40" fill="#06b6d4" fill-opacity="0.3" stroke="#06b6d4" stroke-width="3"/>
-                    <text x="150" y="335" text-anchor="middle" fill="#f0fdf4" font-size="10">weather</text>
-                    <text x="150" y="350" text-anchor="middle" fill="#f0fdf4" font-size="10">_node</text>
+                    <text x="150" y="335" text-anchor="middle" fill="#333333" font-size="10">weather</text>
+                    <text x="150" y="350" text-anchor="middle" fill="#333333" font-size="10">_node</text>
                     <circle cx="350" cy="340" r="40" fill="#f97316" fill-opacity="0.3" stroke="#f97316" stroke-width="3"/>
-                    <text x="350" y="335" text-anchor="middle" fill="#f0fdf4" font-size="10">time</text>
-                    <text x="350" y="350" text-anchor="middle" fill="#f0fdf4" font-size="10">_node</text>
+                    <text x="350" y="335" text-anchor="middle" fill="#333333" font-size="10">time</text>
+                    <text x="350" y="350" text-anchor="middle" fill="#333333" font-size="10">_node</text>
                     <circle cx="550" cy="340" r="40" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="3"/>
-                    <text x="550" y="335" text-anchor="middle" fill="#f0fdf4" font-size="10">general</text>
-                    <text x="550" y="350" text-anchor="middle" fill="#f0fdf4" font-size="10">_node</text>
+                    <text x="550" y="335" text-anchor="middle" fill="#333333" font-size="10">general</text>
+                    <text x="550" y="350" text-anchor="middle" fill="#333333" font-size="10">_node</text>
                     <!-- END への合流 -->
                     <line x1="150" y1="380" x2="330" y2="440" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr5)"/>
                     <line x1="350" y1="380" x2="350" y2="430" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr5)"/>
                     <line x1="550" y1="380" x2="370" y2="440" stroke="#8b5cf6" stroke-width="2" marker-end="url(#arr5)"/>
                     <circle cx="350" cy="460" r="30" fill="#ec4899" fill-opacity="0.3" stroke="#ec4899" stroke-width="3"/>
-                    <text x="350" y="465" text-anchor="middle" fill="#f0fdf4" font-size="12">END</text>
+                    <text x="350" y="465" text-anchor="middle" fill="#333333" font-size="12">END</text>
                 </svg>
             </div>
         </section>
@@ -1367,7 +1356,7 @@ workflow.add_conditional_edges(
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin: 1.5rem 0;">
                         <div style="background: rgba(34, 197, 94, 0.1); padding: 1rem; border-radius: 8px; border: 1px solid #22c55e;">
                             <p style="color: #22c55e; font-weight: 700; margin-bottom: 0.5rem;">✅ 会社のたとえ</p>
-                            <ul style="margin: 0; padding-left: 1.2rem; color: #9ca3af; font-size: 0.9rem;">
+                            <ul style="margin: 0; padding-left: 1.2rem; color: #666666; font-size: 0.9rem;">
                                 <li>回覧ファイル = <strong>State</strong></li>
                                 <li>ファイルの項目 = <strong>フィールド</strong></li>
                                 <li>社員が記入 = <strong>Nodeの戻り値</strong></li>
@@ -1375,7 +1364,7 @@ workflow.add_conditional_edges(
                         </div>
                         <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; border: 1px solid #3b82f6;">
                             <p style="color: #3b82f6; font-weight: 700; margin-bottom: 0.5rem;">💻 コードのたとえ</p>
-                            <ul style="margin: 0; padding-left: 1.2rem; color: #9ca3af; font-size: 0.9rem;">
+                            <ul style="margin: 0; padding-left: 1.2rem; color: #666666; font-size: 0.9rem;">
                                 <li>State = <strong>TypedDict</strong></li>
                                 <li>フィールド = <strong>key: 型</strong></li>
                                 <li>戻り値 = <strong>return {"key": 値}</strong></li>
@@ -1447,7 +1436,7 @@ workflow.add_conditional_edges(
 
                     <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
                         <p style="margin: 0; color: #f87171;"><strong>😱 なぜ消える？</strong></p>
-                        <p style="margin: 0.5rem 0 0 0; color: #9ca3af;">LangGraphのデフォルト動作は「<strong>上書き</strong>」です。return で返した値がそのままStateに入り、古い値は消えます。</p>
+                        <p style="margin: 0.5rem 0 0 0; color: #666666;">LangGraphのデフォルト動作は「<strong>上書き</strong>」です。return で返した値がそのままStateに入り、古い値は消えます。</p>
                     </div>
                 </div>
             </div>
@@ -1459,12 +1448,12 @@ workflow.add_conditional_edges(
                     <h3 class="card-title">解決策：Annotated + reducer で「追加モード」にする</h3>
                 </div>
                 <div class="card-body">
-                    <p>「<strong>上書き</strong>」ではなく「<strong>追加</strong>」したい場合は、<code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">Annotated</code>を使います。</p>
+                    <p>「<strong>上書き</strong>」ではなく「<strong>追加</strong>」したい場合は、<code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">Annotated</code>を使います。</p>
 
                     <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <p style="margin: 0; color: #22c55e; font-weight: 700;">💡 覚え方</p>
                         <p style="margin: 0.5rem 0 0 0; color: #d1d5db;">
-                            <code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">Annotated[型, どう処理するか]</code><br>
+                            <code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">Annotated[型, どう処理するか]</code><br>
                             「この項目は○○して処理してね」という<strong>指示書き</strong>をつけるイメージ
                         </p>
                     </div>
@@ -1500,12 +1489,12 @@ workflow.add_conditional_edges(
                     </div>
 
                     <!-- 図解 -->
-                    <div style="background: #1a2634; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
                         <p style="color: #22c55e; font-weight: 700; margin-bottom: 1rem;">📊 動作の違いを図解</p>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
                             <div style="text-align: center;">
                                 <p style="color: #ef4444; font-weight: 600; margin-bottom: 0.5rem;">❌ 普通の list（上書き）</p>
-                                <div style="background: #0f1419; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: #9ca3af;">
+                                <div style="background: #f0f2f5; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: #666666;">
                                     既存: [A, B]<br>
                                     ↓ return {"history": [C]}<br>
                                     結果: <span style="color: #ef4444;">[C]</span> ← A,Bが消えた
@@ -1513,7 +1502,7 @@ workflow.add_conditional_edges(
                             </div>
                             <div style="text-align: center;">
                                 <p style="color: #22c55e; font-weight: 600; margin-bottom: 0.5rem;">✅ Annotated[list, add]（追加）</p>
-                                <div style="background: #0f1419; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: #9ca3af;">
+                                <div style="background: #f0f2f5; padding: 1rem; border-radius: 8px; font-family: monospace; font-size: 0.85rem; color: #666666;">
                                     既存: [A, B]<br>
                                     ↓ return {"history": [C]}<br>
                                     結果: <span style="color: #22c55e;">[A, B, C]</span> ← 追加された
@@ -1604,7 +1593,7 @@ workflow.add_conditional_edges(
                     <h3 class="card-title">応用：カスタムreducer（履歴を制限する）</h3>
                 </div>
                 <div class="card-body">
-                    <p><code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">add</code>だと履歴が無限に増えてしまいます。<strong>直近15件だけ</strong>残したい場合は、自分で処理を書きます。</p>
+                    <p><code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">add</code>だと履歴が無限に増えてしまいます。<strong>直近15件だけ</strong>残したい場合は、自分で処理を書きます。</p>
 
                     <div class="code-block">
                         <div class="code-header">Python - 履歴を15件に制限</div>
@@ -1632,7 +1621,7 @@ workflow.add_conditional_edges(
 
                     <div style="background: rgba(139, 92, 246, 0.1); border-left: 4px solid #8b5cf6; padding: 1rem; border-radius: 8px; margin-top: 1rem;">
                         <p style="margin: 0; color: #a78bfa;"><strong>💡 なぜ履歴を制限する？</strong></p>
-                        <ul style="margin: 0.5rem 0 0 0; padding-left: 1.2rem; color: #9ca3af; font-size: 0.9rem;">
+                        <ul style="margin: 0.5rem 0 0 0; padding-left: 1.2rem; color: #666666; font-size: 0.9rem;">
                             <li>LLMには<strong>トークン上限</strong>がある（履歴が長すぎるとエラー）</li>
                             <li><strong>コスト削減</strong>（トークン数で課金される）</li>
                             <li><strong>レスポンス速度</strong>の向上</li>
@@ -1653,7 +1642,7 @@ workflow.add_conditional_edges(
                     <!-- 問題提起 -->
                     <div style="background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <p style="margin: 0; color: #f87171; font-weight: 700;">😱 困る例：LLMの回答がバラバラ</p>
-                        <div style="background: #0f1419; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; font-family: monospace; font-size: 0.85rem; color: #9ca3af;">
+                        <div style="background: #f0f2f5; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; font-family: monospace; font-size: 0.85rem; color: #666666;">
                             <p style="margin: 0; color: #6b7280;">質問: 「会議の議題を抽出して」</p>
                             <p style="margin: 0.5rem 0 0 0;">回答1: 「議題は予算と人事です」</p>
                             <p style="margin: 0;">回答2: 「1. 予算 2. 人事」</p>
@@ -1668,7 +1657,7 @@ workflow.add_conditional_edges(
                         <p style="margin: 0.5rem 0 0 0; color: #d1d5db;">
                             「<strong>この形式で回答してね</strong>」とLLMに伝えると、必ずその形式で返してくれる機能です。
                         </p>
-                        <div style="background: #0f1419; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; font-family: monospace; font-size: 0.85rem; color: #9ca3af;">
+                        <div style="background: #f0f2f5; padding: 1rem; border-radius: 8px; margin-top: 0.5rem; font-family: monospace; font-size: 0.85rem; color: #666666;">
                             <p style="margin: 0; color: #6b7280;">形式を指定すると...</p>
                             <p style="margin: 0.5rem 0 0 0; color: #22c55e;">回答: {"topics": ["予算", "人事"], "main_topic": "予算"}</p>
                             <p style="margin: 0; color: #22c55e;">→ 毎回同じ形式！プログラムで扱いやすい！</p>
@@ -1676,7 +1665,7 @@ workflow.add_conditional_edges(
                     </div>
 
                     <h4 style="margin: 1.5rem 0 1rem; color: #3b82f6;">Step 1: 欲しい形式を定義する（Pydantic）</h4>
-                    <p>まず「こういう形式で欲しい」を<code style="background: #1f2937; padding: 2px 6px; border-radius: 4px;">Pydantic</code>というライブラリで定義します。</p>
+                    <p>まず「こういう形式で欲しい」を<code style="background: #e8f5e9; padding: 2px 6px; border-radius: 4px;">Pydantic</code>というライブラリで定義します。</p>
 
                     <div class="code-block">
                         <div class="code-header">Python - 欲しい形式を定義</div>
@@ -1705,7 +1694,7 @@ workflow.add_conditional_edges(
 
                     <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <p style="margin: 0; color: #60a5fa;"><strong>💡 Pydanticとは？</strong></p>
-                        <p style="margin: 0.5rem 0 0 0; color: #9ca3af;">「データの形式を定義する」Pythonライブラリです。TypedDictに似ていますが、より多機能（バリデーション等）です。</p>
+                        <p style="margin: 0.5rem 0 0 0; color: #666666;">「データの形式を定義する」Pythonライブラリです。TypedDictに似ていますが、より多機能（バリデーション等）です。</p>
                     </div>
 
                     <h4 style="margin: 1.5rem 0 1rem; color: #3b82f6;">Step 2: LLMに形式を伝えて呼び出す</h4>
@@ -1773,7 +1762,7 @@ result = structured_llm.invoke(<span class="st">"今日の会議では予算と�
 
                     <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <p style="margin: 0 0 0.5rem; color: #22c55e; font-weight: 600;">✅ 構造化出力を使うメリット</p>
-                        <ul style="margin: 0 0 0 1rem; color: #9ca3af; font-size: 0.9rem;">
+                        <ul style="margin: 0 0 0 1rem; color: #666666; font-size: 0.9rem;">
                             <li><strong>安定した出力</strong>: 毎回同じ形式で返ってくる</li>
                             <li><strong>パース不要</strong>: JSON文字列を自分で解析しなくていい</li>
                             <li><strong>タイポ防止</strong>: <code>result.topics</code>と書けば補完が効く</li>
@@ -1783,7 +1772,7 @@ result = structured_llm.invoke(<span class="st">"今日の会議では予算と�
 
                     <div style="background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <p style="margin: 0 0 0.5rem; color: #fb923c; font-weight: 600;">⚠️ 注意点（最初は気にしなくてOK）</p>
-                        <ul style="margin: 0 0 0 1rem; color: #9ca3af; font-size: 0.9rem;">
+                        <ul style="margin: 0 0 0 1rem; color: #666666; font-size: 0.9rem;">
                             <li>対応モデル: Gemini 1.5、GPT-4、Claude 3など最新モデルが必要</li>
                             <li>複雑すぎる形式は精度が下がることがある</li>
                         </ul>
@@ -1801,20 +1790,20 @@ result = structured_llm.invoke(<span class="st">"今日の会議では予算と�
             </div>
 
             <!-- 進行インジケーター -->
-            <div class="card" style="background: linear-gradient(135deg, #1a2634, #243447); padding: 1.5rem;">
+            <div class="card" style="padding: 1.5rem;">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
                     <span style="color: var(--accent-green); font-weight: 700;">📍 現在の進行状況</span>
                     <span id="tutorialProgress" style="color: var(--text-secondary);">Step 1 / 6</span>
                 </div>
                 <div class="tut-step-buttons" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-                    <button class="tut-step-btn active" data-step="1" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--accent-green); background: rgba(34, 197, 94, 0.2); color: var(--accent-green); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">1. 環境</button>
-                    <button class="tut-step-btn" data-step="2" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">2. State</button>
-                    <button class="tut-step-btn" data-step="3" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">3. Node</button>
-                    <button class="tut-step-btn" data-step="4" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">4. 分岐</button>
-                    <button class="tut-step-btn" data-step="5" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">5. 組立</button>
-                    <button class="tut-step-btn" data-step="6" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">6. 実行</button>
+                    <button class="tut-step-btn active" data-step="1" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 2px solid var(--accent-green); background: rgba(85, 197, 0, 0.1); color: var(--accent-green); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">1. 環境</button>
+                    <button class="tut-step-btn" data-step="2" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">2. State</button>
+                    <button class="tut-step-btn" data-step="3" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">3. Node</button>
+                    <button class="tut-step-btn" data-step="4" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">4. 分岐</button>
+                    <button class="tut-step-btn" data-step="5" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">5. 組立</button>
+                    <button class="tut-step-btn" data-step="6" style="flex: 1; min-width: 80px; padding: 0.5rem; border: 1px solid var(--border-color); background: transparent; color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-size: 0.75rem; transition: all 0.3s;">6. 実行</button>
                 </div>
-                <div style="margin-top: 1rem; padding: 1rem; background: rgba(0,0,0,0.2); border-radius: 8px;">
+                <div style="margin-top: 1rem; padding: 1rem; background: #f8f9fa; border-radius: 8px; border: 1px solid var(--border-color);">
                     <div style="display: flex; align-items: center; gap: 1rem;">
                         <span style="font-size: 2rem;" id="tutorialIcon">📁</span>
                         <div>
@@ -1904,8 +1893,8 @@ result = structured_llm.invoke(<span class="st">"今日の会議では予算と�
                         <text x="730" y="165" text-anchor="middle" fill="#ec4899" font-size="10">END</text>
 
                         <!-- 補足説明 -->
-                        <text x="400" y="240" text-anchor="middle" fill="#86efac" font-size="10">💡 長い会議（2000文字以上）→ 詳細モード（議題・アクション抽出）</text>
-                        <text x="400" y="260" text-anchor="middle" fill="#86efac" font-size="10">💡 短い会議 → 簡易モード（要約のみで整形へ直行）</text>
+                        <text x="400" y="240" text-anchor="middle" fill="#333333" font-size="10">💡 長い会議（2000文字以上）→ 詳細モード（議題・アクション抽出）</text>
+                        <text x="400" y="260" text-anchor="middle" fill="#333333" font-size="10">💡 短い会議 → 簡易モード（要約のみで整形へ直行）</text>
                     </svg>
                 </div>
             </div>
@@ -1926,12 +1915,12 @@ result = structured_llm.invoke(<span class="st">"今日の会議では予算と�
                 </p>
 
                 <!-- Google Colab推奨 -->
-                <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid #f97316; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
+                <div style="background: #fff8f5; border: 1px solid #f97316; border-radius: 8px; padding: 1.25rem; margin: 1rem 0;">
                     <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
                         <span style="font-size: 2rem;">📓</span>
                         <div>
                             <div style="color: #fb923c; font-weight: 700; font-size: 1.1rem;">Google Colab で実行します</div>
-                            <div style="color: #9ca3af; font-size: 0.9rem;">環境構築不要！ブラウザだけで始められます</div>
+                            <div style="color: #666666; font-size: 0.9rem;">環境構築不要！ブラウザだけで始められます</div>
                         </div>
                     </div>
                     <a href="https://colab.research.google.com/" target="_blank" style="display: inline-block; background: #f97316; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
@@ -1965,7 +1954,7 @@ result = structured_llm.invoke(<span class="st">"今日の会議では予算と�
                                 <span style="background: #22c55e; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">推奨</span>
                                 <span style="color: #22c55e; font-weight: 700;">方式A: Gemini API（簡単！）</span>
                             </div>
-                            <div style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem;">
+                            <div style="color: #666666; font-size: 0.9rem; margin-bottom: 1rem;">
                                 <strong>メリット:</strong> GCPプロジェクト不要、APIキーを取得するだけ<br>
                                 <strong>取得方法:</strong> <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #22c55e;">Google AI Studio</a> で無料発行（1分で完了）
                             </div>
@@ -1998,7 +1987,7 @@ llm = ChatGoogleGenerativeAI(model=<span class="st">"gemini-1.5-flash"</span>)
                                 <span style="background: #3b82f6; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">本番向け</span>
                                 <span style="color: #60a5fa; font-weight: 700;">方式B: Vertex AI（GCPプロジェクト）</span>
                             </div>
-                            <div style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem;">
+                            <div style="color: #666666; font-size: 0.9rem; margin-bottom: 1rem;">
                                 <strong>メリット:</strong> Cloud Runデプロイ時にコード変更不要、GCPの他サービスと連携しやすい<br>
                                 <strong>必要なもの:</strong> GCPプロジェクト + Vertex AI APIの有効化
                             </div>
@@ -2041,16 +2030,16 @@ llm = ChatVertexAI(
                 </div>
 
                 <!-- Colabでの進め方 -->
-                <div class="highlight-box" style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border-left-color: var(--accent-purple); margin-top: 2rem;">
+                <div class="highlight-box" style="background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%); border-left-color: var(--accent-purple); margin-top: 2rem;">
                     <div class="highlight-title" style="color: var(--accent-purple);">📓 Colabでの進め方</div>
                     <p style="margin: 0;">このチュートリアルは<strong>1つのノートブック内でセルを分けて</strong>進めます。<br>
                     Step 2〜6のコードを順番にセルに貼り付けて実行するだけでOK！</p>
                 </div>
 
-                <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; margin: 1rem 0;">
+                <div style="background: #f0f2f5; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.25rem; margin: 1rem 0;">
                     <div style="color: var(--accent-cyan); font-weight: 700; margin-bottom: 0.75rem;">📋 これから作るセル構成</div>
                     <div style="display: grid; gap: 0.5rem; font-size: 0.9rem;">
-                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #9ca3af;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; color: #666666;">
                             <span style="background: #22c55e; color: white; padding: 0.2rem 0.5rem; border-radius: 4px; font-size: 0.75rem;">完了</span>
                             <span>セル1-2: 環境準備 & LLM設定</span>
                         </div>
@@ -2191,7 +2180,7 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
                     </table>
                 </div>
 
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
+                <div class="highlight-box" style="background: #f8f9fa; border-left-color: var(--accent-cyan);">
                     <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 AIエンジニア視点</div>
                     <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
                         <li><strong>State設計は最初にしっかり考える！</strong> 後から追加は簡単だが、削除は既存Nodeに影響</li>
@@ -2201,7 +2190,7 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
                 </div>
 
                 <!-- TypedDict vs BaseModel -->
-                <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid var(--accent-purple); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
+                <div style="background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%); border: 2px solid var(--accent-purple); border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
                     <div style="color: var(--accent-purple); font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">📚 State定義の2つの方法：TypedDict vs BaseModel</div>
 
                     <p style="color: var(--text-secondary); margin-bottom: 1rem;">
@@ -2229,7 +2218,7 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1rem;">
                         <!-- TypedDict版 -->
-                        <div style="background: #0f1419; border-radius: 8px; padding: 1rem; border: 2px solid var(--accent-green);">
+                        <div style="background: #f0f2f5; border-radius: 8px; padding: 1rem; border: 2px solid var(--accent-green);">
                             <div style="color: var(--accent-green); font-weight: 600; margin-bottom: 0.5rem;">TypedDict版（シンプル）</div>
                             <pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; overflow-x: auto;"><span class="kw">from</span> typing <span class="kw">import</span> TypedDict
 
@@ -2240,7 +2229,7 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
                         </div>
 
                         <!-- BaseModel版 -->
-                        <div style="background: #0f1419; border-radius: 8px; padding: 1rem; border: 2px solid var(--accent-purple);">
+                        <div style="background: #f0f2f5; border-radius: 8px; padding: 1rem; border: 2px solid var(--accent-purple);">
                             <div style="color: var(--accent-purple); font-weight: 600; margin-bottom: 0.5rem;">BaseModel版（Pydantic）</div>
                             <pre style="font-size: 0.75rem; color: var(--text-secondary); margin: 0; overflow-x: auto;"><span class="kw">from</span> pydantic <span class="kw">import</span> BaseModel, Field
 
@@ -2260,7 +2249,7 @@ TypedDictを使うと、IDEの補完が効いて開発が楽になります。
                         </div>
                     </div>
 
-                    <div style="background: #0f1419; border-radius: 8px; padding: 1rem; margin-top: 1rem; border-left: 3px solid var(--accent-orange);">
+                    <div style="background: #f0f2f5; border-radius: 8px; padding: 1rem; margin-top: 1rem; border-left: 3px solid var(--accent-orange);">
                         <div style="color: var(--accent-orange); font-weight: 600; margin-bottom: 0.5rem;">💡 どちらを選ぶ？</div>
                         <ul style="margin: 0 0 0 1rem; color: var(--text-secondary); font-size: 0.9rem;">
                             <li><strong>学習・プロトタイプ</strong> → TypedDict（シンプルで始めやすい）</li>
@@ -2570,20 +2559,20 @@ Stateの値を見て「次にどのNodeに進むか」を返します。
                             </marker>
                         </defs>
                         <!-- check_length -->
-                        <rect x="30" y="50" width="100" height="50" rx="8" fill="#1a2634" stroke="#667eea" stroke-width="2"/>
-                        <text x="80" y="80" text-anchor="middle" fill="#86efac" font-size="11">check_length</text>
+                        <rect x="30" y="50" width="100" height="50" rx="8" fill="#f8f9fa" stroke="#667eea" stroke-width="2"/>
+                        <text x="80" y="80" text-anchor="middle" fill="#333333" font-size="11">check_length</text>
                         <!-- Diamond -->
                         <polygon points="200,75 230,45 260,75 230,105" fill="#8b5cf6" fill-opacity="0.3" stroke="#8b5cf6" stroke-width="2"/>
                         <text x="230" y="78" text-anchor="middle" fill="#8b5cf6" font-size="10">is_long?</text>
                         <!-- Arrows from check to diamond -->
                         <line x1="130" y1="75" x2="195" y2="75" stroke="#667eea" stroke-width="2" marker-end="url(#routeArr)"/>
                         <!-- detailed path -->
-                        <rect x="320" y="20" width="100" height="40" rx="8" fill="#1a2634" stroke="#22c55e" stroke-width="2"/>
+                        <rect x="320" y="20" width="100" height="40" rx="8" fill="#f8f9fa" stroke="#22c55e" stroke-width="2"/>
                         <text x="370" y="45" text-anchor="middle" fill="#22c55e" font-size="10">extract_topics</text>
                         <line x1="260" y1="65" x2="315" y2="40" stroke="#22c55e" stroke-width="2" marker-end="url(#routeArr)"/>
                         <text x="280" y="40" fill="#22c55e" font-size="9">True</text>
                         <!-- simple path -->
-                        <rect x="320" y="90" width="100" height="40" rx="8" fill="#1a2634" stroke="#f97316" stroke-width="2"/>
+                        <rect x="320" y="90" width="100" height="40" rx="8" fill="#f8f9fa" stroke="#f97316" stroke-width="2"/>
                         <text x="370" y="115" text-anchor="middle" fill="#f97316" font-size="10">format_doc</text>
                         <line x1="260" y1="85" x2="315" y2="110" stroke="#f97316" stroke-width="2" marker-end="url(#routeArr)"/>
                         <text x="280" y="115" fill="#f97316" font-size="9">False</text>
@@ -2694,7 +2683,7 @@ Stateの値を見て「次にどのNodeに進むか」を返します。
                     </div>
                 </div>
 
-                <div class="highlight-box" style="background: #1a2634; border-left-color: var(--accent-cyan);">
+                <div class="highlight-box" style="background: #f8f9fa; border-left-color: var(--accent-cyan);">
                     <div class="highlight-title" style="color: var(--accent-cyan);">🧑‍💻 AIエンジニア視点</div>
                     <ul style="margin: 0.5rem 0 0 1rem; color: var(--text-secondary);">
                         <li><strong>add_nodeは順番不問</strong>: 登録順は関係なく、エッジで接続順が決まる</li>
@@ -2834,16 +2823,16 @@ QAテストは来週月曜から3日間で150件実施予定。
 
                         <!-- Step 1: 環境準備 -->
                         <g id="sidebar-step1" class="sidebar-step" data-step="1">
-                            <rect x="80" y="10" width="120" height="35" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
-                            <text x="140" y="32" text-anchor="middle" fill="#86efac" font-size="11">📁 環境準備</text>
+                            <rect x="80" y="10" width="120" height="35" rx="8" fill="#f8f9fa" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="32" text-anchor="middle" fill="#333333" font-size="11">📁 環境準備</text>
                         </g>
 
                         <line x1="140" y1="45" x2="140" y2="60" stroke="#667eea" stroke-width="2" marker-end="url(#sidebarArr)"/>
 
                         <!-- Step 2: MeetingState -->
                         <g id="sidebar-step2" class="sidebar-step" data-step="2">
-                            <rect x="65" y="65" width="150" height="50" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
-                            <text x="140" y="85" text-anchor="middle" fill="#86efac" font-size="11">📦 MeetingState</text>
+                            <rect x="65" y="65" width="150" height="50" rx="8" fill="#f8f9fa" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="85" text-anchor="middle" fill="#333333" font-size="11">📦 MeetingState</text>
                             <text x="140" y="102" text-anchor="middle" fill="#4ade80" font-size="8">(raw_text, summary, ...)</text>
                         </g>
 
@@ -2897,8 +2886,8 @@ QAテストは来週月曜から3日間で150件実施予定。
 
                         <!-- Step 4: 条件分岐 -->
                         <g id="sidebar-step4" class="sidebar-step" data-step="4">
-                            <text x="140" y="445" text-anchor="middle" fill="#86efac" font-size="10">🔀 条件分岐</text>
-                            <polygon points="140,455 180,490 140,525 100,490" fill="#1a2634" stroke="#8b5cf6" stroke-width="2"/>
+                            <text x="140" y="445" text-anchor="middle" fill="#333333" font-size="10">🔀 条件分岐</text>
+                            <polygon points="140,455 180,490 140,525 100,490" fill="#f8f9fa" stroke="#8b5cf6" stroke-width="2"/>
                             <text x="140" y="488" text-anchor="middle" fill="#8b5cf6" font-size="10">is_long?</text>
                             <text x="140" y="503" text-anchor="middle" fill="#8b5cf6" font-size="8">True/False</text>
                         </g>
@@ -2907,8 +2896,8 @@ QAテストは来週月曜から3日間で150件実施予定。
 
                         <!-- Step 5: グラフ組立 -->
                         <g id="sidebar-step5" class="sidebar-step" data-step="5">
-                            <rect x="50" y="550" width="180" height="50" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
-                            <text x="140" y="570" text-anchor="middle" fill="#86efac" font-size="10">🔧 グラフ組み立て</text>
+                            <rect x="50" y="550" width="180" height="50" rx="8" fill="#f8f9fa" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="570" text-anchor="middle" fill="#333333" font-size="10">🔧 グラフ組み立て</text>
                             <text x="140" y="588" text-anchor="middle" fill="#4ade80" font-size="9">add_node → add_edge → compile()</text>
                         </g>
 
@@ -2916,8 +2905,8 @@ QAテストは来週月曜から3日間で150件実施予定。
 
                         <!-- Step 6: 実行 -->
                         <g id="sidebar-step6" class="sidebar-step" data-step="6">
-                            <rect x="70" y="625" width="140" height="40" rx="8" fill="#1a2634" stroke="#22543d" stroke-width="2"/>
-                            <text x="140" y="650" text-anchor="middle" fill="#86efac" font-size="11">▶ graph.invoke()</text>
+                            <rect x="70" y="625" width="140" height="40" rx="8" fill="#f8f9fa" stroke="#22543d" stroke-width="2"/>
+                            <text x="140" y="650" text-anchor="middle" fill="#333333" font-size="11">▶ graph.invoke()</text>
                         </g>
                     </svg>
                     <div class="current-step-label" id="sidebarStepLabel">Step 1: 環境準備</div>
@@ -3023,27 +3012,27 @@ QAテストは来週月曜から3日間で150件実施予定。
                     <p>専門用語が出てくるので、先に「たとえ話」で理解しておきましょう。</p>
 
                     <div style="display: grid; gap: 1rem; margin: 1rem 0;">
-                        <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #3b82f6;">
                             <p style="margin: 0; color: #60a5fa; font-weight: 700;">🌐 CORS = 「誰からの電話を受けるか」</p>
-                            <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                            <p style="margin: 0.5rem 0 0 0; color: #666666; font-size: 0.9rem;">
                                 会社の電話に誰でも出られたら困る → 「この番号からだけ受ける」と設定する
                             </p>
                         </div>
-                        <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #22c55e;">
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #22c55e;">
                             <p style="margin: 0; color: #22c55e; font-weight: 700;">🔑 APIキー = 「合言葉」</p>
-                            <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                            <p style="margin: 0.5rem 0 0 0; color: #666666; font-size: 0.9rem;">
                                 合言葉を知っている人だけが入れる → お客さんごとに別の合言葉を発行
                             </p>
                         </div>
-                        <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #f97316;">
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #f97316;">
                             <p style="margin: 0; color: #fb923c; font-weight: 700;">📝 JWT = 「本人確認の会員証」</p>
-                            <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                            <p style="margin: 0.5rem 0 0 0; color: #666666; font-size: 0.9rem;">
                                 会員証に名前が書いてある → サーバーが「この人は誰か」を確認できる
                             </p>
                         </div>
-                        <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #8b5cf6;">
+                        <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #8b5cf6;">
                             <p style="margin: 0; color: #a78bfa; font-weight: 700;">✒️ 署名 = 「偽造できない実印」</p>
-                            <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                            <p style="margin: 0.5rem 0 0 0; color: #666666; font-size: 0.9rem;">
                                 会員証に実印を押す → 偽の会員証を作っても実印がないのでバレる
                             </p>
                         </div>
@@ -3103,14 +3092,14 @@ QAテストは来週月曜から3日間で150件実施予定。
                                 <div style="background: #3b82f6; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">1</div>
                                 <div>
                                     <div style="color: #60a5fa; font-weight: 600;">ユーザーがボタンを押す</div>
-                                    <div style="color: #9ca3af; font-size: 0.85rem;">HTMLの「要約する」ボタンをクリック</div>
+                                    <div style="color: #666666; font-size: 0.85rem;">HTMLの「要約する」ボタンをクリック</div>
                                 </div>
                             </div>
                             <div style="display: flex; align-items: flex-start; gap: 1rem;">
                                 <div style="background: #3b82f6; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">2</div>
                                 <div>
                                     <div style="color: #60a5fa; font-weight: 600;">HTMLがブラウザに頼む</div>
-                                    <div style="color: #9ca3af; font-size: 0.85rem;">「Cloud Run APIにこのデータを送ってきて」</div>
+                                    <div style="color: #666666; font-size: 0.85rem;">「Cloud Run APIにこのデータを送ってきて」</div>
                                 </div>
                             </div>
                             <!-- Step 3-4: CORS確認 -->
@@ -3119,7 +3108,7 @@ QAテストは来週月曜から3日間で150件実施予定。
                                     <div style="background: #f97316; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">3</div>
                                     <div>
                                         <div style="color: #fb923c; font-weight: 600;">⚡ 事前確認（OPTIONSリクエスト）</div>
-                                        <div style="color: #9ca3af; font-size: 0.85rem;">ブラウザ→API「POSTメソッドでデータ送っていい？Content-Typeラベル付けていい？」</div>
+                                        <div style="color: #666666; font-size: 0.85rem;">ブラウザ→API「POSTメソッドでデータ送っていい？Content-Typeラベル付けていい？」</div>
                                         <div style="color: #fbbf24; font-size: 0.8rem; margin-top: 0.25rem;">※まだデータは送っていない！許可を求めてるだけ</div>
                                     </div>
                                 </div>
@@ -3127,7 +3116,7 @@ QAテストは来週月曜から3日間で150件実施予定。
                                     <div style="background: #f97316; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">4</div>
                                     <div>
                                         <div style="color: #fb923c; font-weight: 600;">✅ 許可を返す（CORSヘッダー）</div>
-                                        <div style="color: #9ca3af; font-size: 0.85rem;">API→ブラウザ「いいよ！Allow-Origin: * で許可するね」</div>
+                                        <div style="color: #666666; font-size: 0.85rem;">API→ブラウザ「いいよ！Allow-Origin: * で許可するね」</div>
                                     </div>
                                 </div>
                             </div>
@@ -3136,14 +3125,14 @@ QAテストは来週月曜から3日間で150件実施予定。
                                 <div style="background: #22c55e; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">5</div>
                                 <div>
                                     <div style="color: #22c55e; font-weight: 600;">📤 本番データを送る（POSTリクエスト）</div>
-                                    <div style="color: #9ca3af; font-size: 0.85rem;">ブラウザ→API「許可もらえた！会議テキストを送るよ」</div>
+                                    <div style="color: #666666; font-size: 0.85rem;">ブラウザ→API「許可もらえた！会議テキストを送るよ」</div>
                                 </div>
                             </div>
                             <div style="display: flex; align-items: flex-start; gap: 1rem;">
                                 <div style="background: #22c55e; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">6</div>
                                 <div>
                                     <div style="color: #22c55e; font-weight: 600;">⚙️ LangGraphを実行</div>
-                                    <div style="color: #9ca3af; font-size: 0.85rem;">Cloud Run APIが議事録要約AIを動かす</div>
+                                    <div style="color: #666666; font-size: 0.85rem;">Cloud Run APIが議事録要約AIを動かす</div>
                                 </div>
                             </div>
                             <!-- Step 7-8: レスポンス -->
@@ -3151,14 +3140,14 @@ QAテストは来週月曜から3日間で150件実施予定。
                                 <div style="background: #8b5cf6; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">7</div>
                                 <div>
                                     <div style="color: #a78bfa; font-weight: 600;">📥 結果を返す</div>
-                                    <div style="color: #9ca3af; font-size: 0.85rem;">API→ブラウザ「処理結果だよ」+ Allow-Originヘッダー</div>
+                                    <div style="color: #666666; font-size: 0.85rem;">API→ブラウザ「処理結果だよ」+ Allow-Originヘッダー</div>
                                 </div>
                             </div>
                             <div style="display: flex; align-items: flex-start; gap: 1rem;">
                                 <div style="background: #8b5cf6; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">8</div>
                                 <div>
                                     <div style="color: #a78bfa; font-weight: 600;">🎉 画面に表示</div>
-                                    <div style="color: #9ca3af; font-size: 0.85rem;">ブラウザがHTMLに結果を渡す → 画面に表示！</div>
+                                    <div style="color: #666666; font-size: 0.85rem;">ブラウザがHTMLに結果を渡す → 画面に表示！</div>
                                 </div>
                             </div>
                         </div>
@@ -3200,9 +3189,9 @@ QAテストは来週月曜から3日間で150件実施予定。
 
                     <!-- Content-Type説明 -->
                     <h4 style="color: var(--accent-green); margin: 1.5rem 0 1rem;">📦 Content-Typeとは？</h4>
-                    <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #06b6d4;">
+                    <div style="background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #06b6d4;">
                         <p style="margin: 0; color: #22d3ee; font-weight: 700;">「送るデータの形式が何か」をサーバーに教えるラベル</p>
-                        <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                        <p style="margin: 0.5rem 0 0 0; color: #666666; font-size: 0.9rem;">
                             宅配便の「割れ物注意」「冷蔵」ラベルのようなもの
                         </p>
                         <div style="display: grid; gap: 0.25rem; margin-top: 0.75rem; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">
@@ -3291,13 +3280,13 @@ google-cloud-aiplatform>=1.38.0   <span class="cm"># Vertex AI</span></pre>
                     </div>
 
                     <!-- 2種類のAPIキーの違い -->
-                    <div style="background: #1a2634; padding: 1.25rem; border-radius: 12px; border: 2px solid #f97316; margin-bottom: 1.5rem;">
+                    <div style="background: #f8f9fa; padding: 1.25rem; border-radius: 12px; border: 2px solid #f97316; margin-bottom: 1.5rem;">
                         <p style="margin: 0 0 1rem; color: #fb923c; font-weight: 700; font-size: 1rem;">⚠️ 2種類の「APIキー」を混同しないで！</p>
                         <div style="display: grid; gap: 1rem;">
                             <!-- Gemini APIキー -->
                             <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; border-left: 3px solid #3b82f6;">
                                 <div style="color: #60a5fa; font-weight: 600; margin-bottom: 0.5rem;">🤖 Gemini APIキー（LLM用）</div>
-                                <div style="color: #9ca3af; font-size: 0.85rem;">
+                                <div style="color: #666666; font-size: 0.85rem;">
                                     <strong>用途:</strong> GoogleのLLM（Gemini）を呼び出すためのキー<br>
                                     <strong>発行元:</strong> Google AI Studio または Vertex AI<br>
                                     <strong>誰が使う:</strong> あなたのサーバー（Cloud Run）がGoogleに対して使う<br>
@@ -3307,7 +3296,7 @@ google-cloud-aiplatform>=1.38.0   <span class="cm"># Vertex AI</span></pre>
                             <!-- あなたのAPIキー -->
                             <div style="background: rgba(249, 115, 22, 0.1); padding: 1rem; border-radius: 8px; border-left: 3px solid #f97316;">
                                 <div style="color: #fb923c; font-weight: 600; margin-bottom: 0.5rem;">🔑 あなたのAPIキー（アクセス制限用）</div>
-                                <div style="color: #9ca3af; font-size: 0.85rem;">
+                                <div style="color: #666666; font-size: 0.85rem;">
                                     <strong>用途:</strong> あなたのAPIを使う人を制限する「合言葉」<br>
                                     <strong>発行元:</strong> あなた自身が自由に決める<br>
                                     <strong>誰が使う:</strong> ユーザー（HTMLサイト）があなたのAPIに対して使う<br>
@@ -3381,24 +3370,24 @@ CORS_ORIGINS = [o.strip() <span class="kw">for</span> o <span class="kw">in</spa
                     <p style="margin: 0; color: #fb923c; font-weight: 700;">⚠️ Cloud Consoleでの設定例</p>
                     <table style="width: 100%; margin-top: 0.5rem; border-collapse: collapse; font-size: 0.85rem;">
                         <tr style="background: rgba(0,0,0,0.2);">
-                            <th style="padding: 8px; text-align: left; border: 1px solid #374151;">環境変数名</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #374151;">設定例</th>
-                            <th style="padding: 8px; text-align: left; border: 1px solid #374151;">説明</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #e0e0e0;">環境変数名</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #e0e0e0;">設定例</th>
+                            <th style="padding: 8px; text-align: left; border: 1px solid #e0e0e0;">説明</th>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;"><code>PROJECT_ID</code></td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">my-gcp-project</td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #6b7280;">GCPプロジェクトID</td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #666666;"><code>PROJECT_ID</code></td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #666666;">my-gcp-project</td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #6b7280;">GCPプロジェクトID</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;"><code>API_KEYS</code></td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">key-abc123,key-xyz789</td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #6b7280;">許可する合言葉（カンマ区切り）</td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #666666;"><code>API_KEYS</code></td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #666666;">key-abc123,key-xyz789</td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #6b7280;">許可する合言葉（カンマ区切り）</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;"><code>CORS_ORIGINS</code></td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #9ca3af;">*（開発）/ https://myapp.web.app（本番）</td>
-                            <td style="padding: 8px; border: 1px solid #374151; color: #6b7280;">許可する呼び出し元</td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #666666;"><code>CORS_ORIGINS</code></td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #666666;">*（開発）/ https://myapp.web.app（本番）</td>
+                            <td style="padding: 8px; border: 1px solid #e0e0e0; color: #6b7280;">許可する呼び出し元</td>
                         </tr>
                     </table>
                 </div>
@@ -3410,7 +3399,7 @@ CORS_ORIGINS = [o.strip() <span class="kw">for</span> o <span class="kw">in</spa
                             実践チュートリアル（タブ6）で作成した<strong>3つのファイルはそのまま使用</strong>します。<br>
                             コピーして同じフォルダに配置してください。
                         </p>
-                        <ul style="margin: 0.5rem 0 0 1rem; color: #9ca3af; font-size: 0.9rem;">
+                        <ul style="margin: 0.5rem 0 0 1rem; color: #666666; font-size: 0.9rem;">
                             <li><code>state.py</code> - MeetingStateの定義</li>
                             <li><code>nodes.py</code> - summarize_node, extract_topics_node など</li>
                             <li><code>routing.py</code> - route_by_length</li>
@@ -3530,7 +3519,7 @@ graph = create_graph()
 
                 <div style="background: rgba(34, 197, 94, 0.1); border-left: 4px solid #22c55e; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                     <p style="margin: 0 0 0.5rem; color: #22c55e; font-weight: 600;">✅ ポイント（実践セクションと連動）</p>
-                    <ul style="margin: 0 0 0 1rem; color: #9ca3af; font-size: 0.9rem;">
+                    <ul style="margin: 0 0 0 1rem; color: #666666; font-size: 0.9rem;">
                         <li><strong>実践で作ったグラフをそのまま使用</strong>: graph.pyのcreate_graph()を呼び出し</li>
                         <li><strong>MeetingStateを使用</strong>: raw_textを入力、final_docを出力</li>
                         <li><strong>たとえ話コメント</strong>: CORS=電話、認証=合言葉</li>
@@ -3540,14 +3529,14 @@ graph = create_graph()
 
                 <!-- コールドスタート解説（新規追加） -->
                 <h4 style="color: var(--accent-cyan); margin: 1.5rem 0 1rem;">❄️ コールドスタートと遅延初期化</h4>
-                <div style="background: #1a2634; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: #f8f9fa; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <p style="color: var(--text-secondary); margin: 0 0 1rem 0;">
                         <code>graph = create_graph()</code> をファイルのトップレベルで書いているのはなぜ？
                     </p>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
                         <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
                             <div style="color: #60a5fa; font-weight: 600; margin-bottom: 0.5rem;">🚀 コールドスタート（初回起動）</div>
-                            <div style="color: #9ca3af; font-size: 0.85rem;">
+                            <div style="color: #666666; font-size: 0.85rem;">
                                 main.py 全体を読み込む<br>
                                 → <code>graph = create_graph()</code> が1回だけ実行<br>
                                 → 少し時間がかかる（数秒）
@@ -3555,7 +3544,7 @@ graph = create_graph()
                         </div>
                         <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
                             <div style="color: #22c55e; font-weight: 600; margin-bottom: 0.5rem;">⚡ ウォームスタート（2回目以降）</div>
-                            <div style="color: #9ca3af; font-size: 0.85rem;">
+                            <div style="color: #666666; font-size: 0.85rem;">
                                 graphは既に作成済み<br>
                                 → 関数だけ実行<br>
                                 → 高速！（数百ミリ秒）
@@ -3571,7 +3560,7 @@ graph = create_graph()
 
                 <!-- レスポンスの返し方解説（新規追加） -->
                 <h4 style="color: var(--accent-cyan); margin: 1.5rem 0 1rem;">📨 レスポンスの返し方を理解する</h4>
-                <div style="background: #1a2634; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                <div style="background: #f8f9fa; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
                     <p style="color: var(--text-secondary); margin: 0 0 1rem 0;">
                         Cloud Run APIからブラウザへの「手紙」の書き方です。
                     </p>
@@ -3582,7 +3571,7 @@ graph = create_graph()
                         <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #e6edf3; margin: 0.5rem 0;">
                             <code>return ("", 204, headers)</code>
                         </div>
-                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.8rem; color: #9ca3af; margin-top: 0.5rem;">
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.8rem; color: #666666; margin-top: 0.5rem;">
                             <code>""</code><span>本文は空っぽ（確認だけなので）</span>
                             <code>204</code><span>「OK、でも中身はないよ」</span>
                             <code>headers</code><span>許可証（CORSヘッダー）</span>
@@ -3595,7 +3584,7 @@ graph = create_graph()
                         <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #e6edf3; margin: 0.5rem 0;">
                             <code>return (jsonify({...}), 200, headers)</code>
                         </div>
-                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.8rem; color: #9ca3af; margin-top: 0.5rem;">
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.8rem; color: #666666; margin-top: 0.5rem;">
                             <code>jsonify({...})</code><span>本文（JSON形式の結果）</span>
                             <code>200</code><span>「OK、中身あるよ」</span>
                             <code>headers</code><span>許可証（これも必要！）</span>
@@ -3813,7 +3802,7 @@ graph = create_graph()
                     <div class="card-icon blue">📋</div>
                     <h3 class="card-title">デプロイ前チェックリスト</h3>
                 </div>
-                <div style="background: #0f1419; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
+                <div style="background: #f0f2f5; border: 1px solid var(--border-color); border-radius: 12px; padding: 1.5rem;">
                     <div style="display: grid; gap: 0.75rem;">
                         <label style="display: flex; align-items: center; gap: 0.75rem; color: var(--text-secondary); cursor: pointer;">
                             <input type="checkbox" style="width: 18px; height: 18px; accent-color: #22c55e;">
@@ -3855,39 +3844,39 @@ graph = create_graph()
                         <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
                             <thead>
                                 <tr style="background: rgba(34, 197, 94, 0.1);">
-                                    <th style="padding: 12px; text-align: left; border: 1px solid #374151;">方式</th>
-                                    <th style="padding: 12px; text-align: left; border: 1px solid #374151;">用途</th>
-                                    <th style="padding: 12px; text-align: left; border: 1px solid #374151;">実装難易度</th>
-                                    <th style="padding: 12px; text-align: left; border: 1px solid #374151;">セキュリティ</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #e0e0e0;">方式</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #e0e0e0;">用途</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #e0e0e0;">実装難易度</th>
+                                    <th style="padding: 12px; text-align: left; border: 1px solid #e0e0e0;">セキュリティ</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #22c55e; font-weight: 600;">APIキー認証</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">お客さんにAPI提供</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">⭐ 簡単</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">○ 十分</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #22c55e; font-weight: 600;">APIキー認証</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">お客さんにAPI提供</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">⭐ 簡単</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">○ 十分</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #3b82f6; font-weight: 600;">Firebase Auth</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">自社フロントエンド経由</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">⭐⭐ やや複雑</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">◎ 高い</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #3b82f6; font-weight: 600;">Firebase Auth</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">自社フロントエンド経由</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">⭐⭐ やや複雑</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">◎ 高い</td>
                                 </tr>
                                 <tr>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #8b5cf6; font-weight: 600;">IAM認証のみ</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">社内GCPユーザー限定</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">⭐ 簡単（コード不要）</td>
-                                    <td style="padding: 10px; border: 1px solid #374151; color: #9ca3af;">◎ 高い</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #8b5cf6; font-weight: 600;">IAM認証のみ</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">社内GCPユーザー限定</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">⭐ 簡単（コード不要）</td>
+                                    <td style="padding: 10px; border: 1px solid #e0e0e0; color: #666666;">◎ 高い</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <!-- フローチャート -->
-                    <div style="background: #1a2634; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
                         <p style="color: #22c55e; font-weight: 700; margin-bottom: 1rem;">🤔 どれを選ぶ？</p>
-                        <div style="font-family: monospace; font-size: 0.85rem; color: #9ca3af; line-height: 1.8;">
+                        <div style="font-family: monospace; font-size: 0.85rem; color: #666666; line-height: 1.8;">
                             <p style="margin: 0;">お客さんにAPIだけ提供する？</p>
                             <p style="margin: 0; padding-left: 1rem;">├─ Yes → <span style="color: #22c55e; font-weight: 600;">APIキー認証</span></p>
                             <p style="margin: 0; padding-left: 1rem;">└─ No → 自社でフロントエンドも作る？</p>
@@ -3911,9 +3900,9 @@ graph = create_graph()
                     <p>シンプルで導入しやすい方式。お客さんごとにAPIキーを発行し、リクエストに含めてもらいます。</p>
 
                     <!-- 仕組み図 -->
-                    <div style="background: #1a2634; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
                         <p style="color: #22c55e; font-weight: 700; margin-bottom: 1rem;">📊 仕組み</p>
-                        <div style="font-family: monospace; font-size: 0.85rem; color: #9ca3af; line-height: 1.6;">
+                        <div style="font-family: monospace; font-size: 0.85rem; color: #666666; line-height: 1.6;">
                             <p style="margin: 0;">[お客さんのシステム]</p>
                             <p style="margin: 0; padding-left: 1rem;">↓ リクエスト + APIキー</p>
                             <p style="margin: 0; padding-left: 1rem;">↓ X-API-Key: sk-abc123...</p>
@@ -4015,7 +4004,7 @@ response = requests.post(
 
                     <div style="background: rgba(249, 115, 22, 0.1); border-left: 4px solid #f97316; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <p style="margin: 0 0 0.5rem; color: #fb923c; font-weight: 600;">⚠️ APIキー管理の注意点</p>
-                        <ul style="margin: 0 0 0 1rem; color: #9ca3af; font-size: 0.9rem;">
+                        <ul style="margin: 0 0 0 1rem; color: #666666; font-size: 0.9rem;">
                             <li>本番では<strong>Secret Manager</strong>でキーを管理（環境変数に直接書かない）</li>
                             <li>お客さんごとに<strong>別のキー</strong>を発行（誰のリクエストか追跡可能に）</li>
                             <li>定期的に<strong>キーをローテーション</strong>する仕組みを検討</li>
@@ -4036,9 +4025,9 @@ response = requests.post(
                     <p>Googleログインなどを使い、<strong>署名付きJWT</strong>でユーザーを安全に認証します。</p>
 
                     <!-- 仕組み図 -->
-                    <div style="background: #1a2634; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
+                    <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 12px; margin: 1.5rem 0;">
                         <p style="color: #3b82f6; font-weight: 700; margin-bottom: 1rem;">📊 仕組み（署名検証あり）</p>
-                        <div style="font-family: monospace; font-size: 0.85rem; color: #9ca3af; line-height: 1.6;">
+                        <div style="font-family: monospace; font-size: 0.85rem; color: #666666; line-height: 1.6;">
                             <p style="margin: 0;">[ユーザー] → Googleでログイン</p>
                             <p style="margin: 0; padding-left: 1rem;">↓</p>
                             <p style="margin: 0;">[Firebase Auth] → JWT発行（<span style="color: #f97316;">秘密鍵で署名</span>）</p>
@@ -4181,7 +4170,7 @@ response = requests.post(
 
                     <div style="background: rgba(59, 130, 246, 0.1); border-left: 4px solid #3b82f6; padding: 1rem; border-radius: 8px; margin: 1rem 0;">
                         <p style="margin: 0 0 0.5rem; color: #60a5fa; font-weight: 600;">✅ Firebase Auth のメリット</p>
-                        <ul style="margin: 0 0 0 1rem; color: #9ca3af; font-size: 0.9rem;">
+                        <ul style="margin: 0 0 0 1rem; color: #666666; font-size: 0.9rem;">
                             <li><strong>署名検証</strong>: 偽造されたJWTを確実に弾ける</li>
                             <li><strong>ユーザー管理</strong>: Firebase Console でユーザー一覧を確認可能</li>
                             <li><strong>多様なログイン</strong>: Google, Microsoft, メール/パスワード等に対応</li>
@@ -4232,7 +4221,7 @@ response = requests.post(
 
                 <div style="display: grid; gap: 1rem; margin-top: 1rem;">
                     <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(34, 197, 94, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-green);">
-                        <div style="background: var(--accent-green); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
+                        <div style="background: var(--accent-green); color: #ffffff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">1</div>
                         <div>
                             <div style="font-weight: 600; margin-bottom: 0.25rem;">ゴールを明確にする</div>
                             <div style="color: var(--text-secondary); font-size: 0.9rem;">「何を入力して、何を出力したいか」を言語化</div>
@@ -4240,7 +4229,7 @@ response = requests.post(
                     </div>
 
                     <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(16, 185, 129, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-emerald);">
-                        <div style="background: var(--accent-emerald); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
+                        <div style="background: var(--accent-emerald); color: #ffffff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">2</div>
                         <div>
                             <div style="font-weight: 600; margin-bottom: 0.25rem;">処理を日本語で書き出す</div>
                             <div style="color: var(--text-secondary); font-size: 0.9rem;">コードではなく「やること」を箇条書きに</div>
@@ -4248,7 +4237,7 @@ response = requests.post(
                     </div>
 
                     <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-blue);">
-                        <div style="background: var(--accent-blue); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
+                        <div style="background: var(--accent-blue); color: #ffffff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">3</div>
                         <div>
                             <div style="font-weight: 600; margin-bottom: 0.25rem;">Nodeに分解する</div>
                             <div style="color: var(--text-secondary); font-size: 0.9rem;">「1つの処理 = 1つのNode」を意識して分割</div>
@@ -4256,7 +4245,7 @@ response = requests.post(
                     </div>
 
                     <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(139, 92, 246, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-purple);">
-                        <div style="background: var(--accent-purple); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
+                        <div style="background: var(--accent-purple); color: #ffffff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">4</div>
                         <div>
                             <div style="font-weight: 600; margin-bottom: 0.25rem;">Stateを設計する</div>
                             <div style="color: var(--text-secondary); font-size: 0.9rem;">Node間で受け渡すデータを洗い出す</div>
@@ -4264,7 +4253,7 @@ response = requests.post(
                     </div>
 
                     <div style="display: flex; align-items: flex-start; gap: 1rem; background: rgba(249, 115, 22, 0.1); padding: 1rem; border-radius: 8px; border-left: 4px solid var(--accent-orange);">
-                        <div style="background: var(--accent-orange); color: #0f1419; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">5</div>
+                        <div style="background: var(--accent-orange); color: #ffffff; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 700; flex-shrink: 0;">5</div>
                         <div>
                             <div style="font-weight: 600; margin-bottom: 0.25rem;">Edgeと分岐を決める</div>
                             <div style="color: var(--text-secondary); font-size: 0.9rem;">フローの順序と条件分岐を整理</div>
@@ -4285,7 +4274,7 @@ response = requests.post(
                 <div class="code-block" style="margin-top: 1.5rem;">
                     <div class="code-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <span>プロンプトテンプレート（コピーして使う）</span>
-                        <button onclick="copyPrompt()" style="background: var(--accent-green); color: #0f1419; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">📋 コピー</button>
+                        <button onclick="copyPrompt()" style="background: var(--accent-green); color: #ffffff; border: none; padding: 0.5rem 1rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.8rem;">📋 コピー</button>
                     </div>
                     <div class="code-body" style="background: #0d1117;">
                         <div class="code-content">
@@ -4460,7 +4449,7 @@ State、Node、Edgeの構成を提案してもらえると助かります。
                 </div>
 
                 <div style="display: grid; gap: 1rem; margin-top: 1rem;">
-                    <div style="background: #0f1419; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
+                    <div style="background: #f0f2f5; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
                         <p style="margin: 0 0 0.5rem; color: var(--accent-cyan); font-weight: 600;">「Nodeの分け方がわからない」</p>
                         <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
                             → <strong>動詞で考える</strong>。「要約する」「分類する」「検索する」など、<br>
@@ -4468,7 +4457,7 @@ State、Node、Edgeの構成を提案してもらえると助かります。
                         </p>
                     </div>
 
-                    <div style="background: #0f1419; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
+                    <div style="background: #f0f2f5; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
                         <p style="margin: 0 0 0.5rem; color: var(--accent-cyan); font-weight: 600;">「Stateに何を入れるべき？」</p>
                         <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
                             → <strong>後のNodeが必要とするもの</strong>をすべて入れる。<br>
@@ -4476,7 +4465,7 @@ State、Node、Edgeの構成を提案してもらえると助かります。
                         </p>
                     </div>
 
-                    <div style="background: #0f1419; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
+                    <div style="background: #f0f2f5; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
                         <p style="margin: 0 0 0.5rem; color: var(--accent-cyan); font-weight: 600;">「条件分岐が複雑になりそう」</p>
                         <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
                             → まず<strong>シンプルな直線フロー</strong>で動くものを作る。<br>
@@ -4484,7 +4473,7 @@ State、Node、Edgeの構成を提案してもらえると助かります。
                         </p>
                     </div>
 
-                    <div style="background: #0f1419; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
+                    <div style="background: #f0f2f5; padding: 1rem; border-radius: 8px; border-left: 3px solid var(--accent-cyan);">
                         <p style="margin: 0 0 0.5rem; color: var(--accent-cyan); font-weight: 600;">「LLMを使う箇所が多すぎる」</p>
                         <p style="margin: 0; color: var(--text-secondary); font-size: 0.9rem;">
                             → 本当にLLMが必要か確認。単純なルールベースで<br>
@@ -4506,7 +4495,7 @@ State、Node、Edgeの構成を提案してもらえると助かります。
                 <div style="margin-top: 1.5rem; display: grid; gap: 1.5rem;">
 
                     <!-- 問題1: 古いAPI -->
-                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
+                    <div style="background: #f0f2f5; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
                         <div style="background: rgba(249, 115, 22, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
                             <span style="color: var(--accent-orange); font-weight: 700;">🔴 古いAPI・非推奨の書き方</span>
                         </div>
@@ -4533,7 +4522,7 @@ State、Node、Edgeの構成を提案してもらえると助かります。
                     </div>
 
                     <!-- 問題2: 過剰なtry-except -->
-                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
+                    <div style="background: #f0f2f5; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
                         <div style="background: rgba(249, 115, 22, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
                             <span style="color: var(--accent-orange); font-weight: 700;">🔴 過剰なtry-except</span>
                         </div>
@@ -4564,7 +4553,7 @@ except Exception as e:
                     </div>
 
                     <!-- 問題3: 不要なクラス化 -->
-                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
+                    <div style="background: #f0f2f5; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
                         <div style="background: rgba(249, 115, 22, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
                             <span style="color: var(--accent-orange); font-weight: 700;">🔴 不要なクラス化・抽象化</span>
                         </div>
@@ -4596,7 +4585,7 @@ except Exception as e:
                     </div>
 
                     <!-- 問題4: 冗長なコメント -->
-                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
+                    <div style="background: #f0f2f5; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-orange);">
                         <div style="background: rgba(249, 115, 22, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
                             <span style="color: var(--accent-orange); font-weight: 700;">🔴 冗長なコメント・docstring</span>
                         </div>
@@ -4627,7 +4616,7 @@ results = results[-15:]</pre>
                     </div>
 
                     <!-- 問題5: LangGraph特有 -->
-                    <div style="background: #0f1419; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-purple);">
+                    <div style="background: #f0f2f5; border-radius: 12px; overflow: hidden; border: 2px solid var(--accent-purple);">
                         <div style="background: rgba(139, 92, 246, 0.2); padding: 0.75rem 1rem; border-bottom: 1px solid var(--border-color);">
                             <span style="color: var(--accent-purple); font-weight: 700;">🟣 LangGraph特有の注意点</span>
                         </div>
@@ -5093,7 +5082,7 @@ results = results[-15:]</pre>
                 if (tab.dataset.target === targetId) {
                     tab.style.background = 'linear-gradient(135deg, #22c55e, #10b981)';
                     tab.style.border = 'none';
-                    tab.style.color = '#0f1419';
+                    tab.style.color = '#ffffff';
                 } else {
                     tab.style.background = 'var(--bg-card)';
                     tab.style.border = '2px solid var(--border-color)';
