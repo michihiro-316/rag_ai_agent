@@ -1919,54 +1919,119 @@ result = structured_llm.invoke(<span class="st">"今日の会議では予算と�
                     </ul>
                 </div>
 
+                <!-- Google Colab推奨 -->
+                <div style="background: linear-gradient(135deg, #1a2634 0%, #0f1419 100%); border: 2px solid #f97316; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;">
+                    <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <span style="font-size: 2rem;">📓</span>
+                        <div>
+                            <div style="color: #fb923c; font-weight: 700; font-size: 1.1rem;">Google Colab で実行します</div>
+                            <div style="color: #9ca3af; font-size: 0.9rem;">環境構築不要！ブラウザだけで始められます</div>
+                        </div>
+                    </div>
+                    <a href="https://colab.research.google.com/" target="_blank" style="display: inline-block; background: #f97316; color: white; padding: 0.75rem 1.5rem; border-radius: 8px; text-decoration: none; font-weight: 600;">
+                        🚀 Google Colab を開く
+                    </a>
+                </div>
+
                 <div class="code-block">
-                    <div class="code-header">Terminal - プロジェクトのセットアップ</div>
+                    <div class="code-header">Python (Colab) - セル1: ライブラリインストール</div>
                     <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span></div>
+                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span></div>
                         <div class="code-content">
 <pre><span class="cm"># ============================================</span>
-<span class="cm"># 1. プロジェクトディレクトリを作成</span>
-<span class="cm">#    → 専用フォルダで依存関係を管理</span>
+<span class="cm"># 必要なライブラリをインストール</span>
+<span class="cm">#   langgraph: グラフ構築の本体</span>
+<span class="cm">#   どちらか1つを選んでください（両方入れてもOK）</span>
 <span class="cm"># ============================================</span>
-mkdir meeting_summarizer
-cd meeting_summarizer
-
-<span class="cm"># ============================================</span>
-<span class="cm"># 2. 必要なライブラリをインストール</span>
-<span class="cm">#    langgraph: グラフ構築の本体</span>
-<span class="cm">#    langchain-google-vertexai: Gemini APIへの接続</span>
-<span class="cm"># ============================================</span>
-pip install langgraph langchain-google-vertexai</pre>
+!pip install -q langgraph langchain-google-genai      <span class="cm"># ← Gemini API版</span>
+<span class="cm"># !pip install -q langgraph langchain-google-vertexai  # ← Vertex AI版</span></pre>
                         </div>
                     </div>
                 </div>
 
-                <div class="code-block">
-                    <div class="code-header">Terminal - Google Cloud認証</div>
-                    <div class="code-body">
-                        <div class="line-nums"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span><span>9</span><span>10</span><span>11</span></div>
-                        <div class="code-content">
+                <!-- LLM選択: 2つの方式 -->
+                <div style="margin: 1.5rem 0;">
+                    <p style="color: var(--text-primary); font-weight: 700; margin-bottom: 1rem;">🔧 LLMの設定（どちらか1つを選択）</p>
+                    <div style="display: grid; gap: 1rem;">
+                        <!-- 方式A: Gemini API -->
+                        <div style="background: linear-gradient(135deg, rgba(34, 197, 94, 0.1), rgba(34, 197, 94, 0.05)); border: 2px solid #22c55e; border-radius: 12px; padding: 1.25rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                <span style="background: #22c55e; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">推奨</span>
+                                <span style="color: #22c55e; font-weight: 700;">方式A: Gemini API（簡単！）</span>
+                            </div>
+                            <div style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem;">
+                                <strong>メリット:</strong> GCPプロジェクト不要、APIキーを取得するだけ<br>
+                                <strong>取得方法:</strong> <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color: #22c55e;">Google AI Studio</a> で無料発行（1分で完了）
+                            </div>
+                            <div class="code-block" style="margin: 0;">
+                                <div class="code-header">Python (Colab) - セル2A: Gemini API設定</div>
+                                <div class="code-body">
+                                    <div class="code-content">
 <pre><span class="cm"># ============================================</span>
-<span class="cm"># 3. Google Cloud認証</span>
-<span class="cm">#    なぜ必要？ → Vertex AI（Gemini）はGCPのサービスなので認証が必要</span>
-<span class="cm">#    事前準備: gcloud CLIをインストールしておく</span>
+<span class="cm"># 方式A: Gemini API（APIキーで認証）</span>
 <span class="cm"># ============================================</span>
+<span class="kw">from</span> google.colab <span class="kw">import</span> userdata
+<span class="kw">import</span> os
 
-<span class="cm"># ブラウザが開いてGoogleアカウントでログイン</span>
-gcloud auth application-default login
+<span class="cm"># Colabのシークレットから取得（左サイドバーの🔑アイコン）</span>
+os.environ[<span class="st">"GOOGLE_API_KEY"</span>] = userdata.get(<span class="st">"GOOGLE_API_KEY"</span>)
 
-<span class="cm"># プロジェクトIDを設定（GCPコンソールで確認）</span>
-gcloud config set project YOUR_PROJECT_ID</pre>
+<span class="cm"># LLMを初期化</span>
+<span class="kw">from</span> langchain_google_genai <span class="kw">import</span> ChatGoogleGenerativeAI
+llm = ChatGoogleGenerativeAI(model=<span class="st">"gemini-1.5-flash"</span>)
+
+<span class="bi">print</span>(<span class="st">"✅ Gemini API 設定完了"</span>)</pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 方式B: Vertex AI -->
+                        <div style="background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(59, 130, 246, 0.05)); border: 2px solid #3b82f6; border-radius: 12px; padding: 1.25rem;">
+                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem;">
+                                <span style="background: #3b82f6; color: white; padding: 0.25rem 0.75rem; border-radius: 4px; font-size: 0.8rem; font-weight: 700;">本番向け</span>
+                                <span style="color: #60a5fa; font-weight: 700;">方式B: Vertex AI（GCPプロジェクト）</span>
+                            </div>
+                            <div style="color: #9ca3af; font-size: 0.9rem; margin-bottom: 1rem;">
+                                <strong>メリット:</strong> Cloud Runデプロイ時にコード変更不要、GCPの他サービスと連携しやすい<br>
+                                <strong>必要なもの:</strong> GCPプロジェクト + Vertex AI APIの有効化
+                            </div>
+                            <div class="code-block" style="margin: 0;">
+                                <div class="code-header">Python (Colab) - セル2B: Vertex AI設定</div>
+                                <div class="code-body">
+                                    <div class="code-content">
+<pre><span class="cm"># ============================================</span>
+<span class="cm"># 方式B: Vertex AI（GCP認証）</span>
+<span class="cm"># ============================================</span>
+<span class="kw">from</span> google.colab <span class="kw">import</span> auth
+auth.authenticate_user()
+
+<span class="cm"># ★★★ あなたのプロジェクトIDに書き換え ★★★</span>
+PROJECT_ID = <span class="st">"your-project-id"</span>
+LOCATION = <span class="st">"asia-northeast1"</span>
+
+<span class="cm"># LLMを初期化</span>
+<span class="kw">from</span> langchain_google_vertexai <span class="kw">import</span> ChatVertexAI
+llm = ChatVertexAI(
+    model=<span class="st">"gemini-1.5-flash"</span>,
+    project=PROJECT_ID,
+    location=LOCATION
+)
+
+<span class="bi">print</span>(<span class="st">f"✅ Vertex AI 設定完了: {PROJECT_ID}"</span>)</pre>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="highlight-box warning">
-                    <div class="highlight-title">⚠️ Vertex AI APIの有効化（初回のみ）</div>
-                    <p>1. <a href="https://console.cloud.google.com/" target="_blank" style="color: var(--accent-cyan);">Google Cloud Console</a>にアクセス<br>
-                    2. 「APIとサービス」→「ライブラリ」で「Vertex AI API」を検索<br>
-                    3. 「有効にする」をクリック<br>
-                    <strong>※ 無料枠あり</strong>: Gemini 1.5 Flashは月100万トークンまで無料</p>
+                <div class="highlight-box success">
+                    <div class="highlight-title">✅ どちらを選んでも、この後のコードは同じ！</div>
+                    <p style="margin: 0;">
+                        どちらの方式でも <code>llm</code> 変数にLLMが入るので、<strong>Step 2以降のコードはそのまま動きます</strong>。<br>
+                        迷ったら<strong>方式A（Gemini API）</strong>がおすすめ。1分で始められます。
+                    </p>
                 </div>
 
                 <!-- ファイル構成ガイド -->
