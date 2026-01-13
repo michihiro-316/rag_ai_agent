@@ -174,5 +174,3 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
-        with:
-          timeout: 1200000  # 20分に延長（デフォルト10分）
