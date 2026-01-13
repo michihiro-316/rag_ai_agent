@@ -3738,6 +3738,41 @@ google-cloud-aiplatform>=1.38.0   <span class="cm"># Vertex AI</span></pre>
                             → <strong>コードを変えずに</strong>Cloud Consoleで設定変更できる
                         </p>
                     </div>
+
+                    <!-- 2種類のAPIキーの違い -->
+                    <div style="background: #1a2634; padding: 1.25rem; border-radius: 12px; border: 2px solid #f97316; margin-bottom: 1.5rem;">
+                        <p style="margin: 0 0 1rem; color: #fb923c; font-weight: 700; font-size: 1rem;">⚠️ 2種類の「APIキー」を混同しないで！</p>
+                        <div style="display: grid; gap: 1rem;">
+                            <!-- Gemini APIキー -->
+                            <div style="background: rgba(59, 130, 246, 0.1); padding: 1rem; border-radius: 8px; border-left: 3px solid #3b82f6;">
+                                <div style="color: #60a5fa; font-weight: 600; margin-bottom: 0.5rem;">🤖 Gemini APIキー（LLM用）</div>
+                                <div style="color: #9ca3af; font-size: 0.85rem;">
+                                    <strong>用途:</strong> GoogleのLLM（Gemini）を呼び出すためのキー<br>
+                                    <strong>発行元:</strong> Google AI Studio または Vertex AI<br>
+                                    <strong>誰が使う:</strong> あなたのサーバー（Cloud Run）がGoogleに対して使う<br>
+                                    <strong>今回の設定:</strong> Vertex AIを使うため不要（GCPの認証で代用）
+                                </div>
+                            </div>
+                            <!-- あなたのAPIキー -->
+                            <div style="background: rgba(249, 115, 22, 0.1); padding: 1rem; border-radius: 8px; border-left: 3px solid #f97316;">
+                                <div style="color: #fb923c; font-weight: 600; margin-bottom: 0.5rem;">🔑 あなたのAPIキー（アクセス制限用）</div>
+                                <div style="color: #9ca3af; font-size: 0.85rem;">
+                                    <strong>用途:</strong> あなたのAPIを使う人を制限する「合言葉」<br>
+                                    <strong>発行元:</strong> あなた自身が自由に決める<br>
+                                    <strong>誰が使う:</strong> ユーザー（HTMLサイト）があなたのAPIに対して使う<br>
+                                    <strong>今回の設定:</strong> <code>API_KEYS</code> 環境変数で設定
+                                </div>
+                            </div>
+                        </div>
+                        <!-- 図解 -->
+                        <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 8px; margin-top: 1rem; font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; color: #e6edf3; overflow-x: auto;">
+<pre style="margin: 0;">┌──────────────┐   X-API-Key: "abc123"    ┌──────────────┐   GCP認証（自動）   ┌──────────────┐
+│  HTMLサイト   │ ──────────────────────→ │  Cloud Run   │ ─────────────────→ │   Gemini     │
+│  (ユーザー)   │   あなたのAPIキー        │   (あなた)   │   Vertex AI認証    │   (Google)   │
+└──────────────┘                          └──────────────┘                     └──────────────┘</pre>
+                        </div>
+                    </div>
+
                 <div class="code-block">
                     <div class="code-header">config.py - APIキー認証 + 環境変数管理</div>
                     <div class="code-body">
