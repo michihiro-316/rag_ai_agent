@@ -809,70 +809,84 @@ result = chain.invoke({<span class="st">"question"</span>: <span class="st">"今
                 <p><strong>→ これらを解決するのがLangGraphです！</strong></p>
             </div>
 
-            <!-- グラフ理論の図解 -->
+            <!-- LangGraphの3要素 -->
             <div class="card">
                 <div class="card-header">
                     <div class="card-icon green">🎯</div>
-                    <h3 class="card-title">グラフ理論の基本：頂点と辺</h3>
+                    <h3 class="card-title">LangGraphの3要素：State・Node・Edge</h3>
                 </div>
                 <div class="diagram-container">
-                    <div class="diagram-title">LangGraphはグラフ構造でワークフローを定義する</div>
-                    <svg class="svg-diagram" viewBox="0 0 800 320">
+                    <div class="diagram-title">Stateを持ち運びながらNodeを順番に実行する</div>
+                    <svg class="svg-diagram" viewBox="0 0 800 350">
                         <defs>
                             <marker id="arr1" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
                                 <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6"/>
                             </marker>
                         </defs>
-                        <!-- 左側：グラフ構造 -->
-                        <text x="180" y="30" text-anchor="middle" fill="#667eea" font-size="16" font-weight="700">グラフ構造の基本</text>
-                        <circle cx="100" cy="120" r="40" fill="#667eea" fill-opacity="0.2" stroke="#667eea" stroke-width="3"/>
-                        <text x="100" y="115" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
-                        <text x="100" y="130" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
-                        <circle cx="260" cy="120" r="40" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="3"/>
-                        <text x="260" y="115" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
-                        <text x="260" y="130" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
-                        <circle cx="180" cy="240" r="40" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899" stroke-width="3"/>
-                        <text x="180" y="235" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">頂点</text>
-                        <text x="180" y="250" text-anchor="middle" fill="#f0fdf4" font-size="12" font-weight="600">(Node)</text>
-                        <!-- 辺 -->
-                        <line x1="140" y1="120" x2="215" y2="120" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
-                        <line x1="115" y1="155" x2="150" y2="205" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
-                        <line x1="245" y1="155" x2="210" y2="205" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
-                        <text x="180" y="105" text-anchor="middle" fill="#8b5cf6" font-size="11" font-weight="600">辺(Edge)</text>
-                        <!-- 右側：対応表 -->
-                        <line x1="380" y1="50" x2="380" y2="280" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="5,5"/>
-                        <text x="590" y="30" text-anchor="middle" fill="#667eea" font-size="16" font-weight="700">LangGraphでの対応</text>
-                        <rect x="430" y="60" width="320" height="65" rx="10" fill="white" stroke="#667eea" stroke-width="2"/>
-                        <circle cx="470" cy="92" r="20" fill="#667eea" fill-opacity="0.2" stroke="#667eea" stroke-width="2"/>
-                        <text x="510" y="85" fill="#667eea" font-size="14" font-weight="700">Node（頂点）</text>
-                        <text x="510" y="105" fill="#4b5563" font-size="12">= 処理の単位（関数）</text>
-                        <rect x="430" y="140" width="320" height="65" rx="10" fill="white" stroke="#8b5cf6" stroke-width="2"/>
-                        <line x1="450" y1="172" x2="490" y2="172" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
-                        <text x="510" y="165" fill="#8b5cf6" font-size="14" font-weight="700">Edge（辺）</text>
-                        <text x="510" y="185" fill="#4b5563" font-size="12">= 頂点間の接続（矢印）</text>
-                        <rect x="430" y="220" width="320" height="65" rx="10" fill="white" stroke="#10b981" stroke-width="2"/>
-                        <rect x="455" y="245" width="30" height="25" rx="4" fill="#10b981" fill-opacity="0.2" stroke="#10b981" stroke-width="2"/>
-                        <text x="470" y="262" text-anchor="middle" fill="#10b981" font-size="10">{ }</text>
-                        <text x="510" y="250" fill="#10b981" font-size="14" font-weight="700">State（状態）</text>
-                        <text x="510" y="270" fill="#4b5563" font-size="12">= 全頂点で共有するデータ</text>
+
+                        <!-- 左側：ワークフロー図 -->
+                        <text x="180" y="25" text-anchor="middle" fill="#667eea" font-size="16" font-weight="700">ワークフローの流れ</text>
+
+                        <!-- State（クリップボード）- 中央に大きく -->
+                        <rect x="110" y="50" width="140" height="80" rx="12" fill="#10b981" fill-opacity="0.15" stroke="#10b981" stroke-width="3"/>
+                        <text x="180" y="80" text-anchor="middle" fill="#10b981" font-size="14" font-weight="700">State（状態）</text>
+                        <text x="180" y="100" text-anchor="middle" fill="#86efac" font-size="11">データを持ち運ぶ箱</text>
+                        <text x="180" y="118" text-anchor="middle" fill="#86efac" font-size="10">{ message, result, ... }</text>
+
+                        <!-- Node A -->
+                        <circle cx="80" cy="220" r="40" fill="#667eea" fill-opacity="0.2" stroke="#667eea" stroke-width="3"/>
+                        <text x="80" y="215" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">Node A</text>
+                        <text x="80" y="232" text-anchor="middle" fill="#a5b4fc" font-size="9">要約する</text>
+
+                        <!-- Node B -->
+                        <circle cx="180" cy="300" r="40" fill="#f97316" fill-opacity="0.2" stroke="#f97316" stroke-width="3"/>
+                        <text x="180" y="295" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">Node B</text>
+                        <text x="180" y="312" text-anchor="middle" fill="#fdba74" font-size="9">分類する</text>
+
+                        <!-- Node C -->
+                        <circle cx="280" cy="220" r="40" fill="#ec4899" fill-opacity="0.2" stroke="#ec4899" stroke-width="3"/>
+                        <text x="280" y="215" text-anchor="middle" fill="#f0fdf4" font-size="11" font-weight="600">Node C</text>
+                        <text x="280" y="232" text-anchor="middle" fill="#f9a8d4" font-size="9">整形する</text>
+
+                        <!-- Edge（矢印）-->
+                        <line x1="115" y1="200" x2="150" y2="265" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
+                        <line x1="210" y1="270" x2="250" y2="240" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
+
+                        <!-- StateからNodeへの点線（Stateが全体を包んでいることを示す） -->
+                        <line x1="180" y1="130" x2="80" y2="175" stroke="#10b981" stroke-width="2" stroke-dasharray="4,4"/>
+                        <line x1="180" y1="130" x2="280" y2="175" stroke="#10b981" stroke-width="2" stroke-dasharray="4,4"/>
+
+                        <!-- Edgeラベル -->
+                        <text x="120" y="235" fill="#8b5cf6" font-size="10" font-weight="600">Edge</text>
+                        <text x="235" y="265" fill="#8b5cf6" font-size="10" font-weight="600">Edge</text>
+
+                        <!-- 右側：説明 -->
+                        <line x1="380" y1="50" x2="380" y2="320" stroke="#e5e7eb" stroke-width="2" stroke-dasharray="5,5"/>
+                        <text x="590" y="25" text-anchor="middle" fill="#667eea" font-size="16" font-weight="700">それぞれの役割</text>
+
+                        <!-- State説明 -->
+                        <rect x="420" y="50" width="340" height="70" rx="10" fill="#10b981" fill-opacity="0.1" stroke="#10b981" stroke-width="2"/>
+                        <rect x="440" y="70" width="35" height="30" rx="4" fill="#10b981" fill-opacity="0.3" stroke="#10b981" stroke-width="2"/>
+                        <text x="458" y="90" text-anchor="middle" fill="#10b981" font-size="12">{ }</text>
+                        <text x="495" y="80" fill="#10b981" font-size="14" font-weight="700">State（状態）</text>
+                        <text x="495" y="100" fill="#6b7280" font-size="12">= 全Nodeで共有するデータの箱</text>
+
+                        <!-- Node説明 -->
+                        <rect x="420" y="135" width="340" height="70" rx="10" fill="white" stroke="#667eea" stroke-width="2"/>
+                        <circle cx="458" cy="170" r="18" fill="#667eea" fill-opacity="0.2" stroke="#667eea" stroke-width="2"/>
+                        <text x="495" y="162" fill="#667eea" font-size="14" font-weight="700">Node（ノード）</text>
+                        <text x="495" y="182" fill="#6b7280" font-size="12">= 処理を行う関数（要約、分類など）</text>
+
+                        <!-- Edge説明 -->
+                        <rect x="420" y="220" width="340" height="70" rx="10" fill="white" stroke="#8b5cf6" stroke-width="2"/>
+                        <line x1="438" y1="255" x2="478" y2="255" stroke="#8b5cf6" stroke-width="3" marker-end="url(#arr1)"/>
+                        <text x="495" y="247" fill="#8b5cf6" font-size="14" font-weight="700">Edge（エッジ）</text>
+                        <text x="495" y="267" fill="#6b7280" font-size="12">= Node間の接続（次にどこへ行くか）</text>
+
+                        <!-- まとめ -->
+                        <rect x="420" y="305" width="340" height="35" rx="6" fill="#0f1419" stroke="#22c55e" stroke-width="1"/>
+                        <text x="590" y="327" text-anchor="middle" fill="#86efac" font-size="11">Stateを持って、Edgeに沿って、Nodeを順番に実行</text>
                     </svg>
-                </div>
-                <div class="grid-3" style="margin-top: 1.5rem;">
-                    <div class="concept-card">
-                        <div class="concept-icon">⚫</div>
-                        <div class="concept-title">Node（頂点）</div>
-                        <div class="concept-desc">処理の単位（関数）<br><span class="tag green">グラフの「点」</span></div>
-                    </div>
-                    <div class="concept-card">
-                        <div class="concept-icon">➡️</div>
-                        <div class="concept-title">Edge（辺）</div>
-                        <div class="concept-desc">頂点間の接続<br><span class="tag purple">グラフの「線」</span></div>
-                    </div>
-                    <div class="concept-card">
-                        <div class="concept-icon">📦</div>
-                        <div class="concept-title">State（状態）</div>
-                        <div class="concept-desc">共有データの入れ物<br><span class="tag emerald">頂点間で共有</span></div>
-                    </div>
                 </div>
             </div>
         </section>
