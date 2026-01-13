@@ -3499,8 +3499,175 @@ console.log(result.final_doc);  <span class="cm">// 整形された議事録</sp
                     </div>
 
                     <p style="color: var(--text-muted); font-size: 0.85rem; margin: 0;">
-                        ※ 詳しい仕組みは後で説明します。まずは「こういうものがある」と覚えてください。
+                        ※ 詳しい仕組みは下で説明します。まずは「こういうものがある」と覚えてください。
                     </p>
+                </div>
+            </div>
+
+            <!-- 通信フロー詳細解説（新規追加） -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon cyan">🔄</div>
+                    <h3 class="card-title">通信の流れを完全理解する</h3>
+                </div>
+                <div class="card-body">
+                    <p>HTMLからAPIを呼ぶとき、<strong>ブラウザが間に入ります</strong>。この流れを理解しましょう。</p>
+
+                    <!-- 登場人物 -->
+                    <h4 style="color: var(--accent-green); margin: 1.5rem 0 1rem;">👥 登場人物</h4>
+                    <div class="diagram-container" style="padding: 1.5rem;">
+                        <svg class="svg-diagram" viewBox="0 0 700 120">
+                            <!-- HTML -->
+                            <rect x="20" y="30" width="150" height="60" rx="12" fill="#667eea" fill-opacity="0.2" stroke="#667eea" stroke-width="2"/>
+                            <text x="95" y="55" text-anchor="middle" fill="#667eea" font-size="12" font-weight="700">HTML</text>
+                            <text x="95" y="72" text-anchor="middle" fill="#9ca3af" font-size="10">あなたのWebサイト</text>
+                            <!-- 矢印1 -->
+                            <line x1="175" y1="60" x2="235" y2="60" stroke="#22c55e" stroke-width="2" marker-end="url(#arr-deploy1)"/>
+                            <!-- ブラウザ -->
+                            <rect x="240" y="30" width="150" height="60" rx="12" fill="#22c55e" fill-opacity="0.2" stroke="#22c55e" stroke-width="2"/>
+                            <text x="315" y="50" text-anchor="middle" fill="#22c55e" font-size="12" font-weight="700">🌐 ブラウザ</text>
+                            <text x="315" y="67" text-anchor="middle" fill="#9ca3af" font-size="10">Chrome, Safari等</text>
+                            <text x="315" y="82" text-anchor="middle" fill="#fbbf24" font-size="9">★ここが重要！</text>
+                            <!-- 矢印2 -->
+                            <line x1="395" y1="60" x2="455" y2="60" stroke="#22c55e" stroke-width="2" marker-end="url(#arr-deploy1)"/>
+                            <!-- Cloud Run API -->
+                            <rect x="460" y="30" width="180" height="60" rx="12" fill="#06b6d4" fill-opacity="0.2" stroke="#06b6d4" stroke-width="2"/>
+                            <text x="550" y="55" text-anchor="middle" fill="#06b6d4" font-size="12" font-weight="700">☁️ Cloud Run API</text>
+                            <text x="550" y="72" text-anchor="middle" fill="#9ca3af" font-size="10">あなたのサーバー</text>
+                            <!-- 矢印定義 -->
+                            <defs>
+                                <marker id="arr-deploy1" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+                                    <polygon points="0 0, 10 3.5, 0 7" fill="#22c55e"/>
+                                </marker>
+                            </defs>
+                        </svg>
+                    </div>
+
+                    <!-- 8ステップフロー -->
+                    <h4 style="color: var(--accent-green); margin: 1.5rem 0 1rem;">📋 通信の8ステップ</h4>
+                    <div style="background: rgba(0,0,0,0.2); border-radius: 12px; padding: 1.5rem; margin: 1rem 0;">
+                        <div style="display: grid; gap: 0.75rem;">
+                            <!-- Step 1-2: ユーザー操作 -->
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div style="background: #3b82f6; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">1</div>
+                                <div>
+                                    <div style="color: #60a5fa; font-weight: 600;">ユーザーがボタンを押す</div>
+                                    <div style="color: #9ca3af; font-size: 0.85rem;">HTMLの「要約する」ボタンをクリック</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div style="background: #3b82f6; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">2</div>
+                                <div>
+                                    <div style="color: #60a5fa; font-weight: 600;">HTMLがブラウザに頼む</div>
+                                    <div style="color: #9ca3af; font-size: 0.85rem;">「Cloud Run APIにこのデータを送ってきて」</div>
+                                </div>
+                            </div>
+                            <!-- Step 3-4: CORS確認 -->
+                            <div style="border-left: 3px solid #f97316; padding-left: 1rem; margin-left: 0.7rem;">
+                                <div style="display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 0.75rem;">
+                                    <div style="background: #f97316; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">3</div>
+                                    <div>
+                                        <div style="color: #fb923c; font-weight: 600;">⚡ 事前確認（OPTIONSリクエスト）</div>
+                                        <div style="color: #9ca3af; font-size: 0.85rem;">ブラウザ→API「POSTメソッドでデータ送っていい？Content-Typeラベル付けていい？」</div>
+                                        <div style="color: #fbbf24; font-size: 0.8rem; margin-top: 0.25rem;">※まだデータは送っていない！許可を求めてるだけ</div>
+                                    </div>
+                                </div>
+                                <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                    <div style="background: #f97316; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">4</div>
+                                    <div>
+                                        <div style="color: #fb923c; font-weight: 600;">✅ 許可を返す（CORSヘッダー）</div>
+                                        <div style="color: #9ca3af; font-size: 0.85rem;">API→ブラウザ「いいよ！Allow-Origin: * で許可するね」</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Step 5-6: 本番リクエスト -->
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div style="background: #22c55e; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">5</div>
+                                <div>
+                                    <div style="color: #22c55e; font-weight: 600;">📤 本番データを送る（POSTリクエスト）</div>
+                                    <div style="color: #9ca3af; font-size: 0.85rem;">ブラウザ→API「許可もらえた！会議テキストを送るよ」</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div style="background: #22c55e; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">6</div>
+                                <div>
+                                    <div style="color: #22c55e; font-weight: 600;">⚙️ LangGraphを実行</div>
+                                    <div style="color: #9ca3af; font-size: 0.85rem;">Cloud Run APIが議事録要約AIを動かす</div>
+                                </div>
+                            </div>
+                            <!-- Step 7-8: レスポンス -->
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div style="background: #8b5cf6; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">7</div>
+                                <div>
+                                    <div style="color: #a78bfa; font-weight: 600;">📥 結果を返す</div>
+                                    <div style="color: #9ca3af; font-size: 0.85rem;">API→ブラウザ「処理結果だよ」+ Allow-Originヘッダー</div>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: flex-start; gap: 1rem;">
+                                <div style="background: #8b5cf6; color: white; border-radius: 50%; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: 700; flex-shrink: 0;">8</div>
+                                <div>
+                                    <div style="color: #a78bfa; font-weight: 600;">🎉 画面に表示</div>
+                                    <div style="color: #9ca3af; font-size: 0.85rem;">ブラウザがHTMLに結果を渡す → 画面に表示！</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CORSヘッダー詳細表 -->
+                    <h4 style="color: var(--accent-green); margin: 1.5rem 0 1rem;">📝 CORSヘッダーの意味</h4>
+                    <table style="font-size: 0.85rem;">
+                        <thead>
+                            <tr>
+                                <th>ヘッダー</th>
+                                <th>誰が誰に？</th>
+                                <th>意味</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>Access-Control-Allow-Origin</code></td>
+                                <td>API→ブラウザ</td>
+                                <td>このドメインからのアクセスを許可するよ</td>
+                            </tr>
+                            <tr>
+                                <td><code>Access-Control-Allow-Methods</code></td>
+                                <td>API→ブラウザ</td>
+                                <td>このHTTPメソッド（POST等）で送っていいよ</td>
+                            </tr>
+                            <tr>
+                                <td><code>Access-Control-Allow-Headers</code></td>
+                                <td>API→ブラウザ</td>
+                                <td>このラベル（Content-Type等）を付けていいよ</td>
+                            </tr>
+                            <tr>
+                                <td><code>Access-Control-Max-Age</code></td>
+                                <td>API→ブラウザ</td>
+                                <td>この許可を○秒間キャッシュして</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <!-- Content-Type説明 -->
+                    <h4 style="color: var(--accent-green); margin: 1.5rem 0 1rem;">📦 Content-Typeとは？</h4>
+                    <div style="background: #1a2634; padding: 1rem; border-radius: 8px; border-left: 4px solid #06b6d4;">
+                        <p style="margin: 0; color: #22d3ee; font-weight: 700;">「送るデータの形式が何か」をサーバーに教えるラベル</p>
+                        <p style="margin: 0.5rem 0 0 0; color: #9ca3af; font-size: 0.9rem;">
+                            宅配便の「割れ物注意」「冷蔵」ラベルのようなもの
+                        </p>
+                        <div style="display: grid; gap: 0.25rem; margin-top: 0.75rem; font-size: 0.85rem; font-family: 'JetBrains Mono', monospace;">
+                            <div><code style="color: #22d3ee;">application/json</code> → 「これはJSONデータです」</div>
+                            <div><code style="color: #22d3ee;">text/html</code> → 「これはHTMLです」</div>
+                            <div><code style="color: #22d3ee;">image/png</code> → 「これは画像です」</div>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box warning" style="margin-top: 1.5rem;">
+                        <div class="highlight-title">⚠️ 本番環境では * を変更すること！</div>
+                        <p style="font-size: 0.9rem; margin: 0;">
+                            <code>Access-Control-Allow-Origin: "*"</code> は「誰でもAPIを使える」設定です。<br>
+                            本番では <code>"https://your-app.web.app"</code> など特定ドメインのみに制限しましょう。
+                        </p>
+                    </div>
                 </div>
             </div>
 
@@ -3783,6 +3950,79 @@ graph = create_graph()
                         <li><strong>たとえ話コメント</strong>: CORS=電話、認証=合言葉</li>
                         <li><strong>APIキー認証</strong>: X-API-Keyヘッダーで認証</li>
                     </ul>
+                </div>
+
+                <!-- コールドスタート解説（新規追加） -->
+                <h4 style="color: var(--accent-cyan); margin: 1.5rem 0 1rem;">❄️ コールドスタートと遅延初期化</h4>
+                <div style="background: #1a2634; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <p style="color: var(--text-secondary); margin: 0 0 1rem 0;">
+                        <code>graph = create_graph()</code> をファイルのトップレベルで書いているのはなぜ？
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                            <div style="color: #60a5fa; font-weight: 600; margin-bottom: 0.5rem;">🚀 コールドスタート（初回起動）</div>
+                            <div style="color: #9ca3af; font-size: 0.85rem;">
+                                main.py 全体を読み込む<br>
+                                → <code>graph = create_graph()</code> が1回だけ実行<br>
+                                → 少し時間がかかる（数秒）
+                            </div>
+                        </div>
+                        <div style="background: rgba(0,0,0,0.2); padding: 1rem; border-radius: 8px;">
+                            <div style="color: #22c55e; font-weight: 600; margin-bottom: 0.5rem;">⚡ ウォームスタート（2回目以降）</div>
+                            <div style="color: #9ca3af; font-size: 0.85rem;">
+                                graphは既に作成済み<br>
+                                → 関数だけ実行<br>
+                                → 高速！（数百ミリ秒）
+                            </div>
+                        </div>
+                    </div>
+                    <div class="highlight-box success" style="margin: 1rem 0 0 0;">
+                        <p style="margin: 0; font-size: 0.9rem;">
+                            <strong>メリット:</strong> 重い処理（グラフ構築）を1回だけにして、2回目以降を高速化
+                        </p>
+                    </div>
+                </div>
+
+                <!-- レスポンスの返し方解説（新規追加） -->
+                <h4 style="color: var(--accent-cyan); margin: 1.5rem 0 1rem;">📨 レスポンスの返し方を理解する</h4>
+                <div style="background: #1a2634; padding: 1.25rem; border-radius: 12px; border: 1px solid var(--border-color);">
+                    <p style="color: var(--text-secondary); margin: 0 0 1rem 0;">
+                        Cloud Run APIからブラウザへの「手紙」の書き方です。
+                    </p>
+
+                    <!-- OPTIONSへの返事 -->
+                    <div style="background: rgba(249, 115, 22, 0.1); padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 3px solid #f97316;">
+                        <div style="color: #fb923c; font-weight: 600; margin-bottom: 0.5rem;">OPTIONSリクエストへの返事（許可証だけ）</div>
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #e6edf3; margin: 0.5rem 0;">
+                            <code>return ("", 204, headers)</code>
+                        </div>
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.8rem; color: #9ca3af; margin-top: 0.5rem;">
+                            <code>""</code><span>本文は空っぽ（確認だけなので）</span>
+                            <code>204</code><span>「OK、でも中身はないよ」</span>
+                            <code>headers</code><span>許可証（CORSヘッダー）</span>
+                        </div>
+                    </div>
+
+                    <!-- POSTへの返事 -->
+                    <div style="background: rgba(34, 197, 94, 0.1); padding: 1rem; border-radius: 8px; border-left: 3px solid #22c55e;">
+                        <div style="color: #22c55e; font-weight: 600; margin-bottom: 0.5rem;">POSTリクエストへの返事（結果 + 許可証）</div>
+                        <div style="font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: #e6edf3; margin: 0.5rem 0;">
+                            <code>return (jsonify({...}), 200, headers)</code>
+                        </div>
+                        <div style="display: grid; grid-template-columns: auto 1fr; gap: 0.5rem 1rem; font-size: 0.8rem; color: #9ca3af; margin-top: 0.5rem;">
+                            <code>jsonify({...})</code><span>本文（JSON形式の結果）</span>
+                            <code>200</code><span>「OK、中身あるよ」</span>
+                            <code>headers</code><span>許可証（これも必要！）</span>
+                        </div>
+                    </div>
+
+                    <div class="highlight-box warning" style="margin: 1rem 0 0 0;">
+                        <div class="highlight-title">⚠️ なぜPOSTの返事にもheadersが必要？</div>
+                        <p style="font-size: 0.85rem; margin: 0;">
+                            ブラウザは結果を受け取るときも「この結果をHTMLに渡していいか」をチェックします。<br>
+                            <strong>許可証なし → ブラウザがブロック → 画面に表示されない</strong>
+                        </p>
+                    </div>
                 </div>
             </div>
 
